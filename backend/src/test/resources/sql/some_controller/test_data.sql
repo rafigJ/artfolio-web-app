@@ -1,0 +1,16 @@
+INSERT INTO public._user (uuid, email, name, password, role, create_time, update_time)
+VALUES ('5197611e-eaca-4cca-aa30-be0faa483c26', 'new@gmail.com', 'Новый Пользователь',
+        '$2a$10$Gc.VvnnnoRTncOa7BNZnrua4BhKNunSchmX3OTkW6fLDHRGrzQcUC', 'USER', '2024-01-11 09:21:12.816763',
+        '2024-01-28 14:57:44.278494'),
+       ('43bdd767-69c7-4fbb-bb42-ab6e0bd88ed6', 'rafig@mail.ru', 'Rafig Dzhabbarov',
+        '$2a$10$.iZBML6K7NGlEORFtmgGc.Q.U12ybdtBSiFnBRbVCdWOw3xXXdite', 'USER', '2024-01-17 01:03:44.139114',
+        '2024-01-17 01:03:44.139114'),
+       ('e3afca3b-b6dd-4950-901e-a83bbe721480', 'test@gmail.com', 'Админ Тестовый',
+        '$2a$10$I8YQT1SspaIpgTNxMUZIrupvaZ5n5OHze6vhtlNhSzbl3y2Y1KYdO', 'ADMIN', '2023-12-31 03:06:08.409021',
+        '2024-01-10 16:26:36.590097'),
+       ('15c3b047-92f2-46f2-9f9f-01728cb87436', 'forest@yandex.ru', 'Форрест Гамп',
+        '$2a$10$h37VWWYBoDcFq8NJy25.Dej.rRLQg95nm46Hr/6poOqGGxJTIJwRW', 'USER', '2024-01-11 08:47:44.111656',
+        '2024-01-11 08:47:44.111656'),
+       ('13ff3fec-43b1-4b5d-ba6b-95385e6bb3fb', 'superuser@mail.ru', 'Иван Васильевич',
+        '$2a$10$4xvvdZYlSj5WO672pNy6XO5sUJGQeZowhzsnBsvOMewtCDGDqYPee', 'ADMIN', '2024-01-11 01:05:56.764012',
+        '2024-01-17 01:00:09.386759');
