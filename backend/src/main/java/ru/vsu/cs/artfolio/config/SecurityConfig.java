@@ -34,7 +34,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests((auth -> auth
                         .requestMatchers("/api/v1/auth/**").permitAll()
                         .requestMatchers(HttpMethod.OPTIONS).permitAll()
-                        .requestMatchers("/api/v1/**").authenticated()
+                        .requestMatchers("/api/v1/**").authenticated() // TODO поменять политику после завершения разработки
                         .anyRequest().hasAuthority(Role.ADMIN.name())
                 ))
                 .sessionManagement(s ->
