@@ -4,6 +4,8 @@ package ru.vsu.cs.artfolio.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Getter
 @Setter
@@ -17,7 +19,10 @@ public class PostEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String name;
-    private String type;
-    private String filePath;
+    @ManyToOne
+    @JoinColumn(name = "owner_id")
+    private UserEntity owner;
+
+    @Column(name = "create_time")
+    private LocalDateTime createTime;
 }

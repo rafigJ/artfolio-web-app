@@ -9,5 +9,5 @@ public interface PostService {
 
     void uploadImages(List<MultipartFile> images) throws IOException;
 
-    byte[] downloadImages(String fileName) throws IOException;
+    byte[] downloadImage(String fileName) throws IOException;
 }

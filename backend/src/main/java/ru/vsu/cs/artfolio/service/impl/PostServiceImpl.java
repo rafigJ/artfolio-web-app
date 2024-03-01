@@ -23,31 +23,5 @@ public class PostServiceImpl implements PostService {
 
     private final PostRepository postRepository;
 
-    @Value("${application.post.folder-path}")
-    private String FOLDER_PATH;
 
-    @Override
-    @Transactional
-    public void uploadImages(List<MultipartFile> images) throws IOException {
-        List<PostEntity> newPosts = new ArrayList<>();
-        for (MultipartFile file : images) {
-            Path filePath = Path.of(FOLDER_PATH, file.getOriginalFilename());
-            PostEntity newPost = PostEntity.builder()
-                    .name(file.getOriginalFilename())
-                    .type(file.getContentType())
-                    .filePath(filePath.toString())
-                    .build();
-            newPosts.add(newPost);
-            file.transferTo(new File(filePath.toString()));
-        }
-        postRepository.saveAllAndFlush(newPosts);
-    }
-
-    @Override
-    public byte[] downloadImages(String fileName) throws IOException {
-        PostEntity postData = postRepository.findByName(fileName)
-                .orElseThrow(() -> new NotFoundException("Image with " + fileName + " name not found"));
-        String imagePath = postData.getFilePath();
-        return Files.readAllBytes(Path.of(imagePath));
-    }
 }

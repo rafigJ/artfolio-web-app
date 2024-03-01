@@ -23,7 +23,7 @@ public class PostController {
     private final PostService service;
 
     @PostMapping
-    public ResponseEntity<String> uploadImage(@RequestParam("images") List<MultipartFile> listFiles) {
+    public ResponseEntity<String> uploadImages(@RequestParam("images") List<MultipartFile> listFiles) {
         listFiles.forEach(f -> LOGGER.info("upload file {}", f.getOriginalFilename()));
         try {
             service.uploadImages(listFiles);
@@ -42,7 +42,7 @@ public class PostController {
                     .contentType(MediaType.IMAGE_PNG)
                     .body(imageData);
         } catch (IOException e) {
-            throw new RestException("Server error", HttpStatus.BAD_GATEWAY);
+            throw new RestException("Server error " + e.getMessage(), HttpStatus.BAD_GATEWAY);
         }
     }
 }
