@@ -12,6 +12,7 @@ import ru.vsu.cs.artfolio.exception.RestException;
 import ru.vsu.cs.artfolio.service.PostService;
 
 import java.io.IOException;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/posts")
@@ -22,13 +23,13 @@ public class PostController {
     private final PostService service;
 
     @PostMapping
-    public ResponseEntity<String> uploadImage(@RequestParam("image") MultipartFile file) {
-        LOGGER.info("upload file {}", file.getOriginalFilename());
+    public ResponseEntity<String> uploadImage(@RequestParam("images") List<MultipartFile> listFiles) {
+        listFiles.forEach(f -> LOGGER.info("upload file {}", f.getOriginalFilename()));
         try {
-            String uploadImage = service.uploadImage(file);
-            return ResponseEntity.ok(uploadImage);
+            service.uploadImages(listFiles);
+            return ResponseEntity.ok("Загрузились");
         } catch (IOException e) {
-            throw new RestException("Server error", HttpStatus.BAD_GATEWAY);
+            throw new RestException("Server error " + e.getMessage(), HttpStatus.BAD_GATEWAY);
         }
     }
 
