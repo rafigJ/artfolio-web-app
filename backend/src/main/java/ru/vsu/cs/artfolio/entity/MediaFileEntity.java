@@ -23,8 +23,9 @@ public class MediaFileEntity {
     @Column(nullable = false)
     private String type;
 
-    @Column(name = "file_path", nullable = false)
-    private String filePath;
+    @Lob
+    @Column(name = "content", nullable = false)
+    private byte[] file;
 
     @Column(nullable = false)
     private Integer position;

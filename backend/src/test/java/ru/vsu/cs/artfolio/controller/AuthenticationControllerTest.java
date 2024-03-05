@@ -13,7 +13,7 @@ import ru.vsu.cs.artfolio.auth.JwtService;
 import ru.vsu.cs.artfolio.dto.auth.AuthRequestDto;
 import ru.vsu.cs.artfolio.dto.auth.AuthResponseDto;
 import ru.vsu.cs.artfolio.dto.auth.RegisterRequestDto;
-import ru.vsu.cs.artfolio.user.Role;
+import ru.vsu.cs.artfolio.auth.user.Role;
 
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;

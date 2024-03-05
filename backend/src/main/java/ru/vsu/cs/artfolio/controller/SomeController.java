@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ru.vsu.cs.artfolio.dto.auth.AuthResponseDto;
-import ru.vsu.cs.artfolio.user.User;
+import ru.vsu.cs.artfolio.auth.user.User;
 
 @RestController
 @RequestMapping("/api/v1/test")
