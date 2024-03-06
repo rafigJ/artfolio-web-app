@@ -1,5 +1,6 @@
 package ru.vsu.cs.artfolio.controller;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

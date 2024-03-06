@@ -8,6 +8,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,6 +21,7 @@ import ru.vsu.cs.artfolio.entity.PostEntity;
 import ru.vsu.cs.artfolio.entity.UserEntity;
 import ru.vsu.cs.artfolio.exception.RestException;
 import ru.vsu.cs.artfolio.repository.PostRepository;
+import ru.vsu.cs.artfolio.repository.UserRepository;
 import ru.vsu.cs.artfolio.service.MediaService;
 import ru.vsu.cs.artfolio.service.PostService;
 
@@ -33,6 +35,7 @@ public class PostServiceImpl implements PostService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PostServiceImpl.class);
     private final PostRepository postRepository;
+    private final UserRepository userRepository;
     private final MediaService mediaService;
     private final ModelMapper modelMapper;
 
@@ -42,8 +45,7 @@ public class PostServiceImpl implements PostService {
                                           PostRequestDto requestDto,
                                           List<MultipartFile> files) {
         LOGGER.info("Получение следующих данных {}, {}, {}", userId, requestDto, files);
-        UserEntity ownerEntity = UserEntity.builder()
-                .uuid(userId).build();
+        UserEntity ownerEntity = userRepository.getReferenceById(userId);
 
         PostEntity post = PostEntity.builder()
                 .name(requestDto.name())

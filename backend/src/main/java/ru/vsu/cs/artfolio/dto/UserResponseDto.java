@@ -15,5 +15,4 @@ public final class UserResponseDto {
     public UUID uuid;
     public String name;
     public String email;
-
 }
