@@ -1,6 +1,5 @@
 package ru.vsu.cs.artfolio.controller;
 
-import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,11 +12,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import ru.vsu.cs.artfolio.auth.user.User;
 import ru.vsu.cs.artfolio.dto.post.FullPostResponseDto;
 import ru.vsu.cs.artfolio.dto.post.PostRequestDto;
 import ru.vsu.cs.artfolio.exception.RestException;
 import ru.vsu.cs.artfolio.service.PostService;
-import ru.vsu.cs.artfolio.auth.user.User;
 
 import java.util.List;
 

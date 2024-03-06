@@ -9,7 +9,6 @@ import ru.vsu.cs.artfolio.dto.post.PostRequestDto;
 import ru.vsu.cs.artfolio.dto.post.PostResponseDto;
 import ru.vsu.cs.artfolio.entity.PostEntity;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 

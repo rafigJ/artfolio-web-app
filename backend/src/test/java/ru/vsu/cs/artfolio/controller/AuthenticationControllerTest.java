@@ -110,4 +110,19 @@ public class AuthenticationControllerTest {
                         content().json(objectMapper.writeValueAsString(responseDto))
                 );
     }
+
+    @Test
+    void login_NotRegisterUser_Returns404() throws Exception {
+        AuthRequestDto requestDto = new AuthRequestDto(INVALID_EMAIL, INVALID_PASSWORD);
+        AuthResponseDto responseDto = new AuthResponseDto(VALID_NAME, VALID_EMAIL, Role.USER.name(), "token");
+
+        when(authenticationService.authenticate(requestDto)).thenReturn(responseDto);
+
+        mockMvc.perform(post("/api/v1/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(requestDto)))
+                .andExpectAll(
+                        status().isNotFound()
+                );
+    }
 }

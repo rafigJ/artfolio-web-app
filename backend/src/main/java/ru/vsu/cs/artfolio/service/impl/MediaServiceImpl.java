@@ -6,20 +6,19 @@ import org.springframework.web.multipart.MultipartFile;
 import ru.vsu.cs.artfolio.entity.MediaFileEntity;
 import ru.vsu.cs.artfolio.entity.PostEntity;
 import ru.vsu.cs.artfolio.exception.NotFoundException;
-import ru.vsu.cs.artfolio.repository.MediaFileRepository;
+import ru.vsu.cs.artfolio.repository.MediaRepository;
 import ru.vsu.cs.artfolio.service.MediaService;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class MediaServiceImpl implements MediaService {
 
-    private final MediaFileRepository repository;
+    private final MediaRepository repository;
 
     @Override
     public List<Long> uploadMedia(Long postId, List<MultipartFile> mediaFiles) throws IOException {

@@ -3,8 +3,6 @@ package ru.vsu.cs.artfolio.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.Fetch;
-import org.springframework.data.repository.cdi.Eager;
 
 import java.time.LocalDateTime;
 

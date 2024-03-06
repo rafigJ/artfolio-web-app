@@ -8,6 +8,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import ru.vsu.cs.artfolio.auth.user.Role;
+import ru.vsu.cs.artfolio.auth.user.User;
 import ru.vsu.cs.artfolio.dto.auth.AuthRequestDto;
 import ru.vsu.cs.artfolio.dto.auth.AuthResponseDto;
 import ru.vsu.cs.artfolio.dto.auth.RegisterRequestDto;
@@ -17,11 +19,6 @@ import ru.vsu.cs.artfolio.exception.IncorrectCredentialsException;
 import ru.vsu.cs.artfolio.exception.NotExistUserException;
 import ru.vsu.cs.artfolio.exception.RestException;
 import ru.vsu.cs.artfolio.repository.UserRepository;
-import ru.vsu.cs.artfolio.auth.user.Role;
-import ru.vsu.cs.artfolio.auth.user.User;
-
-import java.time.LocalDateTime;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -32,8 +29,8 @@ public class AuthenticationService {
     private final AuthenticationManager authenticationManager;
 
     public AuthResponseDto register(RegisterRequestDto request) throws DataIntegrityViolationException {
-        Optional<UserEntity> optionalUser = repository.findByEmail(request.email());
-        if (optionalUser.isPresent()) {
+
+        if (repository.existsByEmail(request.email())) {
             throw new ExistUserException();
         }
 

@@ -4,7 +4,6 @@ import lombok.*;
 import ru.vsu.cs.artfolio.dto.UserResponseDto;
 
 import java.util.List;
-import java.util.Objects;
 
 @Builder
 @Setter
