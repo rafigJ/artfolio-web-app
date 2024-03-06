@@ -44,14 +44,17 @@ public class MediaServiceImpl implements MediaService {
     @Override
     public byte[] downloadMedia(Long mediaId) {
         MediaFileEntity dbImageData = repository.findById(mediaId)
-                .orElseThrow(() -> new NotFoundException("Media with id: " + mediaId + " not found"));
+                .orElseThrow(() -> new NotFoundException("Media by id: " + mediaId + " not found"));
 
         return dbImageData.getFile();
     }
 
     @Override
     public List<Long> getMediaIdsByPostId(Long postId) {
-        // TODO
-        return null;
+        List<MediaFileEntity> mediaList = repository.findAllByPostIdOrderByPosition(postId);
+        if (mediaList.isEmpty()) {
+            throw new NotFoundException("Post by id" + postId + " not found");
+        }
+        return mediaList.stream().map(MediaFileEntity::getId).toList();
     }
 }

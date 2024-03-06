@@ -18,6 +18,7 @@ import ru.vsu.cs.artfolio.dto.post.PostRequestDto;
 import ru.vsu.cs.artfolio.dto.post.PostResponseDto;
 import ru.vsu.cs.artfolio.entity.PostEntity;
 import ru.vsu.cs.artfolio.entity.UserEntity;
+import ru.vsu.cs.artfolio.exception.NotFoundException;
 import ru.vsu.cs.artfolio.exception.RestException;
 import ru.vsu.cs.artfolio.repository.PostRepository;
 import ru.vsu.cs.artfolio.repository.UserRepository;
@@ -75,8 +76,11 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public FullPostResponseDto getPostById(Long id) {
-        // TODO implement
-        return null;
+        PostEntity postEntity = postRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Post by id" + id + " not found"));
+        FullPostResponseDto mappedPost = modelMapper.map(postEntity, FullPostResponseDto.class);
+        mappedPost.setMediaIds(mediaService.getMediaIdsByPostId(id));
+        return mappedPost;
     }
 
     @Override

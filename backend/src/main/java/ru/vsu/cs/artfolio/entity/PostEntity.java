@@ -21,8 +21,10 @@ public class PostEntity {
 
     private String name;
 
+    private String description;
+
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "owner_id")
+    @JoinColumn(name = "owner_uuid")
     private UserEntity owner;
 
     @Column(name = "create_time")

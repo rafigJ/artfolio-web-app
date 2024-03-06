@@ -6,6 +6,7 @@ import ru.vsu.cs.artfolio.dto.UserResponseDto;
 import java.util.List;
 
 @Builder
+@Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
