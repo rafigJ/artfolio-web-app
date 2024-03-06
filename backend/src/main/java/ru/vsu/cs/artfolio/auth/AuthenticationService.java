@@ -20,6 +20,8 @@ import ru.vsu.cs.artfolio.exception.NotExistUserException;
 import ru.vsu.cs.artfolio.exception.RestException;
 import ru.vsu.cs.artfolio.repository.UserRepository;
 
+import java.time.LocalDateTime;
+
 @Service
 @RequiredArgsConstructor
 public class AuthenticationService {
