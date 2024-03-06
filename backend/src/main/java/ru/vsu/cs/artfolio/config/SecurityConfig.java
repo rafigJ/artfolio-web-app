@@ -15,7 +15,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import ru.vsu.cs.artfolio.auth.UserAuthenticationEntryPoint;
-import ru.vsu.cs.artfolio.user.Role;
+import ru.vsu.cs.artfolio.auth.user.Role;
 
 @Configuration
 @EnableWebSecurity
@@ -34,7 +34,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests((auth -> auth
                         .requestMatchers("/api/v1/auth/**").permitAll()
                         .requestMatchers(HttpMethod.OPTIONS).permitAll()
-                        .requestMatchers("/api/v1/**").authenticated()
+                        .requestMatchers("/api/v1/**").permitAll() // TODO поменять политику после завершения разработки
                         .anyRequest().hasAuthority(Role.ADMIN.name())
                 ))
                 .sessionManagement(s ->

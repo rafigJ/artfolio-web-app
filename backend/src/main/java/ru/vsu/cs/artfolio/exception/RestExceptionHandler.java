@@ -22,6 +22,13 @@ public class RestExceptionHandler {
                 .body(new RestExceptionDto(ex.getMessage()));
     }
 
+    @ExceptionHandler(value = {RuntimeException.class})
+    @ResponseBody
+    public ResponseEntity<RestExceptionDto> handler(RuntimeException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_GATEWAY)
+                .body(new RestExceptionDto(ex.getMessage()));
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseBody
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex) {

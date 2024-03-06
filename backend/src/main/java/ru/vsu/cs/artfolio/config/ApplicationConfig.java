@@ -13,7 +13,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import ru.vsu.cs.artfolio.repository.UserRepository;
 import ru.vsu.cs.artfolio.exception.NotExistUserException;
-import ru.vsu.cs.artfolio.user.User;
+import ru.vsu.cs.artfolio.auth.user.User;
 
 @Configuration
 @RequiredArgsConstructor

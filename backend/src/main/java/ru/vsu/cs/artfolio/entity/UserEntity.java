@@ -2,7 +2,7 @@ package ru.vsu.cs.artfolio.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import ru.vsu.cs.artfolio.user.Role;
+import ru.vsu.cs.artfolio.auth.user.Role;
 
 import java.time.LocalDateTime;
 import java.util.UUID;

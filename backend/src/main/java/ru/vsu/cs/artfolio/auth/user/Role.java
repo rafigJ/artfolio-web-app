@@ -1,4 +1,4 @@
-package ru.vsu.cs.artfolio.user;
+package ru.vsu.cs.artfolio.auth.user;
 
 public enum Role {
     USER,
