@@ -29,7 +29,7 @@ public class PostController {
     private final PostService service;
 
     @PostMapping
-    @PreAuthorize("isAuthenticated() and hasRole('ROLE_USER')")
+    @PreAuthorize("isAuthenticated() and hasAuthority('USER')")
     public ResponseEntity<FullPostResponseDto> createPost(
             @AuthenticationPrincipal User user,
             @RequestParam("name") String name,
