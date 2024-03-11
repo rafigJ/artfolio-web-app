@@ -3,10 +3,7 @@ package ru.vsu.cs.artfolio.controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import ru.vsu.cs.artfolio.auth.AuthenticationService;
 import ru.vsu.cs.artfolio.dto.auth.AuthRequestDto;
 import ru.vsu.cs.artfolio.dto.auth.AuthResponseDto;
@@ -31,7 +28,7 @@ public class AuthenticationController {
         return ResponseEntity.ok(service.authenticate(request));
     }
 
-    @PostMapping("/change-password")
+    @PatchMapping("/change-password")
     public ResponseEntity<?> changePassword(@Valid @RequestBody ChangePasswordRequestDto request) {
         service.changePassword(request);
         return ResponseEntity.ok().build();
