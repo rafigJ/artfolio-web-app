@@ -1,5 +1,5 @@
 # TP-5
-**Проект "Онлайн-платформа для создания и управления портфолио для художников, дизайнеров и фотографов."**
+**Проект "Онлайн-платформа для создания и управления портфолио для художников, дизайнеров и фотографов. Artfolio"**
 
 Выполняют студенты группы:
 - [Джаббаров Рафиг](https://github.com/rafigJ)
@@ -11,3 +11,5 @@
 [YouTrack](https://artfolio.youtrack.cloud/agiles/159-2/current)  
 
 [Miro](https://miro.com/app/board/uXjVNpdsweI=/?share_link_id=742657363195)  
+
+[Figma](https://www.figma.com/file/LuFdvnE8l1kkywsWD1nu5K/Artfolio?type=design&node-id=79-2319&mode=design&t=72VEuIMZaCgoNarr-0)
