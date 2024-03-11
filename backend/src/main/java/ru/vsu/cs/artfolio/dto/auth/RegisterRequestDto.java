@@ -20,6 +20,10 @@ public record RegisterRequestDto(
         @Size(min = 8, message = "Password should contain Minimum eight characters")
         @Pattern(regexp = "^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]{8,}$",
                 message = "Password must contain minimum eight characters: at least one letter and one number")
-        String password
+        String password,
+
+        @NotBlank(message = "should be not blank")
+        @Size(min = 5, message = "Secret word should contain Minimum eight characters")
+        String secretWord
 ) {}
 
