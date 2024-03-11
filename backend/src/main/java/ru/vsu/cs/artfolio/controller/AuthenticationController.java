@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import ru.vsu.cs.artfolio.auth.AuthenticationService;
 import ru.vsu.cs.artfolio.dto.auth.AuthRequestDto;
 import ru.vsu.cs.artfolio.dto.auth.AuthResponseDto;
+import ru.vsu.cs.artfolio.dto.auth.ChangePasswordRequestDto;
 import ru.vsu.cs.artfolio.dto.auth.RegisterRequestDto;
 
 @RestController
@@ -28,5 +29,11 @@ public class AuthenticationController {
     @PostMapping("/login")
     public ResponseEntity<AuthResponseDto> login(@Valid @RequestBody AuthRequestDto request) {
         return ResponseEntity.ok(service.authenticate(request));
+    }
+
+    @PostMapping("/change-password")
+    public ResponseEntity<?> changePassword(@Valid @RequestBody ChangePasswordRequestDto request) {
+        service.changePassword(request);
+        return ResponseEntity.ok().build();
     }
 }

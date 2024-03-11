@@ -12,6 +12,7 @@ import ru.vsu.cs.artfolio.auth.user.Role;
 import ru.vsu.cs.artfolio.auth.user.User;
 import ru.vsu.cs.artfolio.dto.auth.AuthRequestDto;
 import ru.vsu.cs.artfolio.dto.auth.AuthResponseDto;
+import ru.vsu.cs.artfolio.dto.auth.ChangePasswordRequestDto;
 import ru.vsu.cs.artfolio.dto.auth.RegisterRequestDto;
 import ru.vsu.cs.artfolio.entity.UserEntity;
 import ru.vsu.cs.artfolio.exception.ExistUserException;
@@ -67,6 +68,18 @@ public class AuthenticationService {
         return convertEntityToAuthResponse(userEntity, jwtToken);
     }
 
+    public void changePassword(ChangePasswordRequestDto requestDto) {
+        UserEntity user = repository.findByEmail(requestDto.email())
+                .orElseThrow(IncorrectCredentialsException::new);
+
+        if (!passwordEncoder.matches(requestDto.secretWord(), user.getSecretWord())) {
+            throw new IncorrectCredentialsException();
+        }
+
+        user.setPassword(passwordEncoder.encode(requestDto.newPassword()));
+        repository.save(user);
+    }
+
     private static AuthResponseDto convertEntityToAuthResponse(UserEntity userEntity, String token) {
         return AuthResponseDto.builder()
                 .name(userEntity.getName())
@@ -81,6 +94,7 @@ public class AuthenticationService {
                 .name(request.name())
                 .email(request.email())
                 .password(passwordEncoder.encode(request.password()))
+                .secretWord(passwordEncoder.encode(request.secretWord()))
                 .role(Role.USER)
                 .createTime(LocalDateTime.now())
                 .updateTime(LocalDateTime.now())

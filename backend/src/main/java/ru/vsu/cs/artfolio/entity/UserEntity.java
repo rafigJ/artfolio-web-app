@@ -30,6 +30,9 @@ public class UserEntity {
     @Column(nullable = false, name = "password")
     private String password;
 
+    @Column(nullable = false)
+    private String secretWord;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, name = "role")
     private Role role;
