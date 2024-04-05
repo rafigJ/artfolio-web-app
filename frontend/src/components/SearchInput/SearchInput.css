@@ -2,10 +2,11 @@
 	margin: auto;
 	display: flex;
 	justify-content: center;
-	align-items: center
+	align-items: center;
+	width: 100%;
 }
 
 .header__search-input {
-	min-width: 700px;
-
+	max-width: 700px;
+	width: 100%;
 }

@@ -1,18 +1,13 @@
 import './styles/App.css'
 import React from 'react'
-import StandardLayout from './components/StandardLayout/StandardLayout'
+import { BrowserRouter } from 'react-router-dom'
+import AppRouter from './routing/AppRouter'
 
 const App: React.FC = () => {
 	return (
-		<StandardLayout>
-			<div
-				style={{
-					padding: 24
-				}}
-			>
-				Contentsadas
-			</div>
-		</StandardLayout>
+		<BrowserRouter>
+			<AppRouter />
+		</BrowserRouter>
 	)
 }
 

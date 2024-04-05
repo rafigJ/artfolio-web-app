@@ -1,11 +1,10 @@
-import { LoginOutlined } from '@ant-design/icons'
-import { Button, Layout, Typography } from 'antd'
+import { Layout } from 'antd'
 import React, { type FC, type PropsWithChildren } from 'react'
 import Footer from '../Footer/Footer'
-import SearchInput from '../SearchInput/SearchInput'
+import Header from '../Header/Header'
 
-const { Header, Content } = Layout
 
+const { Content } = Layout
 
 interface LayoutProps extends PropsWithChildren {
 
@@ -14,14 +13,15 @@ interface LayoutProps extends PropsWithChildren {
 const StandardLayout: FC<LayoutProps> = ({ children }) => {
 	return (
 		<Layout style={{ minHeight: '100vh' }}>
-			<Header
-				style={{ display: 'flex', alignItems: 'center', backgroundColor: 'white' }}>
-				<Typography.Title className='artfolio-logo'>Artfolio</Typography.Title>
-				<SearchInput />
-				<Button icon={<LoginOutlined />} size='large'>Войти</Button>
-			</Header>
+			<Header />
 			<Content style={{ padding: '0 48px' }}>
-				{children}
+				<div
+					style={{
+						padding: 24
+					}}
+				>
+					{children}
+				</div>
 			</Content>
 			<Footer />
 		</Layout>
