@@ -1,0 +1,11 @@
+.header__search-wrapper {
+	margin: auto;
+	display: flex;
+	justify-content: center;
+	align-items: center
+}
+
+.header__search-input {
+	min-width: 700px;
+
+}

@@ -1,11 +1,19 @@
-import './styles/App.css';
+import './styles/App.css'
+import React from 'react'
+import StandardLayout from './components/StandardLayout/StandardLayout'
 
-function App() {
-  return (
-    <div className="App">
-      Hello World
-    </div>
-  );
+const App: React.FC = () => {
+	return (
+		<StandardLayout>
+			<div
+				style={{
+					padding: 24
+				}}
+			>
+				Contentsadas
+			</div>
+		</StandardLayout>
+	)
 }
 
-export default App;
+export default App
