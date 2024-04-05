@@ -1,4 +1,5 @@
-import { Layout, Typography } from 'antd'
+import { LoginOutlined } from '@ant-design/icons'
+import { Button, Layout, Typography } from 'antd'
 import React, { type FC, type PropsWithChildren } from 'react'
 import Footer from '../Footer/Footer'
 import SearchInput from '../SearchInput/SearchInput'
@@ -16,7 +17,8 @@ const StandardLayout: FC<LayoutProps> = ({ children }) => {
 			<Header
 				style={{ display: 'flex', alignItems: 'center', backgroundColor: 'white' }}>
 				<Typography.Title className='artfolio-logo'>Artfolio</Typography.Title>
-				<SearchInput/>
+				<SearchInput />
+				<Button icon={<LoginOutlined />} size='large'>Войти</Button>
 			</Header>
 			<Content style={{ padding: '0 48px' }}>
 				{children}
