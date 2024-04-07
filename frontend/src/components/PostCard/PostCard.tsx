@@ -1,8 +1,7 @@
-import { HeartFilled } from '@ant-design/icons'
 import { Avatar, Card, Typography } from 'antd'
 import React, { type FC } from 'react'
-import { useNavigate } from 'react-router-dom'
 import type { Product } from '../../types/MockTypes/Product'
+import { HeartFilled } from '@ant-design/icons'
 
 const { Meta } = Card
 
@@ -11,19 +10,16 @@ interface PostCardProps {
 }
 
 const PostCard: FC<PostCardProps> = ({ product }) => {
-	const navigate = useNavigate()
-	
 	return (
 		<Card
 			hoverable
-			style={{ maxWidth: 406 }}
+			style={{ maxWidth: 406}}
 			cover={
 				<img
 					style={{ maxWidth: 406, maxHeight: 204, objectFit: 'cover' }}
 					alt={product.title}
 					src={product.url} />
 			}
-			onClick={() => navigate(`/posts/${product.id}`)}
 		>
 			<Meta
 				title={product.title}
