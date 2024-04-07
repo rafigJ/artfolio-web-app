@@ -1,12 +1,16 @@
 import { InboxOutlined } from '@ant-design/icons'
 import { DndContext, type DragEndEvent, PointerSensor, useSensor } from '@dnd-kit/core'
-import { arrayMove, SortableContext, rectSortingStrategy } from '@dnd-kit/sortable'
+import { arrayMove, rectSortingStrategy, SortableContext } from '@dnd-kit/sortable'
 import { message, Upload, type UploadFile, type UploadProps } from 'antd'
-import React, { useState } from 'react'
+import React, { type FC } from 'react'
 import DraggableUploadListItem from '../DraggableUploadListItem/DraggableUploadListItem'
 
-const DraggableUploadList = () => {
-	const [fileList, setFileList] = useState<UploadFile[]>([])
+interface DraggableUploadListProps {
+	fileList: UploadFile[]
+	setFileList: React.Dispatch<React.SetStateAction<UploadFile<any>[]>>
+}
+
+const DraggableUploadList: FC<DraggableUploadListProps> = ({ fileList, setFileList }) => {
 	
 	const sensor = useSensor(PointerSensor, {
 		activationConstraint: { distance: 10 }
