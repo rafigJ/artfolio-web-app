@@ -1,5 +1,5 @@
-import { Divider, Typography, type UploadFile } from 'antd'
-import { RcFile } from 'antd/es/upload'
+import { Divider, Typography } from 'antd'
+import { UploadFile } from 'antd/lib/upload/interface'
 import React, { FC, useEffect, useState } from 'react'
 import type { MockPostRequest } from '../../types/MockTypes/MockPostRequest'
 
@@ -9,58 +9,52 @@ interface CreatePostFormPreviewProps {
 }
 
 /**
- * Асинхронная функция, возвращающая Promise<string>
- * @param file файл изображения, который нужно преобразовать в dataUrl
- * @return dataUrl
+ * Функция для получения временного URL изображения из файла.
+ * @param file Файл изображения.
+ * @return Promise<string> Возвращает Promise с временным URL изображения.
  */
-const getDataURLFromFile = (file: RcFile) => {
-	return new Promise<string>((resolve, reject) => {
-		const reader = new FileReader()
-		reader.onload = () => {
-			resolve(reader.result as string)
-		}
-		reader.onerror = reject
-		reader.readAsDataURL(file)
-	})
-}
+const getObjectURLFromFile = (file: File): Promise<string> => {
+	return new Promise<string>((resolve) => {
+		const objectURL = URL.createObjectURL(file);
+		resolve(objectURL);
+	});
+};
 
 /**
- * Компонент используется в CreatePostForm.
- * Это динамический компонент, который отображает Заголовок, Изображения, Описание создаваемой публикации.
- * Данный компонент только читает данные параметры.
- * @param post объект, который мы передадим в request
- * @param fileList список изображений (файлов), которые изображаем на странице
+ * Компонент CreatePostFormPreview используется в форме создания поста.
+ * Этот компонент динамически отображает заголовок, изображения и описание создаваемой публикации.
+ * @param post Объект, передаваемый в запрос.
+ * @param fileList Список файлов изображений, которые отображаются на странице.
  */
 const CreatePostFormPreview: FC<CreatePostFormPreviewProps> = ({ post, fileList }) => {
-	const [dataURLs, setDataURLs] = useState<string[]>([])
-	
-	const getDataURLs = async () => {
-		const dataURLs: string[] = []
-		for (const file of fileList) {
-			if (file.originFileObj) {
-				const dataURL = await getDataURLFromFile(file.originFileObj)
-				dataURLs.push(dataURL)
-			}
-		}
-		setDataURLs(dataURLs)
-	}
+	const [objectURLs, setObjectURLs] = useState<string[]>([]);
 	
 	useEffect(() => {
-		getDataURLs()
-	}, [fileList])
+		const getObjectURLs = async () => {
+			const newObjectURLs: string[] = [];
+			for (const file of fileList) {
+				if (file.originFileObj) {
+					const objectURL = await getObjectURLFromFile(file.originFileObj);
+					newObjectURLs.push(objectURL);
+				}
+			}
+			setObjectURLs(newObjectURLs);
+		};
+		
+		getObjectURLs();
+	}, [fileList]);
 	
 	return (
 		<div style={{ display: 'flex', flexDirection: 'column' }}>
-			{/* <PostCard product={post} /> */}
 			<Typography.Title level={3}>
 				{post.title}
 			</Typography.Title>
-			{dataURLs.map((dataURL, index) => (
-				<div>
-					<img key={index}
-					     src={dataURL}
-					     alt={fileList[index]?.name}
-					     style={{ marginTop: '10px', maxWidth: '100%' }} />
+			{objectURLs.map((objectURL, index) => (
+				<div key={index}>
+					<img
+						src={objectURL}
+						alt={fileList[index]?.name}
+						style={{ marginTop: '10px', maxWidth: '100%' }} />
 				</div>
 			))}
 			<Divider>Описание</Divider>
@@ -68,7 +62,7 @@ const CreatePostFormPreview: FC<CreatePostFormPreviewProps> = ({ post, fileList 
 				{post.description}
 			</Typography.Text>
 		</div>
-	)
-}
+	);
+};
 
-export default CreatePostFormPreview
+export default CreatePostFormPreview;

@@ -16,7 +16,7 @@ const CreatePostForm = () => {
 	const [post, setPost] = useState<MockPostRequest>({
 		'title': 'Заголовок публикации',
 		'description': 'Откройте для себя увлекательный мир современного дизайна ' +
-			'и искусства через глаза творцов и инноваторов. Эта публикация на Behance ' +
+			'и искусства через глаза творцов и инноваторов. Эта публикация на Artfolio ' +
 			'представляет вам насыщенную дозу креативности, вдохновения и творческих концепций, ' +
 			'которые олицетворяют современные тенденции в мире дизайна и искусства. ' +
 			'Погрузитесь в уникальные проекты, эксперименты с цветом, текстурой и формой, ' +
@@ -47,7 +47,7 @@ const CreatePostForm = () => {
 			<div style={{ width: '50%' }}>
 				<CreatePostFormPreview post={post} fileList={fileList} />
 			</div>
-			<Affix style={{ maxWidth: '50%' }}>
+			<Affix style={{ maxWidth: '45%' }}>
 				<div>
 					<Form
 						layout='vertical'
