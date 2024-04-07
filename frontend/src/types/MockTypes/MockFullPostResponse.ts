@@ -1,4 +1,5 @@
-export interface MockFullPost {
+// То что мы получаем в ответ
+export interface MockFullPostResponse {
 	id: number
 	title: string
 	description: string
