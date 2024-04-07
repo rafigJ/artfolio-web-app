@@ -1,4 +1,4 @@
-import { Card } from 'antd'
+import { Avatar, Card } from 'antd'
 import React, { type FC } from 'react'
 import type { Product } from '../../types/MockTypes/Product'
 
@@ -20,7 +20,11 @@ const PostCard: FC<PostCardProps> = ({ product }) => {
 					src={product.url} />
 			}
 		>
-			<Meta title={product.title} />
+			<Meta 
+				title={product.title} 
+				avatar={<Avatar src={`https://api.dicebear.com/7.x/miniavs/svg?seed=${product.id}`} />}
+				description={"Автор публикации"}
+			/>
 		</Card>
 	)
 }
