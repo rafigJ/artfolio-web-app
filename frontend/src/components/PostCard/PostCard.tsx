@@ -12,12 +12,15 @@ const PostCard: FC<PostCardProps> = ({ product }) => {
 	return (
 		<Card
 			hoverable
-			style={{ maxWidth: 406}}
+			style={{ maxWidth: 406 }}
 			cover={
-				<img
-					style={{ maxWidth: 406, maxHeight: 204, objectFit: 'cover' }}
-					alt='example'
-					src={product.url} />
+				<div style={{ maxWidth: 406, maxHeight: 204, overflow: 'hidden' }}>
+					<img
+						style={{ width: '100%', height: 'auto', objectFit: 'cover' }}
+						alt={product.title}
+						src={product.url}
+					/>
+				</div>
 			}
 		>
 			<Meta title={product.title} />
