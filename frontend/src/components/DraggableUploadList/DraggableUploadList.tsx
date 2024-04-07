@@ -1,7 +1,7 @@
 import { InboxOutlined } from '@ant-design/icons'
 import { DndContext, type DragEndEvent, PointerSensor, useSensor } from '@dnd-kit/core'
-import { arrayMove, SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
-import { Upload, type UploadFile, type UploadProps } from 'antd'
+import { arrayMove, horizontalListSortingStrategy, SortableContext } from '@dnd-kit/sortable'
+import { message, Upload, type UploadFile, type UploadProps } from 'antd'
 import React, { useState } from 'react'
 import DraggableUploadListItem from '../DraggableUploadListItem/DraggableUploadListItem'
 
@@ -26,22 +26,38 @@ const DraggableUploadList = () => {
 		setFileList(newFileList)
 	}
 	
+	const uploadProps: UploadProps = {
+		beforeUpload: (file) => {
+			const isPNG = file.type === 'image/png'
+			const isJPG = file.type === 'image/jpg' || file.type === 'image/jpeg'
+			if (!isPNG && !isJPG) {
+				message.error(`${file.name} is not a png/jpg file`)
+				return Upload.LIST_IGNORE
+			}
+			return false
+		},
+		maxCount: 10,
+		multiple: true,
+		listType: 'picture-card',
+	}
+	
 	return (
 		<DndContext sensors={[sensor]} onDragEnd={onDragEnd}>
-			<SortableContext items={fileList.map((i) => i.uid)} strategy={verticalListSortingStrategy}>
+			<SortableContext items={fileList.map((i) => i.uid)} strategy={horizontalListSortingStrategy}>
 				<Upload.Dragger
-					beforeUpload={() => false}
 					fileList={fileList}
 					onChange={onChange}
-					listType='picture'
 					itemRender={(originNode, file) => (
 						<DraggableUploadListItem originNode={originNode} file={file} />
 					)}
+					showUploadList={{ showPreviewIcon: false }}
+					onPreview={() => {}}
+					{...uploadProps}
 				>
 					<p className='ant-upload-drag-icon'>
 						<InboxOutlined />
 					</p>
-					<p className='ant-upload-text'>Click or drag file to this area to upload</p>
+					<p className='ant-upload-text'>Переместите изображения в эту область для их загрузки</p>
 				</Upload.Dragger>
 			</SortableContext>
 		</DndContext>
