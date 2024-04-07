@@ -1,6 +1,6 @@
 export interface MockFullPost {
 	id: number
-	name: string
+	title: string
 	description: string
 	likeCount: number
 	previewMedia: number

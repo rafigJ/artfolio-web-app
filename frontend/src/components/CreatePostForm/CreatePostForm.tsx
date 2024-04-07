@@ -1,16 +1,27 @@
 import { Button, Flex, Form, Input, message, Typography, type UploadFile } from 'antd'
 import React, { useState } from 'react'
-import type { Product } from '../../types/MockTypes/Product'
+import type { MockFullPost } from '../../types/MockTypes/MockFullPost'
 import CreatePostFormPreview from '../CreatePostFormPreview/CreatePostFormPreview'
 import DraggableUploadList from '../DraggableUploadList/DraggableUploadList'
 
 const CreatePostForm = () => {
-	const [post, setPost] = useState<Product>({
-		'albumId': 1,
-		'id': 41,
-		'title': 'Заголовок поста',
-		'url': 'https://upload.wikimedia.org/wikipedia/commons/3/36/Ryan_Gosling_%2835397111013%29.jpg',
-		'thumbnailUrl': 'https://upload.wikimedia.org/wikipedia/commons/3/36/Ryan_Gosling_%2835397111013%29.jpg'
+	const [post, setPost] = useState<MockFullPost>({
+		'id': 33,
+		'title': 'Заголовок публикации',
+		'description': 'Откройте для себя увлекательный мир современного дизайна и искусства через глаза творцов и инноваторов. Эта публикация на Behance представляет вам насыщенную дозу креативности, вдохновения и творческих концепций, которые олицетворяют современные тенденции в мире дизайна и искусства. Погрузитесь в уникальные проекты, эксперименты с цветом, текстурой и формой, и вдохновляйтесь новыми идеями, которые заставят вас увидеть мир в ином свете.',
+		'likeCount': 39,
+		'previewMedia': 949,
+		'medias': [
+			12,
+			13,
+			14,
+			15,
+			29
+		],
+		'owner': {
+			'fullName': 'Рамси Болтон',
+			'username': 'boltonArts'
+		}
 	})
 	
 	const [fileList, setFileList] = useState<UploadFile[]>([])
@@ -26,6 +37,10 @@ const CreatePostForm = () => {
 	
 	const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setPost({ ...post, title: e.target.value })
+	}
+	
+	const handleDescriptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+		setPost({ ...post, description: e.target.value })
 	}
 	
 	return (
@@ -44,9 +59,9 @@ const CreatePostForm = () => {
 						<Input onChange={handleTitleChange} maxLength={35} />
 					</Form.Item>
 					<Form.Item name='description' label='Описание публикации' rules={[{ required: true }]}>
-						<Input.TextArea showCount rows={6} maxLength={300} />
+						<Input.TextArea onChange={handleDescriptionChange} showCount rows={6} maxLength={500} />
 					</Form.Item>
-					<DraggableUploadList fileList={fileList} setFileList={setFileList}/>
+					<DraggableUploadList fileList={fileList} setFileList={setFileList} />
 					<Form.Item style={{ marginTop: '18px' }}>
 						<Button type='primary' htmlType='submit'>Опубликовать</Button>
 					</Form.Item>

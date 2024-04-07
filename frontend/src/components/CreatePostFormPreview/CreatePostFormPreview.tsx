@@ -1,10 +1,9 @@
 import { Typography } from 'antd'
 import React, { type FC } from 'react'
-import type { Product } from '../../types/MockTypes/Product'
-import PostCard from '../PostCard/PostCard'
+import type { MockFullPost } from '../../types/MockTypes/MockFullPost'
 
 interface CreatePostFormPreviewProps {
-	post: Product;
+	post: MockFullPost;
 }
 
 const CreatePostFormPreview: FC<CreatePostFormPreviewProps> = ({ post }) => {
@@ -14,6 +13,10 @@ const CreatePostFormPreview: FC<CreatePostFormPreviewProps> = ({ post }) => {
 			<Typography.Title level={3}>
 				{post.title}
 			</Typography.Title>
+			
+			<Typography.Text>
+				{post.description}
+			</Typography.Text>
 		</div>
 	)
 }
