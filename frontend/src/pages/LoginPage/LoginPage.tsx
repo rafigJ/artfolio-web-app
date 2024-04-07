@@ -4,11 +4,9 @@ import StandardLayout from '../../components/StandardLayout/StandardLayout'
 
 const LoginPage = () => {
 	return (
-		<StandardLayout>
-			<Typography.Text>
-				Login Page
-			</Typography.Text>
-		</StandardLayout>
+		<Typography.Text>
+			Login Page
+		</Typography.Text>
 	)
 }
 

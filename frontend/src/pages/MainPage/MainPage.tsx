@@ -6,9 +6,9 @@ import NewTabs from '../../components/Tabs/NewTabs'
 
 const MainPage = () => {
 	return (
-		<StandardLayout> 
+		<div>
 			<NewTabs label={['Новые', 'Популярные', 'Для вас']}/>
-		</StandardLayout>
+		</div>
 	)
 }
 
