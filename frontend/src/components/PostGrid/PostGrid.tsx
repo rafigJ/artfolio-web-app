@@ -5,7 +5,6 @@ import PostService from '../../api/PostService'
 import { useFetching } from '../../hooks/useFetching'
 import type { Product } from '../../types/MockTypes/Product'
 import PostCard from '../PostCard/PostCard'
-import NewTabs from '../Tabs/NewTabs'
 
 const PostGrid = () => {
 	const [page, setPage] = useState(0)
@@ -42,7 +41,6 @@ const PostGrid = () => {
 			hasMore={data.length < 100}
 			loader={<Skeleton avatar paragraph={{ rows: 1 }} active />}
 		>
-			
 			<List
 				loading={isLoading}
 				grid={{

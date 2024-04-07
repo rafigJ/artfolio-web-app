@@ -1,14 +1,15 @@
-import { Typography } from 'antd'
+import { Button } from 'antd'
 import React from 'react'
-import PostGrid from '../../components/PostGrid/PostGrid'
+import { useNavigate } from 'react-router-dom'
 import StandardLayout from '../../components/StandardLayout/StandardLayout'
-import NewTabs from '../../components/Tabs/NewTabs'
 
 const MainPage = () => {
+	const navigate = useNavigate()
+	
 	return (
-		<div>
-			<NewTabs label={['Новые', 'Популярные', 'Для вас']}/>
-		</div>
+		<StandardLayout>
+			<Button size='large' type='primary' onClick={() => navigate('/posts/create')}>Создать пост</Button>
+		</StandardLayout>
 	)
 }
 
