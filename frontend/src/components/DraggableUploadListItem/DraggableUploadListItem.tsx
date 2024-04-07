@@ -7,7 +7,10 @@ interface DraggableUploadListItemProps {
 	originNode: React.ReactElement<any, string | React.JSXElementConstructor<any>>;
 	file: UploadFile;
 }
-
+/**
+ * Используется в DraggableUploadList
+ * Взято из документации antd из компонента Upload
+ */
 const DraggableUploadListItem = ({ originNode, file }: DraggableUploadListItemProps) => {
 	const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
 		id: file.uid

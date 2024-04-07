@@ -4,6 +4,14 @@ import type { MockPostRequest } from '../../types/MockTypes/MockPostRequest'
 import CreatePostFormPreview from '../CreatePostFormPreview/CreatePostFormPreview'
 import DraggableUploadList from '../DraggableUploadList/DraggableUploadList'
 
+/**
+ * Основной компонент CreatePostPage.
+ * Используется для создания поста (публикации).
+ * В форме используется валидация заголовка и описания.
+ * Также мы проверяем, что список файлов не пуст.
+ * TODO: отправление моковых запросов, превью PostCard.
+ * TODO: добавить элемент формы загрузка Preview (обложки публикации).
+ */
 const CreatePostForm = () => {
 	const [post, setPost] = useState<MockPostRequest>({
 		'title': 'Заголовок публикации',

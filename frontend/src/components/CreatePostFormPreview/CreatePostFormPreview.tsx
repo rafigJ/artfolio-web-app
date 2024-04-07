@@ -8,6 +8,11 @@ interface CreatePostFormPreviewProps {
 	fileList: UploadFile[];
 }
 
+/**
+ * Асинхронная функция, возвращающая Promise<string>
+ * @param file файл изображения, который нужно преобразовать в dataUrl
+ * @return dataUrl
+ */
 const getDataURLFromFile = (file: RcFile) => {
 	return new Promise<string>((resolve, reject) => {
 		const reader = new FileReader()
@@ -19,6 +24,13 @@ const getDataURLFromFile = (file: RcFile) => {
 	})
 }
 
+/**
+ * Компонент используется в CreatePostForm.
+ * Это динамический компонент, который отображает Заголовок, Изображения, Описание создаваемой публикации.
+ * Данный компонент только читает данные параметры.
+ * @param post объект, который мы передадим в request
+ * @param fileList список изображений (файлов), которые изображаем на странице
+ */
 const CreatePostFormPreview: FC<CreatePostFormPreviewProps> = ({ post, fileList }) => {
 	const [dataURLs, setDataURLs] = useState<string[]>([])
 	

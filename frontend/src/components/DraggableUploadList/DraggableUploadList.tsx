@@ -10,6 +10,16 @@ interface DraggableUploadListProps {
 	setFileList: React.Dispatch<React.SetStateAction<UploadFile<any>[]>>
 }
 
+/**
+ * Используется в CreatePostForm, и зависим от него!
+ * Взято из документации antd из компонента Upload
+ * Тут преобразована сортировка из @dnd-kit/sortable. А также есть проверка типов на jpg/png
+ * в функции uploadProps.
+ * Представляет собой область, куда можно загрузить файлы, а также при загрузке отображаются
+ * из DraggableUploadListItem, которую можно сортировать. При сортировке меняется состояние fileList.
+ * @param fileList список файлов, которые загружаются в Upload
+ * @param setFileList функция, которая меняет состояние данного списка
+ */
 const DraggableUploadList: FC<DraggableUploadListProps> = ({ fileList, setFileList }) => {
 	
 	const sensor = useSensor(PointerSensor, {
