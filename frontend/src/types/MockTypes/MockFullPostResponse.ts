@@ -5,7 +5,7 @@ export interface MockFullPostResponse {
 	description: string
 	likeCount: number
 	previewMedia: number
-	medias: number[]
+	medias: string[]
 	owner: MockOwner
 }
 
