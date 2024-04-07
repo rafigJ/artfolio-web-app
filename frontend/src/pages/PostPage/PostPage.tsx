@@ -1,6 +1,6 @@
 import { Flex } from 'antd'
 import React from 'react'
-import CommentList from '../../components/CommentList/CommentList'
+import CommentEditor from '../../components/CommentEditor/CommentEditor'
 import PostContent from '../../components/PostContent/PostContent'
 
 const PostPage = () => {
@@ -8,7 +8,7 @@ const PostPage = () => {
 		<main style={{ display: 'flex', justifyContent: 'center' }}>
 			<Flex vertical style={{ maxWidth: '80%' }}>
 				<PostContent />
-				<CommentList />
+				<CommentEditor />
 			</Flex>
 		</main>
 	)

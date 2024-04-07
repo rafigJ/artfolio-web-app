@@ -1,42 +1,19 @@
 import { Comment } from '@ant-design/compatible'
-import { List, Tooltip, Typography } from 'antd'
-import React from 'react'
+import { List, Typography } from 'antd'
+import React, { type FC } from 'react'
 
-const data = [
-	{
-		author: 'Han Solo',
-		avatar: 'https://api.dicebear.com/7.x/miniavs/svg?seed=13',
-		content: (
-			<p>
-				We supply a series of design principles, practical patterns and high quality design
-				resources (Sketch and Axure), to help people create their product prototypes beautifully and
-				efficiently.
-			</p>
-		),
-		datetime: (
-			<Tooltip title='2016-11-22 11:22:33'>
-				<span>8 hours ago</span>
-			</Tooltip>
-		)
-	},
-	{
-		author: 'Han Solo',
-		avatar: 'https://api.dicebear.com/7.x/miniavs/svg?seed=1',
-		content: (
-			<p>
-				We supply a series of design principles, practical patterns and high quality design
-				resources (Sketch and Axure), to help people create their product prototypes beautifully and
-				efficiently.
-			</p>
-		),
-		datetime: (
-			<Tooltip title='2016-11-22 10:22:33'>
-				<span>9 hours ago</span>
-			</Tooltip>
-		)
-	}
-]
-const CommentList = () => {
+export interface CommentItem {
+	author: string;
+	avatar: string;
+	content: React.ReactNode;
+	datetime: React.ReactNode;
+}
+
+interface CommentListProps {
+	data: CommentItem[]
+}
+
+const CommentList: FC<CommentListProps> = ({ data }) => {
 	return (
 		<List
 			style={{ backgroundColor: 'transparent' }}

@@ -64,21 +64,19 @@ const PostContent = () => {
 						style={{ marginTop: '10px', maxWidth: '100%' }} />
 				</div>
 			))}
-			<Flex vertical justify='space-between'>
-				<Flex justify='space-between'>
-					<AuthorLinkCard owner={post.owner} style={{ display: 'flex', minWidth: '30%' }} />
-					<div style={{ display: 'flex', alignItems: 'center' }}>
-						<Typography.Title level={3} style={{ margin: '0 5px 0 0', padding: 0 }}>100</Typography.Title>
-						<HeartFilled style={{ fontSize: '28px', color: 'red' }} />
-					</div>
-				</Flex>
-				<div>
-					<Divider>Описание</Divider>
-					<Typography.Text>
-						{post.description}
-					</Typography.Text>
+			<Flex justify='space-between' style={{marginTop: 13}}>
+				<AuthorLinkCard owner={post.owner} style={{ display: 'flex', minWidth: '30%' }} />
+				<div style={{ display: 'flex', alignItems: 'center' }}>
+					<Typography.Title level={3} style={{ margin: '0 5px 0 0', padding: 0 }}>100</Typography.Title>
+					<HeartFilled style={{ fontSize: '28px', color: 'red' }} />
 				</div>
 			</Flex>
+			<div>
+				<Divider>Описание</Divider>
+				<Typography.Text>
+					{post.description}
+				</Typography.Text>
+			</div>
 		</>
 	)
 }
