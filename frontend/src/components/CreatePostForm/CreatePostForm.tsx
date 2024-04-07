@@ -16,7 +16,9 @@ const CreatePostForm = () => {
 	return (
 		<Flex justify='space-around' align='flex-start'>
 			<CreatePostFormPreview post={post} />
-			<DraggableUploadList />
+			<div style={{maxWidth: '50%'}}>
+				<DraggableUploadList />
+			</div>
 		</Flex>
 	)
 }

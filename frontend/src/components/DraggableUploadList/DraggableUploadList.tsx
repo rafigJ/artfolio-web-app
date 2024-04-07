@@ -1,6 +1,6 @@
 import { InboxOutlined } from '@ant-design/icons'
 import { DndContext, type DragEndEvent, PointerSensor, useSensor } from '@dnd-kit/core'
-import { arrayMove, horizontalListSortingStrategy, SortableContext } from '@dnd-kit/sortable'
+import { arrayMove, SortableContext, rectSortingStrategy } from '@dnd-kit/sortable'
 import { message, Upload, type UploadFile, type UploadProps } from 'antd'
 import React, { useState } from 'react'
 import DraggableUploadListItem from '../DraggableUploadListItem/DraggableUploadListItem'
@@ -38,12 +38,12 @@ const DraggableUploadList = () => {
 		},
 		maxCount: 10,
 		multiple: true,
-		listType: 'picture-card',
+		listType: 'picture-card'
 	}
 	
 	return (
 		<DndContext sensors={[sensor]} onDragEnd={onDragEnd}>
-			<SortableContext items={fileList.map((i) => i.uid)} strategy={horizontalListSortingStrategy}>
+			<SortableContext items={fileList.map((i) => i.uid)} strategy={rectSortingStrategy}>
 				<Upload.Dragger
 					fileList={fileList}
 					onChange={onChange}
@@ -51,7 +51,8 @@ const DraggableUploadList = () => {
 						<DraggableUploadListItem originNode={originNode} file={file} />
 					)}
 					showUploadList={{ showPreviewIcon: false }}
-					onPreview={() => {}}
+					onPreview={() => {
+					}}
 					{...uploadProps}
 				>
 					<p className='ant-upload-drag-icon'>
