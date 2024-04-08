@@ -12,10 +12,11 @@ interface EditorProps {
 	value: string;
 }
 
+// todo добавить в реализацию переход по ссылке, в случае если пользователь не вошел в профиль
 const Editor = ({ onChange, onSubmit, submitting, value }: EditorProps) => (
 	<>
 		<Form.Item>
-			<TextArea maxLength={300} rows={4} onChange={onChange} value={value} />
+			<TextArea placeholder='Введите комментарий' maxLength={300} rows={4} onChange={onChange} value={value} />
 		</Form.Item>
 		<Form.Item>
 			<Button htmlType='submit' loading={submitting} onClick={onSubmit} type='primary'>
