@@ -1,9 +1,10 @@
 import React from 'react'
+import ProfileHeader from '../../components/ProfileHeader/ProfileHeader'
 
 const ProfilePage = () => {
 	return (
 		<>
-		 Profile Page
+			<ProfileHeader />
 		</>
 	)
 }
