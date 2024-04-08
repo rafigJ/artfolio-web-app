@@ -8,7 +8,6 @@ const MainPage = () => {
 	
 	return (
 		<>
-			<Button size='large' type='primary' onClick={() => navigate('/posts/create')}>Создать пост</Button>
 			<PostGrid/>
 		</>
 	)
