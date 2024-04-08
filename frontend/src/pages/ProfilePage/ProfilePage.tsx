@@ -94,7 +94,6 @@ const ProfilePage = () => {
 			<ProfileHeader />
 			<Tabs
 				defaultActiveKey='1'
-				type='card'
 				centered
 				items={
 					[{
