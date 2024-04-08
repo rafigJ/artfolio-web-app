@@ -113,7 +113,7 @@ const RegisterForm: React.FC = () => {
 							<Button type='primary' htmlType='submit' className='login-form-button'>
 								Продолжить
 							</Button>
-							Есть аккаунт? <Link to='/login'>Войти</Link>
+							У вас уже есть аккаунт? <Link to='/login'>Войти</Link>
 						</Form.Item>
 					</Form>
 				</div>
@@ -131,24 +131,18 @@ const RegisterForm: React.FC = () => {
 					>
 						<Typography.Title level={3} className='login-title'>Регистрация</Typography.Title>
 						
-						<Form.Item
-							name='fullName'
-						>
+						<Form.Item name='fullName'>
 							<Input prefix={<UserOutlined className='site-form-item-icon' />} placeholder='Полное имя' />
 						</Form.Item>
 						
-						<Form.Item
-							name='country'
-						>
+						<Form.Item name='country'>
 							<Input
 								prefix={<EnvironmentOutlined className='site-form-item-icon' />}
 								placeholder='Страна'
 							/>
 						</Form.Item>
 						
-						<Form.Item
-							name='city'
-						>
+						<Form.Item name='city'>
 							<Input
 								prefix={<EnvironmentOutlined className='site-form-item-icon' />}
 								placeholder='Город'
@@ -167,7 +161,7 @@ const RegisterForm: React.FC = () => {
 						<Form.Item name='description'>
 							<Input.TextArea
 								placeholder='Описание профиля'
-								style={{ minHeight: '100px' }}
+								rows={4}
 							/>
 						</Form.Item>
 						<Form.Item>
