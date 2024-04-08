@@ -1,7 +1,7 @@
 import { AntDesignOutlined, HeartFilled } from '@ant-design/icons'
 import { Avatar, Divider, Flex, Typography } from 'antd'
 import React, { type CSSProperties, type FC, useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { Link, useParams } from 'react-router-dom'
 import type { MockFullPostResponse, MockOwner } from '../../types/MockTypes/MockFullPostResponse'
 
 interface AuthorLinkCardProps {
@@ -12,15 +12,21 @@ interface AuthorLinkCardProps {
 const AuthorLinkCard: FC<AuthorLinkCardProps> = ({ owner, style }) => {
 	return (
 		<div style={style}>
-			<Avatar
-				src='https://api.dicebear.com/7.x/miniavs/svg?seed=10'
-				size={70}
-				icon={<AntDesignOutlined />}
-			/>
+			<Link to='/profile/username'>
+				<Avatar
+					src='https://api.dicebear.com/7.x/miniavs/svg?seed=10'
+					size={70}
+					icon={<AntDesignOutlined />}
+				/>
+			</Link>
+			
 			<div style={{ display: 'flex', flexDirection: 'column' }}>
-				<Typography.Title style={{ marginTop: '15px' }} level={4}>
-					{owner.fullName}
-				</Typography.Title>
+				<Link to='/profile/username'>
+					<Typography.Title style={{ marginTop: '15px' }} level={4}>
+						{owner.fullName}
+					</Typography.Title>
+				</Link>
+				
 				<Typography.Text>
 					Воронеж, Россия
 				</Typography.Text>
