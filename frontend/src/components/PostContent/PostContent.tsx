@@ -1,13 +1,37 @@
-import { AntDesignOutlined, HeartFilled } from '@ant-design/icons'
-import { Avatar, Divider, Flex, Typography } from 'antd'
+import { AntDesignOutlined, DeleteFilled, DeleteOutlined, EditOutlined, EllipsisOutlined, FlagFilled, HeartFilled } from '@ant-design/icons'
+import { Avatar, Button, Divider, Dropdown, Flex, MenuProps, Typography } from 'antd'
 import React, { type CSSProperties, type FC, useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import type { MockFullPostResponse, MockOwner } from '../../types/MockTypes/MockFullPostResponse'
+import './PostContentStyles.css'
 
 interface AuthorLinkCardProps {
 	owner: MockOwner;
 	style: CSSProperties;
 }
+
+const items: MenuProps['items'] = [
+	{
+	  key: '1',
+	  label: (
+		<Link to={'/posts/create'}>
+			Редактировать
+		</Link>
+	  ),
+	  icon: <EditOutlined />
+	},
+	{
+	  key: '2',
+	  label: ('Удалить'),
+	  icon: <DeleteOutlined />,
+	},
+	{
+	  key: '3',
+	  label: ('Пожаловаться'),
+	  icon: <FlagFilled color='red'/>,
+	  danger: true,
+	},
+  ];
 
 const AuthorLinkCard: FC<AuthorLinkCardProps> = ({ owner, style }) => {
 	return (
@@ -59,9 +83,14 @@ const PostContent = () => {
 	useEffect(() => console.log(params.id), [])
 	return (
 		<>
-			<Typography.Title level={3}>
-				{post.title}
-			</Typography.Title>
+			<div className='title-container'>
+				<Typography.Title level={3} className='title'>
+					{post.title}
+				</Typography.Title>
+				<Dropdown menu={{ items }} placement="bottomLeft" arrow>
+					<Button className='menu-btn'><EllipsisOutlined /></Button>
+				</Dropdown>
+			</div>
 			{post.medias.map((media, index) => (
 				<div key={index}>
 					<img
