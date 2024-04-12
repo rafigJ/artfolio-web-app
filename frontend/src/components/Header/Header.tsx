@@ -13,7 +13,7 @@ const Header = () => {
 			<Typography.Title className='artfolio-logo' style={{ cursor: 'pointer' }}
 			                  onClick={() => navigate('/')}>Artfolio</Typography.Title>
 			<SearchInput />
-			<Button size='large' type='primary' style={{marginRight: '20px'}} onClick={() => navigate('/posts/create')}>Создать пост</Button>
+			<Button size='large' type='primary' style={{marginRight: '20px'}} onClick={() => navigate('/posts/create')}>Опубликовать</Button>
 			<Button icon={<LoginOutlined />} size='large' onClick={() => navigate('/login')}>Войти</Button>
 		</Layout.Header>
 	)
