@@ -1,4 +1,4 @@
-import { LoginOutlined } from '@ant-design/icons'
+import { LoginOutlined, PlusOutlined } from '@ant-design/icons'
 import { Button, Layout, Typography } from 'antd'
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
@@ -13,7 +13,12 @@ const Header = () => {
 			<Typography.Title className='artfolio-logo' style={{ cursor: 'pointer' }}
 			                  onClick={() => navigate('/')}>Artfolio</Typography.Title>
 			<SearchInput />
-			<Button size='large' type='primary' style={{marginRight: '20px'}} onClick={() => navigate('/posts/create')}>Опубликовать</Button>
+			<Button
+				icon={<PlusOutlined />}
+				size='large'
+				type='primary'
+				style={{ marginRight: '20px' }}
+				onClick={() => navigate('/posts/create')}>Опубликовать</Button>
 			<Button icon={<LoginOutlined />} size='large' onClick={() => navigate('/login')}>Войти</Button>
 		</Layout.Header>
 	)

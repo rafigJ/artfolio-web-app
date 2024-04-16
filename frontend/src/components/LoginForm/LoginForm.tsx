@@ -1,6 +1,6 @@
 import { LockOutlined, UserOutlined } from '@ant-design/icons'
 import { Button, Form, Input, Typography } from 'antd'
-import './LoginFormStyles.css'
+import './LoginForm.css'
 import { Link } from 'react-router-dom'
 
 const LoginForm = () => {

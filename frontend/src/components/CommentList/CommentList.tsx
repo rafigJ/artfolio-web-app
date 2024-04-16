@@ -1,9 +1,8 @@
 import { Comment } from '@ant-design/compatible'
-import { DeleteOutlined, EditOutlined, EllipsisOutlined, FlagFilled } from '@ant-design/icons';
-import { Button, Dropdown, List, MenuProps, Typography } from 'antd'
+import { DeleteOutlined, EllipsisOutlined, FlagFilled } from '@ant-design/icons'
+import { Dropdown, List, MenuProps, Typography } from 'antd'
 import React, { type FC } from 'react'
-import './CommentListStyles.css'
-import { Link } from 'react-router-dom';
+import './CommentList.css'
 
 export interface CommentItem {
 	author: string;
@@ -18,17 +17,17 @@ interface CommentListProps {
 
 const items: MenuProps['items'] = [
 	{
-	  key: '1',
-	  label: ('Удалить'),
-	  icon: <DeleteOutlined />,
+		key: '1',
+		label: ('Удалить'),
+		icon: <DeleteOutlined />
 	},
 	{
-	  key: '2',
-	  label: ('Пожаловаться'),
-	  icon: <FlagFilled color='red'/>,
-	  danger: true,
-	},
-  ];
+		key: '2',
+		label: ('Пожаловаться'),
+		icon: <FlagFilled color='red' />,
+		danger: true
+	}
+]
 
 const CommentList: FC<CommentListProps> = ({ data }) => {
 	return (
@@ -47,8 +46,8 @@ const CommentList: FC<CommentListProps> = ({ data }) => {
 							content={item.content}
 							datetime={item.datetime}
 						/>
-						<Dropdown menu={{ items }} placement="bottomLeft" arrow>
-						<EllipsisOutlined className='menu-icon'/>
+						<Dropdown menu={{ items }} placement='bottomLeft' arrow>
+							<EllipsisOutlined className='menu-icon' />
 						</Dropdown>
 					</div>
 				</li>

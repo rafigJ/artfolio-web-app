@@ -25,7 +25,7 @@ const PostCard: FC<PostCardProps> = ({ product }) => {
 			}
 		>
 			<Meta
-				style={{cursor: 'default'}}
+				style={{ cursor: 'default' }}
 				title={
 					<Link className='ant-card-meta-title' to={`/posts/${product.id}`}>
 						{product.title}

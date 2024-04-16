@@ -1,9 +1,16 @@
-import { AntDesignOutlined, DeleteFilled, DeleteOutlined, EditOutlined, EllipsisOutlined, FlagFilled, HeartFilled } from '@ant-design/icons'
+import {
+	AntDesignOutlined,
+	DeleteOutlined,
+	EditOutlined,
+	EllipsisOutlined,
+	FlagFilled,
+	HeartFilled
+} from '@ant-design/icons'
 import { Avatar, Button, Divider, Dropdown, Flex, MenuProps, Typography } from 'antd'
 import React, { type CSSProperties, type FC, useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import type { MockFullPostResponse, MockOwner } from '../../types/MockTypes/MockFullPostResponse'
-import './PostContentStyles.css'
+import './PostContent.css'
 
 interface AuthorLinkCardProps {
 	owner: MockOwner;
@@ -12,26 +19,26 @@ interface AuthorLinkCardProps {
 
 const items: MenuProps['items'] = [
 	{
-	  key: '1',
-	  label: (
-		<Link to={'/posts/create'}>
-			Редактировать
-		</Link>
-	  ),
-	  icon: <EditOutlined />
+		key: '1',
+		label: (
+			<Link to={'/posts/create'}>
+				Редактировать
+			</Link>
+		),
+		icon: <EditOutlined />
 	},
 	{
-	  key: '2',
-	  label: ('Удалить'),
-	  icon: <DeleteOutlined />,
+		key: '2',
+		label: ('Удалить'),
+		icon: <DeleteOutlined />
 	},
 	{
-	  key: '3',
-	  label: ('Пожаловаться'),
-	  icon: <FlagFilled color='red'/>,
-	  danger: true,
-	},
-  ];
+		key: '3',
+		label: ('Пожаловаться'),
+		icon: <FlagFilled color='red' />,
+		danger: true
+	}
+]
 
 const AuthorLinkCard: FC<AuthorLinkCardProps> = ({ owner, style }) => {
 	return (
@@ -87,7 +94,7 @@ const PostContent = () => {
 				<Typography.Title level={3} className='title'>
 					{post.title}
 				</Typography.Title>
-				<Dropdown menu={{ items }} placement="bottomLeft" arrow>
+				<Dropdown menu={{ items }} placement='bottomLeft' arrow>
 					<Button className='menu-btn'><EllipsisOutlined /></Button>
 				</Dropdown>
 			</div>
@@ -99,7 +106,7 @@ const PostContent = () => {
 						style={{ marginTop: '10px', maxWidth: '100%' }} />
 				</div>
 			))}
-			<Flex justify='space-between' style={{marginTop: 13}}>
+			<Flex justify='space-between' style={{ marginTop: 13 }}>
 				<AuthorLinkCard owner={post.owner} style={{ display: 'flex', minWidth: '30%' }} />
 				<div style={{ display: 'flex', alignItems: 'center' }}>
 					<Typography.Title level={3} style={{ margin: '0 5px 0 0', padding: 0 }}>100</Typography.Title>

@@ -1,7 +1,7 @@
 import { EnvironmentOutlined, LockOutlined, MailOutlined, PlusOutlined, UserOutlined } from '@ant-design/icons'
 import { Button, Form, Input, message, Steps, Typography, Upload } from 'antd'
 import React, { useState } from 'react'
-import '../LoginForm/LoginFormStyles.css'
+import '../LoginForm/LoginForm.css'
 import { Link, useNavigate } from 'react-router-dom'
 
 const { Step } = Steps

@@ -57,7 +57,7 @@ const CommentEditor: React.FC = () => {
 	
 	return (
 		<>
-			{comments.length > 0 ? <CommentList data={comments} /> : <div style={{marginTop: 28}}/>}
+			{comments.length > 0 ? <CommentList data={comments} /> : <div style={{ marginTop: 28 }} />}
 			<Comment
 				style={{ backgroundColor: 'transparent' }}
 				avatar={<Avatar src='https://api.dicebear.com/7.x/miniavs/svg?seed=3' alt='Han Solo' />}

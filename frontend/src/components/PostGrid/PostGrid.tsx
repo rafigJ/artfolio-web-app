@@ -5,8 +5,8 @@ import PostService from '../../api/PostService'
 import { useFetching } from '../../hooks/useFetching'
 import { FeedSection } from '../../types/MockTypes/MockFeedRequest'
 import type { Product } from '../../types/MockTypes/Product'
-import PostCard from '../PostCard/PostCard'
 import NewTabs from '../NewTabs/NewTabs'
+import PostCard from '../PostCard/PostCard'
 
 const PostGrid = () => {
 	const [page, setPage] = useState(1)

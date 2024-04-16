@@ -1,7 +1,7 @@
 import { LockOutlined, UserOutlined } from '@ant-design/icons'
 import { Button, Form, Input, Typography } from 'antd'
 import React from 'react'
-import '../LoginForm/LoginFormStyles.css'
+import '../LoginForm/LoginForm.css'
 
 const ForgotPasswordform = () => {
 	const onFinish = (values: any) => {
