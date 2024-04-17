@@ -11,9 +11,11 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public final class FullPostResponseDto {
-    public UserResponseDto owner;
     public Long id;
     public String name;
     public String description;
+    public Long likeCount;
+    public Long previewMedia;
     public List<Long> mediaIds;
+    public UserResponseDto owner;
 }
