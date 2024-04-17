@@ -1,0 +1,14 @@
+.comment-container {
+    display: flex; 
+    align-items: center;
+}
+
+.menu-icon {
+    margin-left: auto;
+    margin-top: 5px;
+    margin-bottom: auto;
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
+    width: 20px;
+}

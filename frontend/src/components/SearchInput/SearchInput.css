@@ -1,0 +1,12 @@
+.header__search-wrapper {
+	margin: auto;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	width: 100%;
+}
+
+.header__search-input {
+	max-width: 700px;
+	width: 100%;
+}
