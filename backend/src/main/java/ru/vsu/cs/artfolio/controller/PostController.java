@@ -1,9 +1,9 @@
 package ru.vsu.cs.artfolio.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -12,13 +12,12 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import ru.vsu.cs.artfolio.auth.user.User;
 import ru.vsu.cs.artfolio.dto.post.FullPostResponseDto;
 import ru.vsu.cs.artfolio.dto.post.PostRequestDto;
-import ru.vsu.cs.artfolio.exception.RestException;
 import ru.vsu.cs.artfolio.service.PostService;
 
 import java.util.List;
@@ -35,18 +34,18 @@ public class PostController {
     @PreAuthorize("isAuthenticated() and hasAuthority('USER')")
     public ResponseEntity<FullPostResponseDto> createPost(
             @AuthenticationPrincipal User user,
-            @RequestParam("name") String name,
-            @RequestParam("description") String description,
-            @RequestParam("file") List<MultipartFile> listFiles) {
+            @RequestPart("post") @Valid PostRequestDto post,
+            @RequestPart("file") List<MultipartFile> listFiles) {
 
-        try {
-            var createdPost = service.createPost(user.getUserEntity().getUuid(),
-                    new PostRequestDto(name, description),
-                    listFiles);
-            return ResponseEntity.ok(createdPost);
-        } catch (Exception e) {
-            throw new RestException("Server error " + e.getMessage(), HttpStatus.BAD_GATEWAY);
-        }
+        LOGGER.info("Пользователь {} сохраняет пост {}", user.getUsername(), post);
+        var createdPost = service.createPost(user.getUserEntity().getUuid(), post, listFiles);
+        return ResponseEntity.ok(createdPost);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<FullPostResponseDto> getPostById(@PathVariable("id") Long id) {
+        LOGGER.info("Получение поста " + id);
+        return ResponseEntity.ok(service.getPostById(id));
     }
 
     @GetMapping("/medias/{id}")

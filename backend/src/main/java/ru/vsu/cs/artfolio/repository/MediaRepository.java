@@ -7,6 +7,6 @@ import java.util.List;
 
 public interface MediaRepository extends JpaRepository<MediaFileEntity, Long> {
 
-    List<MediaFileEntity> findAllByPostIdOrderByPosition(Long postId);
+//    List<MediaFileEntity> findAllByPostIdOrderByPosition(Long postId);
 
 }

@@ -21,27 +21,6 @@ public class MediaServiceImpl implements MediaService {
     private final MediaRepository repository;
 
     @Override
-    public List<Long> uploadMedia(Long postId, List<MultipartFile> mediaFiles) throws IOException {
-        List<MediaFileEntity> entities = new ArrayList<>();
-        int pos = 0;
-        for (MultipartFile mediaFile : mediaFiles) {
-            PostEntity post = new PostEntity();
-            post.setId(postId);
-            entities.add(MediaFileEntity.builder()
-                    .post(post)
-                    .file(mediaFile.getBytes())
-                    .position(pos++)
-                    .type(mediaFile.getContentType())
-                    .build());
-        }
-
-        return repository.saveAllAndFlush(entities).stream()
-                .sorted(Comparator.comparingInt(MediaFileEntity::getPosition))
-                .map(MediaFileEntity::getId)
-                .toList();
-    }
-
-    @Override
     public byte[] downloadMedia(Long mediaId) {
         MediaFileEntity dbImageData = repository.findById(mediaId)
                 .orElseThrow(() -> new NotFoundException("Media by id: " + mediaId + " not found"));
@@ -51,10 +30,11 @@ public class MediaServiceImpl implements MediaService {
 
     @Override
     public List<Long> getMediaIdsByPostId(Long postId) {
-        List<MediaFileEntity> mediaList = repository.findAllByPostIdOrderByPosition(postId);
-        if (mediaList.isEmpty()) {
-            throw new NotFoundException("Post by id" + postId + " not found");
-        }
-        return mediaList.stream().map(MediaFileEntity::getId).toList();
+        throw new UnsupportedOperationException();
+//        List<MediaFileEntity> mediaList = repository.findAllByPostIdOrderByPosition(postId);
+//        if (mediaList.isEmpty()) {
+//            throw new NotFoundException("Post by id" + postId + " not found");
+//        }
+//        return mediaList.stream().map(MediaFileEntity::getId).toList();
     }
 }

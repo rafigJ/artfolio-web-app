@@ -4,6 +4,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.web.multipart.MultipartFile;
+import ru.vsu.cs.artfolio.dto.PageDto;
 import ru.vsu.cs.artfolio.dto.post.FullPostResponseDto;
 import ru.vsu.cs.artfolio.dto.post.PostRequestDto;
 import ru.vsu.cs.artfolio.dto.post.PostResponseDto;
@@ -23,9 +24,9 @@ public interface PostService {
 
     FullPostResponseDto updatePost(UUID userId, Long id, PostRequestDto requestDto, List<MultipartFile> images);
 
-    Page<PostResponseDto> getPostsPageByUserId(UUID userId, Pageable page);
+    PageDto<PostResponseDto> getPostsPageByUserId(UUID userId, Pageable page);
 
-    Page<PostResponseDto> getPostsPageBySpecifications(Specification<PostEntity> specification, Pageable page);
+    PageDto<PostResponseDto> getPostsPageBySpecifications(Specification<PostEntity> specification, Pageable page);
 
     void likePost(UUID userId, Long postId);
 
