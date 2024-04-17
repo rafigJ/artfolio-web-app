@@ -1,3 +1,7 @@
 package ru.vsu.cs.artfolio.dto;
 
-public record RestExceptionDto(String message) {}
+import jakarta.validation.constraints.NotBlank;
+
+public record RestExceptionDto(
+        @NotBlank
+        String message) {}

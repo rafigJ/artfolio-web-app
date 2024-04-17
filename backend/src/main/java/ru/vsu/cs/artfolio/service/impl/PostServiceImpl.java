@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-import ru.vsu.cs.artfolio.dto.UserResponseDto;
+import ru.vsu.cs.artfolio.dto.user.UserResponseDto;
 import ru.vsu.cs.artfolio.dto.post.FullPostResponseDto;
 import ru.vsu.cs.artfolio.dto.post.PostRequestDto;
 import ru.vsu.cs.artfolio.dto.post.PostResponseDto;
@@ -48,7 +48,7 @@ public class PostServiceImpl implements PostService {
         UserEntity ownerEntity = userRepository.getReferenceById(userId);
 
         PostEntity post = PostEntity.builder()
-                .name(requestDto.name())
+                .name(requestDto.getName())
                 .createTime(LocalDateTime.now())
                 .owner(ownerEntity)
                 .build();
@@ -62,9 +62,9 @@ public class PostServiceImpl implements PostService {
             FullPostResponseDto mappedPost = FullPostResponseDto.builder()
                     .id(createdPost.getId())
                     .mediaIds(mediaIds)
-                    .name(requestDto.name())
+                    .name(requestDto.getName())
                     .owner(modelMapper.map(createdPost.getOwner(), UserResponseDto.class))
-                    .description(requestDto.description())
+                    .description(requestDto.getDescription())
                     .build();
             LOGGER.info("Возврат ответа");
             return mappedPost;

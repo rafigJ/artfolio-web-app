@@ -1,7 +1,7 @@
 package ru.vsu.cs.artfolio.dto.post;
 
 import lombok.*;
-import ru.vsu.cs.artfolio.dto.UserResponseDto;
+import ru.vsu.cs.artfolio.dto.user.UserResponseDto;
 
 import java.util.List;
 
