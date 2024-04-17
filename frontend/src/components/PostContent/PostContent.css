@@ -1,0 +1,18 @@
+.title-container {
+	display: flex;
+	align-items: center;
+}
+
+.title {
+	margin-left: 8px;
+	margin-bottom: 0;
+}
+
+.menu-btn {
+	margin-left: auto;
+	margin-top: auto;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	width: 20px;
+}
