@@ -38,6 +38,7 @@ public class AuthenticationControllerTest {
     private static final String VALID_EMAIL = "username@mail.ru";
     private static final String INVALID_EMAIL = "usernamemail.ru";
     private static final String VALID_PASSWORD = "password1";
+    private static final String SECRET = "SECRETWORD";
     private static final String INVALID_PASSWORD = "passw1";
 
     @Autowired
@@ -48,7 +49,7 @@ public class AuthenticationControllerTest {
 
     @Test
     void register_ValidInput_Returns200() throws Exception {
-        RegisterRequestDto requestDto = new RegisterRequestDto(VALID_NAME, VALID_EMAIL, VALID_PASSWORD);
+        RegisterRequestDto requestDto = new RegisterRequestDto(VALID_NAME, VALID_EMAIL, VALID_PASSWORD, SECRET);
         AuthResponseDto responseDto = new AuthResponseDto(VALID_NAME, VALID_EMAIL, Role.USER.name(), "token");
 
         when(authenticationService.register(requestDto)).thenReturn(responseDto);
@@ -65,25 +66,25 @@ public class AuthenticationControllerTest {
 
     @Test
     void register_InvalidInput_All_ReturnsStatus400() throws Exception {
-        RegisterRequestDto requestDto = new RegisterRequestDto(INVALID_NAME, INVALID_EMAIL, INVALID_PASSWORD);
+        RegisterRequestDto requestDto = new RegisterRequestDto(INVALID_NAME, INVALID_EMAIL, INVALID_PASSWORD, SECRET);
         register_InvalidInputTestWithJson_ReturnsBadRequest(requestDto);
     }
 
     @Test
     void register_InvalidInput_Email_ReturnsStatus400() throws Exception {
-        RegisterRequestDto requestDto = new RegisterRequestDto(VALID_NAME, INVALID_EMAIL, VALID_PASSWORD);
+        RegisterRequestDto requestDto = new RegisterRequestDto(VALID_NAME, INVALID_EMAIL, VALID_PASSWORD, SECRET);
         register_InvalidInputTestWithJson_ReturnsBadRequest(requestDto);
     }
 
     @Test
     void register_InvalidInput_Name_ReturnsStatus400() throws Exception {
-        RegisterRequestDto requestDto = new RegisterRequestDto(INVALID_NAME, VALID_EMAIL, VALID_PASSWORD);
+        RegisterRequestDto requestDto = new RegisterRequestDto(INVALID_NAME, VALID_EMAIL, VALID_PASSWORD, SECRET);
         register_InvalidInputTestWithJson_ReturnsBadRequest(requestDto);
     }
 
     @Test
     void register_InvalidInput_Password_ReturnsStatus400() throws Exception {
-        RegisterRequestDto requestDto = new RegisterRequestDto(VALID_NAME, VALID_EMAIL, INVALID_PASSWORD);
+        RegisterRequestDto requestDto = new RegisterRequestDto(VALID_NAME, VALID_EMAIL, INVALID_PASSWORD, SECRET);
         register_InvalidInputTestWithJson_ReturnsBadRequest(requestDto);
     }
 
