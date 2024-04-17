@@ -12,19 +12,21 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-import ru.vsu.cs.artfolio.dto.user.UserResponseDto;
 import ru.vsu.cs.artfolio.dto.post.FullPostResponseDto;
 import ru.vsu.cs.artfolio.dto.post.PostRequestDto;
 import ru.vsu.cs.artfolio.dto.post.PostResponseDto;
+import ru.vsu.cs.artfolio.dto.user.UserResponseDto;
 import ru.vsu.cs.artfolio.entity.PostEntity;
 import ru.vsu.cs.artfolio.entity.UserEntity;
 import ru.vsu.cs.artfolio.exception.NotFoundException;
 import ru.vsu.cs.artfolio.exception.RestException;
+import ru.vsu.cs.artfolio.mapper.PostMapper;
 import ru.vsu.cs.artfolio.repository.PostRepository;
 import ru.vsu.cs.artfolio.repository.UserRepository;
 import ru.vsu.cs.artfolio.service.MediaService;
 import ru.vsu.cs.artfolio.service.PostService;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -49,26 +51,19 @@ public class PostServiceImpl implements PostService {
 
         PostEntity post = PostEntity.builder()
                 .name(requestDto.getName())
+                .description(requestDto.getDescription())
                 .createTime(LocalDateTime.now())
                 .owner(ownerEntity)
                 .build();
 
         try {
             LOGGER.info("Сохранение поста");
-            PostEntity createdPost = postRepository.saveAndFlush(post);
-            LOGGER.info("Загрузка медиа");
+            PostEntity createdPost = postRepository.save(post);
             List<Long> mediaIds = mediaService.uploadMedia(createdPost.getId(), files);
 
-            FullPostResponseDto mappedPost = FullPostResponseDto.builder()
-                    .id(createdPost.getId())
-                    .mediaIds(mediaIds)
-                    .name(requestDto.getName())
-                    .owner(modelMapper.map(createdPost.getOwner(), UserResponseDto.class))
-                    .description(requestDto.getDescription())
-                    .build();
             LOGGER.info("Возврат ответа");
-            return mappedPost;
-        } catch (Exception e) {
+            return PostMapper.toDto(createdPost, modelMapper.map(ownerEntity, UserResponseDto.class), mediaIds);
+        } catch (IOException e) {
             LOGGER.error("ОШИБКА {}", e.getMessage());
             throw new RestException(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -77,7 +72,7 @@ public class PostServiceImpl implements PostService {
     @Override
     public FullPostResponseDto getPostById(Long id) {
         PostEntity postEntity = postRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Post by id" + id + " not found"));
+                .orElseThrow(() -> new NotFoundException("Post by id: " + id + " not found"));
         FullPostResponseDto mappedPost = modelMapper.map(postEntity, FullPostResponseDto.class);
         mappedPost.setMediaIds(mediaService.getMediaIdsByPostId(id));
         return mappedPost;
@@ -86,33 +81,41 @@ public class PostServiceImpl implements PostService {
     @Override
     public void deletePost(UUID userId, Long id) {
         // TODO implement
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public FullPostResponseDto updatePost(UUID userId, Long id, PostRequestDto requestDto, List<MultipartFile> images) {
         // TODO implement
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public Page<PostResponseDto> getPostsPageByUserId(UUID userId, Pageable page) {
         // TODO implement
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public Page<PostResponseDto> getPostsPageBySpecifications(Specification<PostEntity> specification, Pageable page) {
         // TODO implement
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public void likePost(UUID userId, Long postId) {
         // TODO implement
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public void sendReportToPost(UUID userId, Long postId, String reasonText) {
         // TODO implement
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public byte[] downloadMedia(Long mediaId) {
+        return mediaService.downloadMedia(mediaId);
     }
 }

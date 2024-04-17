@@ -37,10 +37,10 @@ public class PostServiceImplUnitTest {
 //    void getPostById_ValidId_ReturnFullPostResponse() {
 //        // given
 //        UUID uuid = UUID.randomUUID();
-//        String name = "name";
+//        String fullName = "fullName";
 //        String mail = "email@email.com";
 //        String password = "password";
-//        UserEntity ownerEntity = new UserEntity(uuid, name, mail, password, Role.USER, LocalDateTime.MIN, LocalDateTime.MIN);
+//        UserEntity ownerEntity = new UserEntity(uuid, fullName, mail, password, Role.USER, LocalDateTime.MIN, LocalDateTime.MIN);
 //
 //        String postName = "post_name";
 //        String description = "description";
@@ -54,13 +54,13 @@ public class PostServiceImplUnitTest {
 //        // assert
 //        assertNotNull(responseDto);
 //        assertEquals(responseDto.id, 1L);
-//        assertEquals(responseDto.name, postName);
+//        assertEquals(responseDto.fullName, postName);
 //        assertEquals(responseDto.description, description);
 //
 //        UserResponseDto owner = responseDto.owner;
 //        assertNotNull(owner);
 //        assertEquals(owner.uuid, uuid);
-//        assertEquals(owner.fullName, name);
+//        assertEquals(owner.fullName, fullName);
 //        assertEquals(owner.email, mail);
 //    }
 }

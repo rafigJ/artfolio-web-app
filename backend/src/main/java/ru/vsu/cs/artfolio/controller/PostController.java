@@ -4,9 +4,12 @@ import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -46,16 +49,12 @@ public class PostController {
         }
     }
 
-//    @GetMapping("/{fileName}")
-//    public ResponseEntity<?> downloadImage(@PathVariable String fileName) {
-//        LOGGER.info("download file {}", fileName);
-//        try {
-////            byte[] imageData = service.downloadImage(fileName);
-//            return ResponseEntity.ok()
-//                    .contentType(MediaType.IMAGE_PNG)
-//                    .body(imageData);
-//        } catch (IOException e) {
-//            throw new RestException("Server error " + e.getMessage(), HttpStatus.BAD_GATEWAY);
-//        }
-//    }
+    @GetMapping("/medias/{id}")
+    public ResponseEntity<?> downloadMedia(@PathVariable Long id) {
+        byte[] imageData = service.downloadMedia(id);
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.IMAGE_PNG)
+                .body(imageData);
+    }
 }

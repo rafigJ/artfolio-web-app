@@ -31,4 +31,6 @@ public interface PostService {
 
     void sendReportToPost(UUID userId, Long postId, String reasonText);
 
+    byte[] downloadMedia(Long mediaId);
+
 }

@@ -22,9 +22,9 @@ public class RestExceptionHandler {
                 .body(new RestExceptionDto(ex.getMessage()));
     }
 
-    @ExceptionHandler(value = {RuntimeException.class})
+    @ExceptionHandler(value = {Exception.class})
     @ResponseBody
-    public ResponseEntity<RestExceptionDto> handler(RuntimeException ex) {
+    public ResponseEntity<RestExceptionDto> handler(Exception ex) {
         return ResponseEntity.status(HttpStatus.BAD_GATEWAY)
                 .body(new RestExceptionDto(ex.getMessage()));
     }

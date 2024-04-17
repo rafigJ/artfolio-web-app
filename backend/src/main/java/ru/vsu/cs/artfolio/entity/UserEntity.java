@@ -22,7 +22,7 @@ public class UserEntity {
     private UUID uuid;
 
     @Column(nullable = false, name = "name")
-    private String name;
+    private String fullName;
 
     @Column(nullable = false, unique = true, name = "email")
     private String email;
