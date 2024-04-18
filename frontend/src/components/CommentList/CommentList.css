@@ -11,4 +11,9 @@
     justify-content: center; 
     align-items: center; 
     width: 20px;
+    font-size: 20px;
+}
+
+.menu-icon-disable {
+    display: none;
 }

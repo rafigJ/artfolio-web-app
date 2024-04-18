@@ -1,10 +1,11 @@
 import { Comment } from '@ant-design/compatible'
 import { DeleteOutlined, EllipsisOutlined, FlagFilled } from '@ant-design/icons'
 import { Dropdown, List, MenuProps, Typography } from 'antd'
-import React, { type FC } from 'react'
+import React, { useState, type FC } from 'react'
 import './CommentList.css'
 
 export interface CommentItem {
+	id: number;
 	author: string;
 	avatar: string;
 	content: React.ReactNode;
@@ -30,6 +31,19 @@ const items: MenuProps['items'] = [
 ]
 
 const CommentList: FC<CommentListProps> = ({ data }) => {
+
+	const [activeComment, setActiveComment] = useState<number | null>(null);
+
+	const handleCommentHover = (id: number) => {
+		setActiveComment(id);
+	};
+
+	const handleCommentLeave = () => {
+		setActiveComment(null);
+	};
+
+
+
 	return (
 		<List
 			style={{ backgroundColor: 'transparent' }}
@@ -37,7 +51,7 @@ const CommentList: FC<CommentListProps> = ({ data }) => {
 			itemLayout='horizontal'
 			dataSource={data}
 			renderItem={item => (
-				<li>
+				<li onMouseEnter={() => handleCommentHover(item.id)} onMouseLeave={handleCommentLeave}>
 					<div className='comment-container'>
 						<Comment
 							style={{ backgroundColor: 'transparent' }}
@@ -47,7 +61,7 @@ const CommentList: FC<CommentListProps> = ({ data }) => {
 							datetime={item.datetime}
 						/>
 						<Dropdown menu={{ items }} placement='bottomLeft' arrow>
-							<EllipsisOutlined className='menu-icon' />
+							<EllipsisOutlined className={activeComment === item.id ? 'menu-icon' : 'menu-icon-disable'} />
 						</Dropdown>
 					</div>
 				</li>

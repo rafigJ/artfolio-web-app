@@ -30,31 +30,32 @@ const CommentEditor: React.FC = () => {
 	const [comments, setComments] = useState<CommentItem[]>([])
 	const [submitting, setSubmitting] = useState(false)
 	const [value, setValue] = useState('')
-	
+
 	const handleSubmit = () => {
 		if (!value) return
-		
+
 		setSubmitting(true)
-		
+
 		setTimeout(() => {
 			setSubmitting(false)
 			setValue('')
-			setComments([
-				...comments,
+			setComments(prevComments => [
+				...prevComments,
 				{
 					author: 'Han Solo',
 					avatar: 'https://api.dicebear.com/7.x/miniavs/svg?seed=3',
 					content: <p>{value}</p>,
-					datetime: '2016-11-22'
+					datetime: '2016-11-22',
+					id: prevComments.length
 				}
 			])
 		}, 1000)
 	}
-	
+
 	const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
 		setValue(e.target.value)
 	}
-	
+
 	return (
 		<>
 			{comments.length > 0 ? <CommentList data={comments} /> : <div style={{ marginTop: 28 }} />}
