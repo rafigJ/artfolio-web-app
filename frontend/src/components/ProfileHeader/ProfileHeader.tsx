@@ -1,17 +1,17 @@
 import { AntDesignOutlined } from '@ant-design/icons'
 import { Avatar, Button, Flex, Typography } from 'antd'
-import React, { useState } from 'react'
+import { useState } from 'react'
 
 const ProfileHeader = () => {
 	const [userIsSubscribed, setIsSubscribed] = useState(false)
-	
+
 	return (
 		<Flex
 			style={{
 				background: 'white',
 				minHeight: 280,
 				padding: 24,
-				borderRadius: 8
+				borderRadius: 8,
 			}}
 			justify={'center'}
 		>
@@ -29,9 +29,7 @@ const ProfileHeader = () => {
 					type='primary'
 					onClick={() => setIsSubscribed(!userIsSubscribed)}
 				>
-					{
-						userIsSubscribed ? 'Отписаться' : 'Подписаться'
-					}
+					{userIsSubscribed ? 'Отписаться' : 'Подписаться'}
 				</Button>
 				<Button href='mailto://rafigdzabbarov0410@gmail.com'>Связаться</Button>
 			</Flex>

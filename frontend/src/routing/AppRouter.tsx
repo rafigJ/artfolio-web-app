@@ -1,4 +1,3 @@
-import React from 'react'
 import { Navigate, Route, Routes } from 'react-router-dom'
 import CreatePostPage from '../pages/CreatePostPage/CreatePostPage'
 import ForgotPasswordPage from '../pages/ForgotPasswordPage/ForgotPasswordPage'

@@ -1,5 +1,5 @@
 import { Button, List, Result, Skeleton } from 'antd'
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import InfiniteScroll from 'react-infinite-scroll-component'
 import PostService from '../../api/PostService'
 import { useFetching } from '../../hooks/useFetching'
@@ -12,16 +12,16 @@ const PostGrid = () => {
 	const [page, setPage] = useState(1)
 	const [data, setData] = useState<Product[]>([])
 	const [activeTabKey, setActiveTabKey] = useState<string>(FeedSection.NEW)
-	
-	const [fetchPosts, isLoading, isError, error] = useFetching(async (_page) => {
+
+	const [fetchPosts, isLoading, isError, error] = useFetching(async _page => {
 		const response = await PostService.getProducts(_page, 20)
 		setData([...data, ...response.data])
 	})
-	
+
 	useEffect(() => {
 		fetchPosts(page)
 	}, [page, activeTabKey])
-	
+
 	if (isError) {
 		return (
 			<Result
@@ -35,11 +35,11 @@ const PostGrid = () => {
 			/>
 		)
 	}
-	
+
 	return (
 		<>
 			<NewTabs
-				onChange={(key) => {
+				onChange={key => {
 					setData([])
 					setPage(1)
 					console.log(key)
@@ -54,7 +54,6 @@ const PostGrid = () => {
 				hasMore={data.length < 100}
 				loader={<Skeleton avatar paragraph={{ rows: 1 }} active />}
 			>
-				
 				<List
 					loading={isLoading}
 					grid={{
@@ -64,10 +63,10 @@ const PostGrid = () => {
 						md: 3,
 						lg: 4,
 						xl: 4,
-						xxl: 4
+						xxl: 4,
 					}}
 					dataSource={data}
-					renderItem={(item) => (
+					renderItem={item => (
 						<List.Item>
 							<PostCard key={item.id} product={item} />
 						</List.Item>

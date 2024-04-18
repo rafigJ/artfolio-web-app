@@ -1,31 +1,37 @@
-import { EnvironmentOutlined, LockOutlined, MailOutlined, PlusOutlined, UserOutlined } from '@ant-design/icons'
-import { Button, Form, Input, message, Steps, Typography, Upload } from 'antd'
+import {
+	EnvironmentOutlined,
+	LockOutlined,
+	MailOutlined,
+	PlusOutlined,
+	UserOutlined,
+} from '@ant-design/icons'
+import { Button, Form, Input, Steps, Typography, Upload, message } from 'antd'
 import React, { useState } from 'react'
-import '../LoginForm/LoginForm.css'
 import { Link, useNavigate } from 'react-router-dom'
+import '../LoginForm/LoginForm.css'
 
 const { Step } = Steps
 
 interface RegistrationFormValues {
-	username: string;
-	email: string;
-	password: string;
-	confirmPassword: string;
-	secretWord: string;
-	fullName: string;
-	country: string;
-	city: string;
-	profileDescription: string;
+	username: string
+	email: string
+	password: string
+	confirmPassword: string
+	secretWord: string
+	fullName: string
+	country: string
+	city: string
+	profileDescription: string
 }
 
 const RegisterForm: React.FC = () => {
 	const navigate = useNavigate()
 	const [currentStep, setCurrentStep] = useState<number>(0)
-	
+
 	const nextStep = () => {
 		setCurrentStep(currentStep + 1)
 	}
-	
+
 	const onFinishStep1 = (values: RegistrationFormValues) => {
 		if (values.password !== values.confirmPassword) {
 			message.error('Пароли не совпадают')
@@ -34,21 +40,21 @@ const RegisterForm: React.FC = () => {
 		console.log('Step 1 values:', values)
 		nextStep()
 	}
-	
+
 	const normFile = (e: any) => {
 		if (Array.isArray(e)) {
 			return e
 		}
 		return e?.fileList
 	}
-	
+
 	const onFinishStep2 = (values: RegistrationFormValues) => {
 		console.log('Step 2 values:', values)
 		// Здесь можно добавить логику отправки данных на сервер
 		message.success('Вы успешно зарегистрировались')
 		navigate('/')
 	}
-	
+
 	const steps = [
 		{
 			title: 'Введите учётные данные',
@@ -60,23 +66,35 @@ const RegisterForm: React.FC = () => {
 						initialValues={{ remember: true }}
 						onFinish={onFinishStep1}
 					>
-						<Typography.Title style={{ margin: '0 0 22px 0' }} level={3} className='login-title'>
+						<Typography.Title
+							style={{ margin: '0 0 22px 0' }}
+							level={3}
+							className='login-title'
+						>
 							Регистрация
 						</Typography.Title>
 						<Form.Item
 							name='username'
 							rules={[{ required: true, message: 'Введите логин!' }]}
 						>
-							<Input prefix={<UserOutlined className='site-form-item-icon' />} placeholder='Логин' />
+							<Input
+								prefix={<UserOutlined className='site-form-item-icon' />}
+								placeholder='Логин'
+							/>
 						</Form.Item>
-						
+
 						<Form.Item
 							name='email'
-							rules={[{ required: true, message: 'Введите электронную почту!' }]}
+							rules={[
+								{ required: true, message: 'Введите электронную почту!' },
+							]}
 						>
-							<Input prefix={<MailOutlined className='site-form-item-icon' />} placeholder='Электронная почта' />
+							<Input
+								prefix={<MailOutlined className='site-form-item-icon' />}
+								placeholder='Электронная почта'
+							/>
 						</Form.Item>
-						
+
 						<Form.Item
 							name='password'
 							rules={[{ required: true, message: 'Введите пароль!' }]}
@@ -87,7 +105,7 @@ const RegisterForm: React.FC = () => {
 								placeholder='Пароль'
 							/>
 						</Form.Item>
-						
+
 						<Form.Item
 							name='confirmPassword'
 							rules={[{ required: true, message: 'Повторите пароль!' }]}
@@ -98,7 +116,7 @@ const RegisterForm: React.FC = () => {
 								placeholder='Повторите пароль'
 							/>
 						</Form.Item>
-						
+
 						<Form.Item
 							name='secretWord'
 							rules={[{ required: true, message: 'Введите секретное слово!' }]}
@@ -108,16 +126,20 @@ const RegisterForm: React.FC = () => {
 								placeholder='Секретное слово'
 							/>
 						</Form.Item>
-						
+
 						<Form.Item>
-							<Button type='primary' htmlType='submit' className='login-form-button'>
+							<Button
+								type='primary'
+								htmlType='submit'
+								className='login-form-button'
+							>
 								Продолжить
 							</Button>
 							У вас уже есть аккаунт? <Link to='/login'>Войти</Link>
 						</Form.Item>
 					</Form>
 				</div>
-			)
+			),
 		},
 		{
 			title: 'Добавьте описание профиля',
@@ -129,19 +151,24 @@ const RegisterForm: React.FC = () => {
 						initialValues={{ remember: true }}
 						onFinish={onFinishStep2}
 					>
-						<Typography.Title level={3} className='login-title'>Регистрация</Typography.Title>
-						
+						<Typography.Title level={3} className='login-title'>
+							Регистрация
+						</Typography.Title>
+
 						<Form.Item name='fullName'>
-							<Input prefix={<UserOutlined className='site-form-item-icon' />} placeholder='Полное имя' />
+							<Input
+								prefix={<UserOutlined className='site-form-item-icon' />}
+								placeholder='Полное имя'
+							/>
 						</Form.Item>
-						
+
 						<Form.Item name='country'>
 							<Input
 								prefix={<EnvironmentOutlined className='site-form-item-icon' />}
 								placeholder='Страна'
 							/>
 						</Form.Item>
-						
+
 						<Form.Item name='city'>
 							<Input
 								prefix={<EnvironmentOutlined className='site-form-item-icon' />}
@@ -157,24 +184,25 @@ const RegisterForm: React.FC = () => {
 								</button>
 							</Upload>
 						</Form.Item>
-						
+
 						<Form.Item name='description'>
-							<Input.TextArea
-								placeholder='Описание профиля'
-								rows={4}
-							/>
+							<Input.TextArea placeholder='Описание профиля' rows={4} />
 						</Form.Item>
 						<Form.Item>
-							<Button type='primary' htmlType='submit' className='login-form-button'>
+							<Button
+								type='primary'
+								htmlType='submit'
+								className='login-form-button'
+							>
 								Зарегистрироваться
 							</Button>
 						</Form.Item>
 					</Form>
 				</div>
-			)
-		}
+			),
+		},
 	]
-	
+
 	return (
 		<div className='steps'>
 			<Steps current={currentStep}>
