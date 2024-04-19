@@ -2,10 +2,10 @@ package ru.vsu.cs.artfolio.mapper;
 
 import org.springframework.data.domain.Page;
 import org.springframework.web.multipart.MultipartFile;
+import ru.vsu.cs.artfolio.dto.PageDto;
 import ru.vsu.cs.artfolio.dto.post.FullPostResponseDto;
 import ru.vsu.cs.artfolio.dto.post.PostRequestDto;
 import ru.vsu.cs.artfolio.dto.post.PostResponseDto;
-import ru.vsu.cs.artfolio.dto.user.UserResponseDto;
 import ru.vsu.cs.artfolio.entity.MediaFileEntity;
 import ru.vsu.cs.artfolio.entity.PostEntity;
 import ru.vsu.cs.artfolio.entity.UserEntity;
@@ -16,12 +16,12 @@ import java.util.Comparator;
 import java.util.List;
 
 public class PostMapper {
-    public static FullPostResponseDto toFullDto(PostEntity postEntity, UserResponseDto owner) {
+    public static FullPostResponseDto toFullDto(PostEntity postEntity) {
         return FullPostResponseDto.builder()
                 .id(postEntity.getId())
                 .mediaIds(postEntity.getMedias().stream().sorted(Comparator.comparingInt(MediaFileEntity::getPosition)).map(MediaFileEntity::getId).toList())
                 .name(postEntity.getName())
-                .owner(owner)
+                .owner(UserMapper.toDto(postEntity.getOwner()))
                 .description(postEntity.getDescription())
                 .build();
     }
@@ -37,10 +37,16 @@ public class PostMapper {
     }
 
     public static PostResponseDto toDto(PostEntity postEntity) {
-        throw new UnsupportedOperationException();
+        return PostResponseDto.builder()
+                .id(postEntity.getId())
+                .previewMediaId(postEntity.getMedias().get(0).getId())
+                .owner(UserMapper.toDto(postEntity.getOwner()))
+                .likeCount(null)
+                .build();
     }
 
-    public static Page<PostResponseDto> toPageDto(Page<PostEntity> postEntityPage) {
-        throw new UnsupportedOperationException();
+    public static PageDto<PostResponseDto> toPageDto(Page<PostEntity> postEntityPage) {
+        Page<PostResponseDto> sourcePage = postEntityPage.map(PostMapper::toDto);
+        return new PageDto<>(sourcePage.getContent(), sourcePage.getTotalElements(), sourcePage.getTotalPages());
     }
 }

@@ -1,10 +1,8 @@
 package ru.vsu.cs.artfolio.service;
 
-import java.util.List;
+import ru.vsu.cs.artfolio.entity.MediaFileEntity;
 
 public interface MediaService {
 
-    byte[] downloadMedia(Long mediaId);
-
-    List<Long> getMediaIdsByPostId(Long postId);
+    MediaFileEntity downloadMedia(Long mediaId);
 }

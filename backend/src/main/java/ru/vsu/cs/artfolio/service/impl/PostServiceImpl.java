@@ -17,7 +17,7 @@ import ru.vsu.cs.artfolio.dto.PageDto;
 import ru.vsu.cs.artfolio.dto.post.FullPostResponseDto;
 import ru.vsu.cs.artfolio.dto.post.PostRequestDto;
 import ru.vsu.cs.artfolio.dto.post.PostResponseDto;
-import ru.vsu.cs.artfolio.dto.user.UserResponseDto;
+import ru.vsu.cs.artfolio.entity.MediaFileEntity;
 import ru.vsu.cs.artfolio.entity.PostEntity;
 import ru.vsu.cs.artfolio.entity.UserEntity;
 import ru.vsu.cs.artfolio.exception.NotFoundException;
@@ -56,7 +56,7 @@ public class PostServiceImpl implements PostService {
             LOGGER.info("Сохранение поста");
             PostEntity createdPost = postRepository.save(post);
             LOGGER.info("Возврат ответа");
-            return PostMapper.toFullDto(createdPost, modelMapper.map(ownerEntity, UserResponseDto.class));
+            return PostMapper.toFullDto(createdPost);
         } catch (IOException e) {
             LOGGER.error("ОШИБКА {}", e.getMessage());
             throw new RestException(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
@@ -67,9 +67,8 @@ public class PostServiceImpl implements PostService {
     public FullPostResponseDto getPostById(Long id) {
         PostEntity postEntity = postRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Post by id: " + id + " not found"));
-        FullPostResponseDto mappedPost = PostMapper.toFullDto(postEntity, modelMapper.map(postEntity.getOwner(), UserResponseDto.class));
-        mappedPost.setMediaIds(mediaService.getMediaIdsByPostId(id));
-        return mappedPost;
+
+        return PostMapper.toFullDto(postEntity);
     }
 
     @Override
@@ -103,7 +102,7 @@ public class PostServiceImpl implements PostService {
             LOGGER.info("Обновление поста");
             PostEntity updatedPost = postRepository.save(newPost);
             LOGGER.info("Возврат ответа");
-            return PostMapper.toFullDto(updatedPost, modelMapper.map(ownerEntity, UserResponseDto.class));
+            return PostMapper.toFullDto(updatedPost);
         } catch (IOException e) {
             LOGGER.error("ОШИБКА {}", e.getMessage());
             throw new RestException(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
@@ -113,14 +112,13 @@ public class PostServiceImpl implements PostService {
     @Override
     public PageDto<PostResponseDto> getPostsPageByUserId(UUID userId, Pageable page) {
         Page<PostEntity> posts = postRepository.findAllByOwnerUuid(userId, page);
-
-        throw new UnsupportedOperationException();
+        return PostMapper.toPageDto(posts);
     }
 
     @Override
     public PageDto<PostResponseDto> getPostsPageBySpecifications(Specification<PostEntity> specification, Pageable page) {
-        // TODO implement
-        throw new UnsupportedOperationException();
+        Page<PostEntity> posts = postRepository.findAll(specification, page);
+        return PostMapper.toPageDto(posts);
     }
 
     @Override
@@ -136,7 +134,7 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public byte[] downloadMedia(Long mediaId) {
+    public MediaFileEntity getMediaById(Long mediaId) {
         return mediaService.downloadMedia(mediaId);
     }
 }

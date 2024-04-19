@@ -1,6 +1,5 @@
 package ru.vsu.cs.artfolio.service;
 
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.web.multipart.MultipartFile;
@@ -8,6 +7,7 @@ import ru.vsu.cs.artfolio.dto.PageDto;
 import ru.vsu.cs.artfolio.dto.post.FullPostResponseDto;
 import ru.vsu.cs.artfolio.dto.post.PostRequestDto;
 import ru.vsu.cs.artfolio.dto.post.PostResponseDto;
+import ru.vsu.cs.artfolio.entity.MediaFileEntity;
 import ru.vsu.cs.artfolio.entity.PostEntity;
 
 import java.util.List;
@@ -32,6 +32,6 @@ public interface PostService {
 
     void sendReportToPost(UUID userId, Long postId, String reasonText);
 
-    byte[] downloadMedia(Long mediaId);
+    MediaFileEntity getMediaById(Long mediaId);
 
 }

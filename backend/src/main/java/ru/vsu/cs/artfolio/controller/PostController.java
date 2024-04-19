@@ -18,6 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 import ru.vsu.cs.artfolio.auth.user.User;
 import ru.vsu.cs.artfolio.dto.post.FullPostResponseDto;
 import ru.vsu.cs.artfolio.dto.post.PostRequestDto;
+import ru.vsu.cs.artfolio.entity.MediaFileEntity;
 import ru.vsu.cs.artfolio.service.PostService;
 
 import java.util.List;
@@ -50,10 +51,10 @@ public class PostController {
 
     @GetMapping("/medias/{id}")
     public ResponseEntity<?> downloadMedia(@PathVariable Long id) {
-        byte[] imageData = service.downloadMedia(id);
+        MediaFileEntity media = service.getMediaById(id);
 
         return ResponseEntity.ok()
-                .contentType(MediaType.IMAGE_PNG)
-                .body(imageData);
+                .contentType(MediaType.valueOf(media.getType()))
+                .body(media.getFile());
     }
 }
