@@ -13,7 +13,7 @@ interface CreatePostFormPreviewProps {
  * @param file Файл изображения.
  * @return Promise<string> Возвращает Promise с временным URL изображения.
  */
-const getObjectURLFromFile = (file: File): Promise<string> => {
+export const getObjectURLFromFile = (file: File): Promise<string> => {
 	return new Promise<string>(resolve => {
 		const objectURL = URL.createObjectURL(file)
 		resolve(objectURL)

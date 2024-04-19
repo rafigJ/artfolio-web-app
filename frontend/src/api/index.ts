@@ -9,4 +9,20 @@ const $api = axios.create({
 	},
 })
 
+
+$api.interceptors.request.use((config) => {
+	let token = localStorage.getItem('token');
+	if (token !== null) {
+		config.headers.Authorization = `Bearer ${token}`;
+	}
+	return config;
+});
+
+$api.interceptors.response.use((config) => {
+	if (config.status === 401 && config.data?.message?.startsWith("JWT")) {
+		localStorage.removeItem('token')
+	}
+	return config;
+});
+
 export default $api
