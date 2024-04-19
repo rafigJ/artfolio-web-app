@@ -8,6 +8,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.vsu.cs.artfolio.repository.MediaRepository;
 import ru.vsu.cs.artfolio.repository.PostRepository;
 import ru.vsu.cs.artfolio.repository.UserRepository;
 import ru.vsu.cs.artfolio.service.impl.PostServiceImpl;
@@ -21,10 +22,10 @@ public class PostServiceImplUnitTest {
     PostRepository postRepository;
 
     @Mock
-    UserRepository userRepository;
+    MediaRepository mediaRepository;
 
     @Mock
-    MediaService mediaService;
+    UserRepository userRepository;
 
     @Spy
     ModelMapper modelMapper;

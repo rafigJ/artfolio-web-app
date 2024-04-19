@@ -1,7 +1,6 @@
 package ru.vsu.cs.artfolio.service.impl;
 
 import lombok.RequiredArgsConstructor;
-import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -23,9 +22,9 @@ import ru.vsu.cs.artfolio.entity.UserEntity;
 import ru.vsu.cs.artfolio.exception.NotFoundException;
 import ru.vsu.cs.artfolio.exception.RestException;
 import ru.vsu.cs.artfolio.mapper.PostMapper;
+import ru.vsu.cs.artfolio.repository.MediaRepository;
 import ru.vsu.cs.artfolio.repository.PostRepository;
 import ru.vsu.cs.artfolio.repository.UserRepository;
-import ru.vsu.cs.artfolio.service.MediaService;
 import ru.vsu.cs.artfolio.service.PostService;
 
 import java.io.IOException;
@@ -39,8 +38,7 @@ public class PostServiceImpl implements PostService {
     private static final Logger LOGGER = LoggerFactory.getLogger(PostServiceImpl.class);
     private final PostRepository postRepository;
     private final UserRepository userRepository;
-    private final MediaService mediaService;
-    private final ModelMapper modelMapper;
+    private final MediaRepository mediaRepository;
 
     @Override
     @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -85,11 +83,11 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public FullPostResponseDto updatePost(UUID userId, Long id, PostRequestDto requestDto, List<MultipartFile> files) {
-        LOGGER.info("Получение следующих данных {}, {}, {}", userId, requestDto, files);
         PostEntity postToUpdate = postRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Post by id: " + id + " not found"));
 
         if (!postToUpdate.getOwner().getUuid().equals(userId)) {
+            LOGGER.warn("Insufficient rights to update post");
             throw new RestException("Insufficient rights to update post", HttpStatus.UNAUTHORIZED);
         }
 
@@ -98,10 +96,7 @@ public class PostServiceImpl implements PostService {
         try {
             PostEntity newPost = PostMapper.toEntity(requestDto, ownerEntity, files);
             newPost.setId(id);
-
-            LOGGER.info("Обновление поста");
             PostEntity updatedPost = postRepository.save(newPost);
-            LOGGER.info("Возврат ответа");
             return PostMapper.toFullDto(updatedPost);
         } catch (IOException e) {
             LOGGER.error("ОШИБКА {}", e.getMessage());
@@ -135,6 +130,7 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public MediaFileEntity getMediaById(Long mediaId) {
-        return mediaService.downloadMedia(mediaId);
+        return mediaRepository.findById(mediaId)
+                .orElseThrow(() -> new NotFoundException("Media by id: " + mediaId + " not found"));
     }
 }
