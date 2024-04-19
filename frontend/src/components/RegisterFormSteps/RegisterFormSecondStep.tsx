@@ -1,20 +1,15 @@
 import { EnvironmentOutlined, UserOutlined } from '@ant-design/icons'
-import { Button, Form, Input, Typography } from 'antd'
+import { Button, Form, Input, Typography, type UploadFile } from 'antd'
 import React, { type FC } from 'react'
 import RegisterFormAvatarUpload from '../RegisterFormAvatarUpload/RegisterFormAvatarUpload'
 
 interface RegisterFormSecondStep {
 	onFinishStep2: ((values: any) => void) | undefined
+	setAvatar: React.Dispatch<React.SetStateAction<UploadFile>>
 }
 
-const RegisterFormSecondStep: FC<RegisterFormSecondStep> = ({ onFinishStep2 }) => {
+const RegisterFormSecondStep: FC<RegisterFormSecondStep> = ({ onFinishStep2, setAvatar }) => {
 	
-	const normFile = (e: any) => {
-		if (Array.isArray(e)) {
-			return e
-		}
-		return e?.fileList
-	}
 	
 	return (
 		<div className='description-step'>
@@ -50,8 +45,7 @@ const RegisterFormSecondStep: FC<RegisterFormSecondStep> = ({ onFinishStep2 }) =
 				</Form.Item>
 				
 				Фото профиля:
-				<RegisterFormAvatarUpload />
-				
+				<RegisterFormAvatarUpload setAvatar={setAvatar}/>
 				
 				<Form.Item name='description'>
 					<Input.TextArea placeholder='Описание профиля' rows={4} />
