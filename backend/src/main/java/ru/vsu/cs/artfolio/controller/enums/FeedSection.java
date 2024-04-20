@@ -6,5 +6,4 @@ public enum FeedSection {
     POPULAR,
 
     SUBSCRIBE
-
 }

@@ -6,20 +6,19 @@ import ru.vsu.cs.artfolio.dto.PageDto;
 import ru.vsu.cs.artfolio.dto.post.FullPostResponseDto;
 import ru.vsu.cs.artfolio.dto.post.PostRequestDto;
 import ru.vsu.cs.artfolio.dto.post.PostResponseDto;
-import ru.vsu.cs.artfolio.entity.MediaFileEntity;
 import ru.vsu.cs.artfolio.entity.PostEntity;
 import ru.vsu.cs.artfolio.entity.UserEntity;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.Comparator;
+import java.util.ArrayList;
 import java.util.List;
 
 public class PostMapper {
-    public static FullPostResponseDto toFullDto(PostEntity postEntity) {
+    public static FullPostResponseDto toFullDto(PostEntity postEntity, List<Long> mediaIds) {
         return FullPostResponseDto.builder()
                 .id(postEntity.getId())
-                .mediaIds(postEntity.getMedias().stream().sorted(Comparator.comparingInt(MediaFileEntity::getPosition)).map(MediaFileEntity::getId).toList())
+                .mediaIds(mediaIds)
                 .name(postEntity.getName())
                 .owner(UserMapper.toDto(postEntity.getOwner()))
                 .description(postEntity.getDescription())
@@ -32,21 +31,28 @@ public class PostMapper {
                 .description(post.getDescription())
                 .createTime(LocalDateTime.now())
                 .owner(owner)
-                .medias(MediaMapper.toEntityList(files))
                 .build();
     }
 
-    public static PostResponseDto toDto(PostEntity postEntity) {
+    public static PostResponseDto toDto(PostEntity postEntity, Long previewMediaId) {
         return PostResponseDto.builder()
                 .id(postEntity.getId())
-                .previewMediaId(postEntity.getMedias().get(0).getId())
+                .previewMediaId(previewMediaId)
                 .owner(UserMapper.toDto(postEntity.getOwner()))
                 .likeCount(null)
                 .build();
     }
 
-    public static PageDto<PostResponseDto> toPageDto(Page<PostEntity> postEntityPage) {
-        Page<PostResponseDto> sourcePage = postEntityPage.map(PostMapper::toDto);
-        return new PageDto<>(sourcePage.getContent(), sourcePage.getTotalElements(), sourcePage.getTotalPages());
+
+    public static PageDto<PostResponseDto> toPageDto(Page<PostEntity> postEntityPage, List<Long> previewMediaIds) {
+        if (previewMediaIds.size() != postEntityPage.getContent().size()) {
+            throw new IllegalArgumentException("previewMediaIds size must be equal postEntityPage size");
+        }
+        List<PostEntity> postEntityList = postEntityPage.getContent();
+        List<PostResponseDto> mappedPosts = new ArrayList<>();
+        for (int i = 0; i < postEntityList.size(); i++) {
+            mappedPosts.add(toDto(postEntityList.get(i), previewMediaIds.get(i)));
+        }
+        return new PageDto<>(mappedPosts, postEntityPage.getTotalElements(), postEntityPage.getTotalPages());
     }
 }

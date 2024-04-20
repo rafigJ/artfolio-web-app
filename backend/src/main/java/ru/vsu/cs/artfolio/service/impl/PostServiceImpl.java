@@ -21,6 +21,7 @@ import ru.vsu.cs.artfolio.entity.PostEntity;
 import ru.vsu.cs.artfolio.entity.UserEntity;
 import ru.vsu.cs.artfolio.exception.NotFoundException;
 import ru.vsu.cs.artfolio.exception.RestException;
+import ru.vsu.cs.artfolio.mapper.MediaMapper;
 import ru.vsu.cs.artfolio.mapper.PostMapper;
 import ru.vsu.cs.artfolio.repository.MediaRepository;
 import ru.vsu.cs.artfolio.repository.PostRepository;
@@ -28,6 +29,7 @@ import ru.vsu.cs.artfolio.repository.UserRepository;
 import ru.vsu.cs.artfolio.service.PostService;
 
 import java.io.IOException;
+import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 
@@ -53,8 +55,10 @@ public class PostServiceImpl implements PostService {
             PostEntity post = PostMapper.toEntity(requestDto, ownerEntity, files);
             LOGGER.info("Сохранение поста");
             PostEntity createdPost = postRepository.save(post);
+            List<MediaFileEntity> medias = mediaRepository.saveAll(MediaMapper.toEntityList(files, createdPost));
             LOGGER.info("Возврат ответа");
-            return PostMapper.toFullDto(createdPost);
+            List<Long> mediaIds = medias.stream().sorted(Comparator.comparingInt(MediaFileEntity::getPosition)).map(MediaFileEntity::getId).toList();
+            return PostMapper.toFullDto(createdPost, mediaIds);
         } catch (IOException e) {
             LOGGER.error("ОШИБКА {}", e.getMessage());
             throw new RestException(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
@@ -65,8 +69,8 @@ public class PostServiceImpl implements PostService {
     public FullPostResponseDto getPostById(Long id) {
         PostEntity postEntity = postRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Post by id: " + id + " not found"));
-
-        return PostMapper.toFullDto(postEntity);
+        List<Long> mediaIds = postEntity.getMedias().stream().sorted(Comparator.comparingInt(MediaFileEntity::getPosition)).map(MediaFileEntity::getId).toList();
+        return PostMapper.toFullDto(postEntity, mediaIds);
     }
 
     @Override
@@ -82,6 +86,7 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public FullPostResponseDto updatePost(UUID userId, Long id, PostRequestDto requestDto, List<MultipartFile> files) {
         PostEntity postToUpdate = postRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Post by id: " + id + " not found"));
@@ -96,8 +101,11 @@ public class PostServiceImpl implements PostService {
         try {
             PostEntity newPost = PostMapper.toEntity(requestDto, ownerEntity, files);
             newPost.setId(id);
+            mediaRepository.deleteAllByPostIdEquals(id);
             PostEntity updatedPost = postRepository.save(newPost);
-            return PostMapper.toFullDto(updatedPost);
+            List<MediaFileEntity> medias = mediaRepository.saveAll(MediaMapper.toEntityList(files, updatedPost));
+            List<Long> mediaIds = medias.stream().sorted(Comparator.comparingInt(MediaFileEntity::getPosition)).map(MediaFileEntity::getId).toList();
+            return PostMapper.toFullDto(updatedPost, mediaIds);
         } catch (IOException e) {
             LOGGER.error("ОШИБКА {}", e.getMessage());
             throw new RestException(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
@@ -107,13 +115,15 @@ public class PostServiceImpl implements PostService {
     @Override
     public PageDto<PostResponseDto> getPostsPageByUserId(UUID userId, Pageable page) {
         Page<PostEntity> posts = postRepository.findAllByOwnerUuid(userId, page);
-        return PostMapper.toPageDto(posts);
+        List<Long> medias = mediaRepository.findAllByPostInAndPositionOrderByPost(posts.getContent(), 1).stream().map(MediaFileEntity::getId).toList();
+        return PostMapper.toPageDto(posts, medias);
     }
 
     @Override
     public PageDto<PostResponseDto> getPostsPageBySpecifications(Specification<PostEntity> specification, Pageable page) {
         Page<PostEntity> posts = postRepository.findAll(specification, page);
-        return PostMapper.toPageDto(posts);
+        List<Long> medias = posts.getContent().stream().map(post -> post.getMedias().get(0).getId()).toList();
+        return PostMapper.toPageDto(posts, medias);
     }
 
     @Override
