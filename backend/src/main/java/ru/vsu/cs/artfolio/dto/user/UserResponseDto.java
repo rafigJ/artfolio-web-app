@@ -1,4 +1,4 @@
-package ru.vsu.cs.artfolio.dto;
+package ru.vsu.cs.artfolio.dto.user;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,6 +13,7 @@ import java.util.UUID;
 @AllArgsConstructor
 public final class UserResponseDto {
     public UUID uuid;
-    public String name;
+    public String fullName;
     public String email;
+    public String username;
 }
