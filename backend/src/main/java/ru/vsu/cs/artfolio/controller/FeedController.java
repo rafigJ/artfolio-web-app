@@ -1,6 +1,5 @@
 package ru.vsu.cs.artfolio.controller;
 
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -14,6 +13,7 @@ import ru.vsu.cs.artfolio.auth.user.User;
 import ru.vsu.cs.artfolio.controller.enums.FeedSection;
 import ru.vsu.cs.artfolio.dto.PageDto;
 import ru.vsu.cs.artfolio.dto.post.PostResponseDto;
+import ru.vsu.cs.artfolio.exception.BadRequestException;
 import ru.vsu.cs.artfolio.service.FeedService;
 
 @RestController
@@ -31,7 +31,12 @@ public class FeedController {
         PageDto<PostResponseDto> posts = switch (section) {
             case NEW -> feedService.getPostsPageOrderedByTime(pageable);
             case POPULAR -> feedService.getPostsPageOrderedByPopularity(pageable);
-            case SUBSCRIBE -> feedService.getPostsPageOrderedByFollowerSubscribe(user.getUserEntity().getUuid(), pageable);
+            case SUBSCRIBE -> {
+                if (user == null) {
+                    throw new BadRequestException("user must be logged in for SUBSCRIBE query");
+                }
+                yield feedService.getPostsPageOrderedByFollowerSubscribe(user.getUserEntity().getUuid(), pageable);
+            }
         };
         return ResponseEntity.ok(posts);
     }

@@ -9,6 +9,7 @@ import ru.vsu.cs.artfolio.entity.PostEntity;
 import java.util.UUID;
 
 public interface FeedService {
+
     PageDto<PostResponseDto> getPostsPageOrderedByTime(Pageable page);
 
     PageDto<PostResponseDto> getPostsPageByName(String name, Pageable page);
@@ -18,6 +19,5 @@ public interface FeedService {
     PageDto<PostResponseDto> getPostsPageOrderedByFollowerSubscribe(UUID userId, Pageable page);
 
     PageDto<PostResponseDto> getPostsPageBySpecifications(Specification<PostEntity> specification, Pageable page);
-
 
 }

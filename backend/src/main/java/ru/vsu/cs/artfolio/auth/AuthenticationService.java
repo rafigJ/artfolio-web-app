@@ -8,6 +8,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import ru.vsu.cs.artfolio.auth.user.Role;
 import ru.vsu.cs.artfolio.auth.user.User;
 import ru.vsu.cs.artfolio.dto.auth.AuthRequestDto;
@@ -21,6 +22,7 @@ import ru.vsu.cs.artfolio.exception.NotExistUserException;
 import ru.vsu.cs.artfolio.exception.RestException;
 import ru.vsu.cs.artfolio.repository.UserRepository;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 
 @Service
@@ -31,22 +33,21 @@ public class AuthenticationService {
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
 
-    public AuthResponseDto register(RegisterRequestDto request) throws DataIntegrityViolationException {
-
-        if (repository.existsByEmail(request.email())) {
+    public AuthResponseDto register(RegisterRequestDto request, MultipartFile avatarFile) {
+        if (repository.existsByEmailOrUsername(request.email(), request.username())) {
             throw new ExistUserException();
         }
 
-        UserEntity userEntity = convertRequestToEntity(request, passwordEncoder);
         try {
+            UserEntity userEntity = convertRequestToEntity(request, avatarFile, passwordEncoder);
             repository.saveAndFlush(userEntity);
-        } catch (DataIntegrityViolationException e) {
+            User user = new User(userEntity);
+            String jwtToken = jwtService.generateToken(user);
+            return convertEntityToAuthResponse(userEntity, jwtToken);
+        } catch (DataIntegrityViolationException | IOException e) {
             throw new RestException("Server error", HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
-        User user = new User(userEntity);
-        String jwtToken = jwtService.generateToken(user);
-        return convertEntityToAuthResponse(userEntity, jwtToken);
     }
 
     public AuthResponseDto authenticate(AuthRequestDto request) {
@@ -89,12 +90,18 @@ public class AuthenticationService {
                 .build();
     }
 
-    private static UserEntity convertRequestToEntity(RegisterRequestDto request, PasswordEncoder passwordEncoder) {
+    private static UserEntity convertRequestToEntity(RegisterRequestDto request, MultipartFile avatar, PasswordEncoder passwordEncoder) throws IOException {
         return UserEntity.builder()
-                .fullName(request.fullName())
                 .email(request.email())
+                .username(request.username())
                 .password(passwordEncoder.encode(request.password()))
                 .secretWord(passwordEncoder.encode(request.secretWord()))
+                .fullName(request.fullName())
+                .country(request.country())
+                .city(request.city())
+                .additionalInfo(request.description())
+                .avatar(avatar.getBytes())
+                .avatarType(avatar.getContentType())
                 .role(Role.USER)
                 .createTime(LocalDateTime.now())
                 .updateTime(LocalDateTime.now())
