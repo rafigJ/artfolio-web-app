@@ -1,0 +1,1301 @@
+openapi: 3.0.3
+info:
+  title: Сервис для создания и управления портфолио Artfolio
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: 0.0.1
+servers:
+  - url: http://localhost/
+tags:
+  - name: auth
+    description: Регистрация, Авторизация, Сброс пароля
+  - name: feed
+    description: Получение всех постов
+  - name: posts
+    description: Работа и взаимодействие с постами
+  - name: comments
+    description: Комментирование постов
+  - name: user
+    description: Взаимодействие с профилем пользователя
+  - name: subscribes
+    description: Работа со списком подписчиков пользователя
+  - name: reports
+    description: Жалобы на посты или комментарии
+paths:
+  # posts
+  /api/v1/posts:
+    post:
+      tags:
+        - posts
+      summary: Создать пост
+      description: Создать пост авторизованным пользователем
+      operationId: createPost
+      requestBody:
+        description: Создать пост в платформе
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PostRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FullPostResponse'
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      security:
+        - bearerAuth: [ ]
+  /api/v1/posts/{postId}:
+    get:
+      tags:
+        - posts
+      summary: Получить пост по идентификатору
+      parameters:
+        - name: postId
+          in: path
+          required: true
+          schema:
+            type: integer
+      operationId: getPostById
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FullPostResponse'
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    put:
+      tags:
+        - posts
+      summary: Обновить пост
+      description: Позволяет обновить пост создателю
+      parameters:
+        - name: postId
+          in: path
+          required: true
+          schema:
+            type: integer
+      operationId: updatePost
+      requestBody:
+        description: Обновить пост в платформе
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PostRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FullPostResponse'
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      security:
+        - bearerAuth: [ ]
+    delete:
+      tags:
+        - posts
+      summary: Удалить пост
+      description: Позволяет удалить пост создателю/администратору
+      parameters:
+        - name: postId
+          in: path
+          required: true
+          schema:
+            type: integer
+      operationId: deletePost
+      responses:
+        '200':
+          description: Successful operation
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      security:
+        - bearerAuth: [ ]
+  # like post
+  /api/v1/posts/{postId}/like:
+    post:
+      tags:
+        - posts
+      summary: Лайкнуть пост
+      description: Позволяет авторизованному пользователю поставить лайк
+      parameters:
+        - name: postId
+          in: path
+          required: true
+          schema:
+            type: integer
+      operationId: likePost
+      responses:
+        '200':
+          description: Successful operation
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      security:
+        - bearerAuth: [ ]
+    delete:
+      tags:
+        - posts
+      summary: Убрать лайк с поста
+      description: Позволяет авторизованному пользователю убрать свой лайк с поста
+      parameters:
+        - name: postId
+          in: path
+          required: true
+          schema:
+            type: integer
+      operationId: deleteLikeFromPost
+      responses:
+        '200':
+          description: Successful operation
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      security:
+        - bearerAuth: [ ]
+  /api/v1/posts/medias/{mediaId}:
+    get:
+      tags:
+        - posts
+      summary: Получить медиа-файл (изображение) поста по идентификатору
+      parameters:
+        - name: mediaId
+          in: path
+          required: true
+          schema:
+            type: integer
+      operationId: getMediaById
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            image/jpg:
+              schema:
+                type: string
+                format: binary
+            image/png:
+              schema:
+                type: string
+                format: binary
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  # comment post
+  /api/v1/posts/{postId}/comments:
+    get:
+      tags:
+        - comments
+      summary: Получить все комментарии под постом
+      description: Позволяет пользователю получить страницу комментариев под постом
+      parameters:
+        - name: postId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: _page
+          description: Номер страницы (отчет от 0)
+          in: query
+          required: true
+          schema:
+            type: integer
+        - name: _limit
+          description: Максимальное количество элементов на одной странице (по-умолчанию 20)
+          in: query
+          required: false
+          schema:
+            type: integer
+      operationId: getComments
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommentsPage'
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    post:
+      tags:
+        - comments
+      summary: Сохранить комментарий под постом
+      description: Позволяет авторизованному пользователю комментировать пост
+      parameters:
+        - name: postId
+          in: path
+          required: true
+          schema:
+            type: integer
+      operationId: commentPost
+      requestBody:
+        description: Создать комментарий под постом
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommentRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommentResponse'
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      security:
+        - bearerAuth: [ ]
+  /api/v1/posts/{postId}/comments/{commentId}:
+    delete:
+      tags:
+        - comments
+      summary: Удалить комментарий под постом
+      description: Позволяет авторизованному пользователю удалить свой комментарий с поста. А также администратору удалить его.
+      parameters:
+        - name: postId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: commentId
+          in: path
+          required: true
+          schema:
+            type: integer
+      operationId: deleteCommentPost
+      responses:
+        '200':
+          description: Successful operation
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      security:
+        - bearerAuth: [ ]
+  # feed
+  /api/v1/feed:
+    get:
+      tags:
+        - feed
+      summary: Получить страницу постов
+      description: Позволяет пользователю получить страницу постов определенной секции (Новые, Популярные, Для вас). Популярные посты определяются по количеству лайков. Секция "Для вас" содержит посты в первую очередь тех, на кого пользователь подписан.
+      parameters:
+        - name: section
+          description: Указывается конкретная секция NEW (по-умолчанию), POPULAR, SUBSCRIBE
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - NEW
+              - POPULAR
+              - SUBSCRIBE
+        - name: _page
+          description: Номер страницы (отчет от 0)
+          in: query
+          required: true
+          schema:
+            type: integer
+        - name: _limit
+          description: Максимальное количество элементов на одной странице (по-умолчанию 20)
+          in: query
+          required: false
+          schema:
+            type: integer
+      operationId: getSectionPosts
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostsPage'
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /api/v1/feed/search:
+    get:
+      tags:
+        - feed
+      summary: Поиск постов по параметрам
+      description: Позволяет пользователю получить страницу постов по названию
+      parameters:
+        - name: name
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: _page
+          description: Номер страницы (отчет от 0)
+          in: query
+          required: true
+          schema:
+            type: integer
+        - name: _limit
+          description: Максимальное количество элементов на одной странице (по-умолчанию 20)
+          in: query
+          required: false
+          schema:
+            type: integer
+      operationId: getPostsByName
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostsPage'
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  # user
+  /api/v1/user/{username}:
+    get:
+      tags:
+        - user
+      summary: Получить информацию о пользователе
+      description: Позволяет получить информацию о пользователе
+      parameters:
+        - name: username
+          in: path
+          required: true
+          schema:
+            type: integer
+      operationId: getUserInfo
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FullUserResponse'
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    put:
+      tags:
+        - user
+      summary: Обновить информацию о пользователе (Доступно только самому пользователю)
+      description: Позволяет обновить информацию о пользователе (Доступно только самому пользователю)
+      parameters:
+        - name: username
+          in: path
+          required: true
+          schema:
+            type: integer
+      operationId: updateUser
+      requestBody:
+        description: Обновить личную информацию пользователя
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UserUpdateRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FullUserResponse'
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      security:
+        - bearerAuth: [ ]
+    delete:
+      tags:
+        - user
+      summary: Удалить пользователя (Доступно только администраторам)
+      description: Позволяет удалить пользователя администратору
+      parameters:
+        - name: username
+          in: path
+          required: true
+          schema:
+            type: integer
+      operationId: deleteUser
+      responses:
+        '200':
+          description: Successful operation
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      security:
+        - bearerAuth: [ ]
+  /api/v1/user/{username}/avatar:
+    get:
+      tags:
+        - user
+      summary: Получить аватарку пользователя
+      parameters:
+        - name: username
+          in: path
+          required: true
+          schema:
+            type: string
+            example: boltonArts
+      operationId: getAvatarByUsername
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            image/jpg:
+              schema:
+                type: string
+                format: binary
+            image/png:
+              schema:
+                type: string
+                format: binary
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  # user posts
+  /api/v1/user/{username}/posts:
+    get:
+      tags:
+        - user
+      summary: Получить страницу постов пользователя
+      description: Позволяет пользователю получить страницу постов сделанные другим пользователем с username
+      parameters:
+        - name: username
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: _page
+          description: Номер страницы (отчет от 0)
+          in: query
+          required: true
+          schema:
+            type: integer
+        - name: _limit
+          description: Максимальное количество элементов на одной странице (по-умолчанию 20)
+          in: query
+          required: false
+          schema:
+            type: integer
+      operationId: getUserPosts
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostsPage'
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  # user subscribes
+  /api/v1/user/{username}/subscribes:
+    get:
+      tags:
+        - subscribes
+      summary: Получить тех пользователей, на кого пользователь c username подписан
+      description: Позволяет получить страницу пользователей, на кого пользователь с username подписан
+      parameters:
+        - name: username
+          in: path
+          required: true
+          schema:
+            type: integer
+      operationId: getAllUserSubscribes
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UsersPage'
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    post:
+      tags:
+        - subscribes
+      summary: Подписаться на пользователя c username
+      description: Позволяет подписаться на пользователя (username)
+      parameters:
+        - name: username
+          in: path
+          required: true
+          schema:
+            type: integer
+      operationId: subscribe
+      responses:
+        '200':
+          description: Successful operation
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      security:
+        - bearerAuth: [ ]
+    delete:
+      tags:
+        - subscribes
+      summary: Отписаться от пользователя с username
+      description: Позволяет отписаться от пользователя с username
+      parameters:
+        - name: username
+          in: path
+          required: true
+          schema:
+            type: integer
+      operationId: deleteSubscribe
+      responses:
+        '200':
+          description: Successful operation
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      security:
+        - bearerAuth: [ ]
+  # user followers
+  /api/v1/user/{username}/followers:
+    get:
+      tags:
+        - subscribes
+      summary: Получить тех пользователей, которые подписаны на пользователя с username
+      description: Позволяет получить страницу пользователей, которые подписаны на пользователя с username
+      parameters:
+        - name: username
+          in: path
+          required: true
+          schema:
+            type: integer
+      operationId: getAllUserFollowers
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UsersPage'
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  # post reports
+  /api/v1/reports:
+    get:
+      tags:
+        - reports
+      summary: Получить страницу жалоб (Доступно только администраторам)
+      description: Получить страницу жалоб на публикацию или комментарии (доступно только администраторам)
+      operationId: getReportPage
+      parameters:
+        - name: type
+          in: query
+          required: true
+          schema:
+            type: string
+            enum:
+              - post
+              - comment
+        - name: _page
+          description: Номер страницы (отчет от 0)
+          in: query
+          required: true
+          schema:
+            type: integer
+        - name: _limit
+          description: Максимальное количество элементов на одной странице (по-умолчанию 20)
+          in: query
+          required: false
+          schema:
+            type: integer
+        - name: reviewed
+          in: query
+          required: false
+          description: Флаг указывающий, рассмотрена ли жалоба (true - рассмотренная, false - нерассмотренная, all - все жалобы) [по-умолчанию all]
+          schema:
+            type: string
+            enum:
+              - all
+              - 'true'
+              - 'false'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  oneOf:
+                    - $ref: '#/components/schemas/PostReportPage'
+                    - $ref: '#/components/schemas/CommentReportPage'
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      security:
+        - bearerAuth: [ ]
+  /api/v1/reports/{reportId}:
+    patch:
+      tags:
+        - reports
+      summary: Отметить жалобу рассмотренной или не рассмотренной (Доступно только администраторам)
+      description: Позволяет администратору отметить жалобу рассмотренной или не рассмотренной
+      operationId: setReviewedReport
+      parameters:
+        - name: reportId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                reviewed:
+                  type: boolean
+                  example: true
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                description: Страница из жалоб на посты или на комментарии
+                items:
+                  oneOf:
+                    - $ref: '#/components/schemas/PostReportResponse'
+                    - $ref: '#/components/schemas/CommentReportResponse'
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      security:
+        - bearerAuth: [ ]
+  /api/v1/posts/{postId}/reports:
+    post:
+      tags:
+        - reports
+      summary: Отправить жалобу на публикацию
+      description: Отправить жалобу на публикацию (доступно только авторизованным пользователям)
+      operationId: createPostReport
+      parameters:
+        - name: postId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostReportRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostReportResponse'
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      security:
+        - bearerAuth: [ ]
+  /api/v1/comments/{commentId}/reports:
+    post:
+      tags:
+        - reports
+      summary: Отправить жалобу на комментарий
+      description: Отправить жалобу на комментарий (доступно только авторизованным пользователям)
+      operationId: createCommentReport
+      parameters:
+        - name: commentId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommentReportRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommentReportResponse'
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      security:
+        - bearerAuth: [ ]
+  
+  
+  # auth
+  /api/v1/auth:
+    get:
+      tags:
+        - auth
+      summary: Получить данные пользователя по JWT токену
+      description: Позволяет по JWT токену в Header получить данные пользователя
+      operationId: getUserDataByJwt
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      security:
+        - bearerAuth: [ ]
+  /api/v1/auth/login:
+    post:
+      tags:
+        - auth
+      summary: Войти в аккаунт (получить JWT токен)
+      description: Позволяет зарегистрированному пользователю получить JWT bearer token
+      operationId: login
+      requestBody:
+        description: Данные пользователя для входа
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthRequest'
+        required: true
+
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /api/v1/auth/register:
+    post:
+      tags:
+        - auth
+      summary: Зарегистрировать аккаунт (получить JWT токен)
+      description: Позволяет анонимному пользователю получить JWT bearer token, а также зарегистрироваться
+      operationId: register
+      requestBody:
+        description: Данные пользователя для входа
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /api/v1/auth/change-password:
+    patch:
+      tags:
+        - auth
+      summary: Сбросить и изменить пароль по Секретному слову
+      description: Позволяет зарегистрированному пользователю изменить пароль по секретному слову
+      requestBody:
+        description: Данные пользователя для сброса пароля
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChangePasswordRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+
+components:
+  schemas:
+    # auth
+    RegisterRequest:
+      type: object
+      properties:
+        userInfo:
+          type: object
+          properties:
+            fullName:
+              type: string
+              example: Рамси Болтон
+            description:
+              type: string
+              example: Родился я бастардом на Севере Вестероса. С раннего детства отец заметил мой талант к Искусству. Пока я новичок в этом деле. Надеюсь вам понравятся мои работы.
+            country:
+              type: string
+              example: Россия
+            city:
+              type: string
+              example: Уфа
+            username:
+              type: string
+              example: boltonArts
+            email:
+              type: string
+              example: bolton@vesteros.com
+            password:
+              type: string
+              example: somePassword19
+            secretWord:
+              type: string
+              example: winterIsComing
+          description: Данные пользователя в формате JSON
+        avatarFile:
+          type: string
+          format: binary
+          description: Изображение аватара в формате png/jpg
+    AuthRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          example: bolton@vesteros.com
+        password:
+          type: string
+          example: somePassword19
+          format: password
+    AuthResponse:
+      type: object
+      properties:
+        username:
+          type: string
+          example: boltonArts
+        fullName:
+          type: string
+          example: Рамси Болтон
+        email:
+          type: string
+          example: bolton@vesteros.com
+        role:
+          type: string
+          enum:
+            - USER
+            - ADMIN
+        token:
+          type: string
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
+    ChangePasswordRequest:
+      type: object
+      properties:
+        email:
+          type: string
+        secretWord:
+          type: string
+        newPassword:
+          type: string
+    # post
+    PostRequest:
+      type: object
+      properties:
+        post:
+          type: object
+          properties:
+            name:
+              type: string
+              example: Герб Болтона
+            description:
+              type: string
+              example: Красный ободранный человек, распятый вниз головой на белом косом кресте на тёмно-синем поле.
+          description: Данные о публикации в формате JSON
+        file:
+          type: array
+          items:
+            type: string
+            format: binary
+          description: Массив изображений в формате jpg/png
+    FullPostResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 33
+        name:
+          type: string
+          example: Герб Болтона
+        description:
+          type: string
+          example: Красный ободранный человек, распятый вниз головой на белом косом кресте на тёмно-синем поле.
+        likeCount:
+          type: integer
+          example: 39
+        previewMedia:
+          type: integer
+          example: 949
+          description: id на превьюшку изображения
+        owner:
+          $ref: '#/components/schemas/UserResponse'
+    PostResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 33
+        name:
+          type: string
+          example: Герб Болтона
+        likeCount:
+          type: integer
+          example: 39
+        previewMedia:
+          type: integer
+          example: 949
+          description: id на превьюшку изображения
+        owner:
+          $ref: '#/components/schemas/UserResponse'
+    PostsPage:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/PostResponse'
+        totalElements:
+          type: integer
+          example: 200
+        totalPages:
+          type: integer
+          example: 10
+    # comment
+    CommentRequest:
+      type: object
+      properties:
+        comment:
+          type: string
+          example: Рамси, у вас невероятно красивое портфолио! Надеюсь, и я когда-нибудь создам подобное) Пока мне до такого как до луны )
+    CommentResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 100
+        owner:
+          type: object
+          properties:
+            fullName:
+              type: string
+              example: Рамси Болтон
+            username:
+              type: string
+              example: boltonArts
+        comment:
+          type: string
+          example: Теон, у вас невероятно красивое портфолио! Надеюсь, и я когда-нибудь создам подобное)
+        createTime:
+          type: string
+          example: 2024-03-23 12:00
+          format: yyyy-MM-dd HH:mm
+    CommentsPage:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/CommentResponse'
+        totalElements:
+          type: integer
+          example: 100
+        totalPages:
+          type: integer
+          example: 10
+    # user
+    UserUpdateRequest:
+      type: object
+      properties:
+        userInfo:
+          type: object
+          properties:
+            fullName:
+              type: string
+              example: Рамси Болтон
+            description:
+              type: string
+              example: Родился я бастардом на Севере России города Уфа. С раннего детства отец приучал меня к Искусству. Пока я новичок в этом деле. Надеюсь вам понравятся мои работы.
+            country:
+              type: string
+              example: Россия
+            city:
+              type: string
+              example: Уфа
+            username:
+              type: string
+              example: boltonArts
+            email:
+              type: string
+              example: bolton@vesteros.com
+          description: Данные пользователя в формате JSON
+        avatarFile:
+          type: string
+          format: binary
+          description: Изображение аватара в формате png/jpg
+    FullUserResponse:
+      type: object
+      properties:
+        fullName:
+          type: string
+          example: Рамси Болтон
+        description:
+          type: string
+          example: Родился я бастардом на Севере России города Уфа. С раннего детства отец приучал меня к Искусству. Пока я новичок в этом деле. Надеюсь вам понравятся мои работы.
+        country:
+          type: string
+          example: Россия
+        city:
+          type: string
+          example: Уфа
+        username:
+          type: string
+          example: boltonArts
+        email:
+          type: string
+          example: bolton@vesteros.com
+        postCount:
+          type: integer
+          example: 0
+        subscribersCount:
+          type: integer
+          example: 3
+          description: Количество подписчиков
+        likeCount:
+          type: integer
+          example: 499
+    UserResponse:
+      type: object
+      properties:
+        fullName:
+          type: string
+          example: Рамси Болтон
+        username:
+          type: string
+          example: boltonArts
+    UsersPage:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserResponse'
+        totalElements:
+          type: integer
+          example: 100
+        totalPages:
+          type: integer
+          example: 10
+    # post report
+    PostReportRequest:
+      type: object
+      properties:
+        reason:
+          type: string
+          example: Очень много крови!
+    PostReportResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 359
+        postId:
+          type: integer
+          example: 33
+        reason:
+          type: string
+          example: Очень много крови!
+        reviewed:
+          type: boolean
+          example: false
+        targetUser:
+          $ref: '#/components/schemas/UserResponse'
+        sendler:
+          $ref: '#/components/schemas/UserResponse'
+    PostReportPage:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/PostReportResponse'
+        totalElements:
+          type: integer
+          example: 100
+        totalPages:
+          type: integer
+          example: 10
+    # comment report
+    CommentReportRequest:
+      type: object
+      properties:
+        reason:
+          type: string
+          example: Очень много мата!
+    CommentReportResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 159
+        postId:
+          type: integer
+          example: 33
+        commentId:
+          type: integer
+          example: 52
+        comment:
+          type: string
+          example: Б**%%ТЬ, КАКАЯ ЖЕ Х***А!
+        reason:
+          type: string
+          example: Очень много мата!
+        reviewed:
+          type: boolean
+          example: false
+        targetUser:
+          $ref: '#/components/schemas/UserResponse'
+        sendler:
+          $ref: '#/components/schemas/UserResponse'
+    CommentReportPage:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/CommentReportResponse'
+        totalElements:
+          type: integer
+          example: 100
+        totalPages:
+          type: integer
+          example: 10
+    # error
+    Error:
+      type: object
+      properties:
+        message:
+          type: string
+          example: Something went wrong.
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
