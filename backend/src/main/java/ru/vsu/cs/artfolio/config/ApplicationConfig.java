@@ -8,9 +8,12 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.transaction.annotation.Transactional;
 import ru.vsu.cs.artfolio.repository.UserRepository;
 import ru.vsu.cs.artfolio.exception.NotExistUserException;
 import ru.vsu.cs.artfolio.auth.user.User;
@@ -23,8 +26,14 @@ public class ApplicationConfig {
 
     @Bean
     public UserDetailsService userDetailsService() {
-        return username -> new User(repository.findByEmail(username)
-                .orElseThrow(NotExistUserException::new));
+        return new UserDetailsService() {
+            @Override
+//            @Transactional
+            public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+                return new User(repository.findByEmail(username)
+                        .orElseThrow(NotExistUserException::new));
+            }
+        };
     }
 
     @Bean
