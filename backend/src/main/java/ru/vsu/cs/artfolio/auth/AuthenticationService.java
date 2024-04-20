@@ -82,7 +82,7 @@ public class AuthenticationService {
 
     private static AuthResponseDto convertEntityToAuthResponse(UserEntity userEntity, String token) {
         return AuthResponseDto.builder()
-                .name(userEntity.getFullName())
+                .name(userEntity.getName())
                 .email(userEntity.getEmail())
                 .role(userEntity.getRole().name())
                 .token(token)
@@ -91,7 +91,7 @@ public class AuthenticationService {
 
     private static UserEntity convertRequestToEntity(RegisterRequestDto request, PasswordEncoder passwordEncoder) {
         return UserEntity.builder()
-                .fullName(request.fullName())
+                .name(request.name())
                 .email(request.email())
                 .password(passwordEncoder.encode(request.password()))
                 .secretWord(passwordEncoder.encode(request.secretWord()))
