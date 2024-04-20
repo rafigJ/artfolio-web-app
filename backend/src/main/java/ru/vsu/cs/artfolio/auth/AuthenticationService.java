@@ -8,6 +8,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import ru.vsu.cs.artfolio.auth.user.Role;
 import ru.vsu.cs.artfolio.auth.user.User;
@@ -33,6 +34,7 @@ public class AuthenticationService {
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
 
+    @Transactional
     public AuthResponseDto register(RegisterRequestDto request, MultipartFile avatarFile) {
         if (repository.existsByEmailOrUsername(request.email(), request.username())) {
             throw new ExistUserException();
@@ -40,8 +42,7 @@ public class AuthenticationService {
 
         try {
             UserEntity userEntity = convertRequestToEntity(request, avatarFile, passwordEncoder);
-            repository.saveAndFlush(userEntity);
-            User user = new User(userEntity);
+            User user = new User(repository.save(userEntity));
             String jwtToken = jwtService.generateToken(user);
             return convertEntityToAuthResponse(userEntity, jwtToken);
         } catch (DataIntegrityViolationException | IOException e) {
@@ -50,6 +51,7 @@ public class AuthenticationService {
 
     }
 
+    @Transactional
     public AuthResponseDto authenticate(AuthRequestDto request) {
         try {
             authenticationManager.authenticate(
