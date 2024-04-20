@@ -51,6 +51,10 @@ public class UserEntity {
     private byte[] avatar;
     // для работы ленивой загрузки, необходимо создать ещё одну сущность, оборачивающее данное поле avatar
 
+    @Lob
+    @Column(name = "avatar_type")
+    private String avatarType;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, name = "role")
     private Role role;

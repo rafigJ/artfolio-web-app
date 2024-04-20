@@ -34,7 +34,7 @@ public class AuthenticationService {
     private final AuthenticationManager authenticationManager;
 
     public AuthResponseDto register(RegisterRequestDto request, MultipartFile avatarFile) {
-        if (repository.existsByEmail(request.email()) || repository.existsByUsername(request.username())) {
+        if (repository.existsByEmailOrUsername(request.email(), request.username())) {
             throw new ExistUserException();
         }
 
@@ -101,6 +101,7 @@ public class AuthenticationService {
                 .city(request.city())
                 .additionalInfo(request.description())
                 .avatar(avatar.getBytes())
+                .avatarType(avatar.getContentType())
                 .role(Role.USER)
                 .createTime(LocalDateTime.now())
                 .updateTime(LocalDateTime.now())

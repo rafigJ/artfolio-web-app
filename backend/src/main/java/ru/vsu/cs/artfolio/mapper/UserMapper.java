@@ -15,7 +15,18 @@ public class UserMapper {
                 .build();
     }
 
-    public static FullUserResponseDto toFullDto() {
-        throw new UnsupportedOperationException();
+    public static FullUserResponseDto toFullDto(UserEntity user) {
+        return FullUserResponseDto.builder()
+                .uuid(user.getUuid())
+                .fullName(user.getFullName())
+                .description(user.getAdditionalInfo())
+                .country(user.getCountry())
+                .city(user.getCity())
+                .username(user.getUsername())
+                .email(user.getEmail())
+                .likeCount(null)
+                .subscribersCount(null)
+                .likeCount(null)
+                .build();
     }
 }

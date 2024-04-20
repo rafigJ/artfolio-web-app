@@ -28,7 +28,7 @@ public class ApplicationConfig {
     public UserDetailsService userDetailsService() {
         return new UserDetailsService() {
             @Override
-//            @Transactional
+            @Transactional
             public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
                 return new User(repository.findByEmail(username)
                         .orElseThrow(NotExistUserException::new));
