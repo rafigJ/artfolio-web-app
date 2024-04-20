@@ -8,7 +8,7 @@ import jakarta.validation.constraints.Size;
 public record RegisterRequestDto(
         @NotBlank(message = "should be not blank")
         @Size(min = 3, max = 40, message = "should contain minimum 3 characters, maximum 40 characters")
-        String name,
+        String fullName,
 
         @NotBlank(message = "should be not blank")
         @Size(min = 5, max = 150, message = "should contain minimum 5 characters, maximum 150 characters")

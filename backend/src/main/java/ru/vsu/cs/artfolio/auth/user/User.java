@@ -28,6 +28,7 @@ public class User implements UserDetails {
     }
 
     @Override
+    // TODO поменять на username
     public String getUsername() {
         return userEntity.getEmail();
     }
