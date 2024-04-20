@@ -3,9 +3,7 @@ package ru.vsu.cs.artfolio.service;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.vsu.cs.artfolio.repository.MediaRepository;
@@ -26,9 +24,6 @@ public class PostServiceImplUnitTest {
 
     @Mock
     UserRepository userRepository;
-
-    @Spy
-    ModelMapper modelMapper;
 
     @InjectMocks
     PostServiceImpl service;

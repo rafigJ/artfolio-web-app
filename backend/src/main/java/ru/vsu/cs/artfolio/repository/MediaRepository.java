@@ -8,8 +8,7 @@ import java.util.List;
 
 public interface MediaRepository extends JpaRepository<MediaFileEntity, Long> {
 
-//    List<MediaFileEntity> findAllByPostIdOrderByPosition(Long postId);
-
     void deleteAllByPostIdEquals(Long postId);
+
     List<MediaFileEntity> findAllByPostInAndPositionOrderByPost(List<PostEntity> postEntities, Integer position);
 }
