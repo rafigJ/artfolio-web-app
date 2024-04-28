@@ -11,7 +11,7 @@ public class UserMapper {
                 .uuid(user.getUuid())
                 .fullName(user.getFullName())
                 .email(user.getEmail())
-                .username(null)
+                .username(user.getUsername())
                 .build();
     }
 
