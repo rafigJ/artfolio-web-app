@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -16,9 +17,9 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import ru.vsu.cs.artfolio.auth.user.User;
+import ru.vsu.cs.artfolio.dto.MediaDto;
 import ru.vsu.cs.artfolio.dto.post.FullPostResponseDto;
 import ru.vsu.cs.artfolio.dto.post.PostRequestDto;
-import ru.vsu.cs.artfolio.entity.MediaFileEntity;
 import ru.vsu.cs.artfolio.service.PostService;
 
 import java.util.List;
@@ -50,11 +51,11 @@ public class PostController {
     }
 
     @GetMapping("/medias/{id}")
-    public ResponseEntity<?> downloadMedia(@PathVariable Long id) {
-        MediaFileEntity media = service.getMediaById(id);
+    public ResponseEntity<InputStreamResource> downloadMedia(@PathVariable Long id) {
+        MediaDto media = service.getMediaById(id);
 
         return ResponseEntity.ok()
-                .contentType(MediaType.valueOf(media.getType()))
-                .body(media.getFile());
+                .contentType(MediaType.valueOf(media.contentType()))
+                .body(new InputStreamResource(media.fileStream()));
     }
 }

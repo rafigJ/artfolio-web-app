@@ -1,7 +1,6 @@
 package ru.vsu.cs.artfolio.mapper;
 
 import org.springframework.data.domain.Page;
-import org.springframework.web.multipart.MultipartFile;
 import ru.vsu.cs.artfolio.dto.PageDto;
 import ru.vsu.cs.artfolio.dto.post.FullPostResponseDto;
 import ru.vsu.cs.artfolio.dto.post.PostRequestDto;
@@ -9,7 +8,6 @@ import ru.vsu.cs.artfolio.dto.post.PostResponseDto;
 import ru.vsu.cs.artfolio.entity.PostEntity;
 import ru.vsu.cs.artfolio.entity.UserEntity;
 
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +23,7 @@ public class PostMapper {
                 .build();
     }
 
-    public static PostEntity toEntity(PostRequestDto post, UserEntity owner, List<MultipartFile> files) throws IOException {
+    public static PostEntity toEntity(PostRequestDto post, UserEntity owner) {
         return PostEntity.builder()
                 .name(post.getName())
                 .description(post.getDescription())

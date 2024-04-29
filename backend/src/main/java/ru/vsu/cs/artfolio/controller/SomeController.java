@@ -30,7 +30,7 @@ public class SomeController {
 
     @PostMapping()
     public ResponseEntity<AuthResponseDto> hellotest(@AuthenticationPrincipal User user,
-                                                     @RequestPart("file") MultipartFile file,
+                                                     @RequestPart("fileStream") MultipartFile file,
                                                      @RequestPart("dto") @Valid RestExceptionDto dto) {
         LOGGER.info("Получен файл {}", file.getOriginalFilename());
         LOGGER.info("Получен dto {}", dto);
