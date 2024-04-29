@@ -9,9 +9,11 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
@@ -48,6 +50,29 @@ public class PostController {
     public ResponseEntity<FullPostResponseDto> getPostById(@PathVariable("id") Long id) {
         LOGGER.info("Получение поста " + id);
         return ResponseEntity.ok(service.getPostById(id));
+    }
+
+    @PutMapping("/{id}")
+    @PreAuthorize("isAuthenticated() and hasAuthority('USER')")
+    public ResponseEntity<FullPostResponseDto> updatePost(
+            @PathVariable("id") Long id,
+            @AuthenticationPrincipal User user,
+            @RequestPart("post") @Valid PostRequestDto post,
+            @RequestPart("file") List<MultipartFile> listFiles) {
+
+        LOGGER.info("Пользователь {} обновляет пост {}", user.getUsername(), post);
+        var updatedPost = service.updatePost(user.getUserEntity().getUuid(), id, post, listFiles);
+        return ResponseEntity.ok(updatedPost);
+    }
+
+    @DeleteMapping("/{id}")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<String> deletePost(
+            @PathVariable("id") Long id,
+            @AuthenticationPrincipal User user) {
+        LOGGER.info("Пользователь {} удаляет пост с идентификатором {}", user.getUsername(), id);
+        service.deletePost(user.getUserEntity().getUuid(), id);
+        return ResponseEntity.ok("post " + id + " is deleted");
     }
 
     @GetMapping("/medias/{id}")

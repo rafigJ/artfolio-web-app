@@ -56,7 +56,6 @@ public class UserController {
 
     @GetMapping("/{username}/avatar")
     public ResponseEntity<InputStreamResource> getUserAvatar(@PathVariable("username") String username) {
-        LOGGER.info("Получение аватарки {}", username);
         var avatar = service.downloadAvatar(username);
         return ResponseEntity.ok()
                 .contentType(MediaType.valueOf(avatar.contentType()))

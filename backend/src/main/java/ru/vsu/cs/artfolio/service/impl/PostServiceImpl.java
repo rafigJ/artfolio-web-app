@@ -121,7 +121,11 @@ public class PostServiceImpl implements PostService {
     @Override
     public PageDto<PostResponseDto> getPostsPageByUserId(UUID userId, Pageable page) {
         Page<PostEntity> posts = postRepository.findAllByOwnerUuid(userId, page);
-        List<Long> medias = mediaRepository.findAllByPostInAndPositionOrderByPost(posts.getContent(), 1).stream().map(MediaFileEntity::getId).toList();
+        List<Long> medias = posts.getContent().stream()
+                .map(post -> post.getMedias().stream()
+                        .sorted(Comparator.comparingInt(MediaFileEntity::getPosition)).toList()
+                        .get(0).getId())
+                .toList();
         return PostMapper.toPageDto(posts, medias);
     }
 
@@ -129,7 +133,9 @@ public class PostServiceImpl implements PostService {
     public PageDto<PostResponseDto> getPostsPageBySpecifications(Specification<PostEntity> specification, Pageable page) {
         Page<PostEntity> posts = postRepository.findAll(specification, page);
         List<Long> medias = posts.getContent().stream()
-                .map(post -> post.getMedias().get(0).getId())
+                .map(post -> post.getMedias().stream()
+                        .sorted(Comparator.comparingInt(MediaFileEntity::getPosition)).toList()
+                        .get(0).getId())
                 .toList();
         return PostMapper.toPageDto(posts, medias);
     }

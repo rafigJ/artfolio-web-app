@@ -48,6 +48,7 @@ public class AuthenticationController {
         var userEntity = user.getUserEntity();
         return ResponseEntity.ok(
                 AuthResponseDto.builder()
+                        .username(userEntity.getUsername())
                         .name(userEntity.getFullName())
                         .email(userEntity.getEmail())
                         .role(userEntity.getRole().name())

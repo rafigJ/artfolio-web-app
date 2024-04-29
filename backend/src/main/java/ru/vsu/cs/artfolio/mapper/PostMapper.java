@@ -35,6 +35,7 @@ public class PostMapper {
     public static PostResponseDto toDto(PostEntity postEntity, Long previewMediaId) {
         return PostResponseDto.builder()
                 .id(postEntity.getId())
+                .name(postEntity.getName())
                 .previewMediaId(previewMediaId)
                 .owner(UserMapper.toDto(postEntity.getOwner()))
                 .likeCount(null)
