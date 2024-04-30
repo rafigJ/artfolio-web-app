@@ -1,6 +1,7 @@
 import { Divider, Typography } from 'antd'
 import { UploadFile } from 'antd/lib/upload/interface'
 import { FC, useEffect, useState } from 'react'
+import { useObjectUrls } from '../../hooks/useObjectUrls'
 import type { MockPostRequest } from '../../types/MockTypes/MockPostRequest'
 
 interface CreatePostFormPreviewProps {
@@ -12,6 +13,7 @@ interface CreatePostFormPreviewProps {
  * Функция для получения временного URL изображения из файла.
  * @param file Файл изображения.
  * @return Promise<string> Возвращает Promise с временным URL изображения.
+ * @deprecated заменен на хук useObjectsUrls (https://www.jacobparis.com/content/file-image-thumbnails)
  */
 export const getObjectURLFromFile = (file: File): Promise<string> => {
 	return new Promise<string>(resolve => {
@@ -26,27 +28,23 @@ export const getObjectURLFromFile = (file: File): Promise<string> => {
  * @param post Объект, передаваемый в запрос.
  * @param fileList Список файлов изображений, которые отображаются на странице.
  */
-const CreatePostFormPreview: FC<CreatePostFormPreviewProps> = ({
-	post,
-	fileList,
-}) => {
+const CreatePostFormPreview: FC<CreatePostFormPreviewProps> = ({ post, fileList }) => {
 	const [objectURLs, setObjectURLs] = useState<string[]>([])
-
+	const getUrl = useObjectUrls()
 	useEffect(() => {
 		const getObjectURLs = async () => {
 			const newObjectURLs: string[] = []
 			for (const file of fileList) {
 				if (file.originFileObj) {
-					const objectURL = await getObjectURLFromFile(file.originFileObj)
+					const objectURL = getUrl(file.originFileObj)
 					newObjectURLs.push(objectURL)
 				}
 			}
 			setObjectURLs(newObjectURLs)
 		}
-
 		getObjectURLs()
 	}, [fileList])
-
+	
 	return (
 		<div style={{ display: 'flex', flexDirection: 'column' }}>
 			<Typography.Title level={3}>{post.title}</Typography.Title>
