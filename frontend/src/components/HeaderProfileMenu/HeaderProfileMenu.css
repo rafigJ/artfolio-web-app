@@ -1,0 +1,11 @@
+.header-avatar__image {
+	width: 48px;
+	height: 48px;
+	border-radius: 50%;
+	background-color: #f3f3f4;
+	object-position: top;
+	-o-object-fit: cover;
+	object-fit: cover;
+}
+
+

@@ -10,6 +10,16 @@ public record RegisterRequestDto(
         @Size(min = 3, max = 40, message = "should contain minimum 3 characters, maximum 40 characters")
         String name,
 
+        String description,
+
+        String country,
+
+        String city,
+
+        @NotBlank(message = "should be not blank")
+        @Size(min = 5, max = 150, message = "should contain minimum 5 characters, maximum 150 characters")
+        String username,
+
         @NotBlank(message = "should be not blank")
         @Size(min = 5, max = 150, message = "should contain minimum 5 characters, maximum 150 characters")
         @Email(regexp = "^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$",
@@ -25,5 +35,6 @@ public record RegisterRequestDto(
         @NotBlank(message = "should be not blank")
         @Size(min = 5, message = "Secret word should contain Minimum eight characters")
         String secretWord
-) {}
+) {
+}
 

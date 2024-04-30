@@ -11,9 +11,9 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import ru.vsu.cs.artfolio.repository.UserRepository;
-import ru.vsu.cs.artfolio.exception.NotExistUserException;
 import ru.vsu.cs.artfolio.auth.user.User;
+import ru.vsu.cs.artfolio.exception.NotExistUserException;
+import ru.vsu.cs.artfolio.repository.UserRepository;
 
 @Configuration
 @RequiredArgsConstructor

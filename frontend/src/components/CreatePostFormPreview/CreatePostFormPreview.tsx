@@ -1,24 +1,26 @@
 import { Divider, Typography } from 'antd'
 import { UploadFile } from 'antd/lib/upload/interface'
-import React, { FC, useEffect, useState } from 'react'
+import { FC, useEffect, useState } from 'react'
+import { useObjectUrls } from '../../hooks/useObjectUrls'
 import type { MockPostRequest } from '../../types/MockTypes/MockPostRequest'
 
 interface CreatePostFormPreviewProps {
-	post: MockPostRequest;
-	fileList: UploadFile[];
+	post: MockPostRequest
+	fileList: UploadFile[]
 }
 
 /**
  * Функция для получения временного URL изображения из файла.
  * @param file Файл изображения.
  * @return Promise<string> Возвращает Promise с временным URL изображения.
+ * @deprecated заменен на хук useObjectsUrls (https://www.jacobparis.com/content/file-image-thumbnails)
  */
-const getObjectURLFromFile = (file: File): Promise<string> => {
-	return new Promise<string>((resolve) => {
-		const objectURL = URL.createObjectURL(file);
-		resolve(objectURL);
-	});
-};
+export const getObjectURLFromFile = (file: File): Promise<string> => {
+	return new Promise<string>(resolve => {
+		const objectURL = URL.createObjectURL(file)
+		resolve(objectURL)
+	})
+}
 
 /**
  * Компонент CreatePostFormPreview используется в форме создания поста.
@@ -27,42 +29,38 @@ const getObjectURLFromFile = (file: File): Promise<string> => {
  * @param fileList Список файлов изображений, которые отображаются на странице.
  */
 const CreatePostFormPreview: FC<CreatePostFormPreviewProps> = ({ post, fileList }) => {
-	const [objectURLs, setObjectURLs] = useState<string[]>([]);
-	
+	const [objectURLs, setObjectURLs] = useState<string[]>([])
+	const getUrl = useObjectUrls()
 	useEffect(() => {
 		const getObjectURLs = async () => {
-			const newObjectURLs: string[] = [];
+			const newObjectURLs: string[] = []
 			for (const file of fileList) {
 				if (file.originFileObj) {
-					const objectURL = await getObjectURLFromFile(file.originFileObj);
-					newObjectURLs.push(objectURL);
+					const objectURL = getUrl(file.originFileObj)
+					newObjectURLs.push(objectURL)
 				}
 			}
-			setObjectURLs(newObjectURLs);
-		};
-		
-		getObjectURLs();
-	}, [fileList]);
+			setObjectURLs(newObjectURLs)
+		}
+		getObjectURLs()
+	}, [fileList])
 	
 	return (
 		<div style={{ display: 'flex', flexDirection: 'column' }}>
-			<Typography.Title level={3}>
-				{post.title}
-			</Typography.Title>
+			<Typography.Title level={3}>{post.title}</Typography.Title>
 			{objectURLs.map((objectURL, index) => (
 				<div key={index}>
 					<img
 						src={objectURL}
 						alt={fileList[index]?.name}
-						style={{ marginTop: '10px', maxWidth: '100%' }} />
+						style={{ marginTop: '10px', maxWidth: '100%' }}
+					/>
 				</div>
 			))}
 			<Divider>Описание</Divider>
-			<Typography.Text>
-				{post.description}
-			</Typography.Text>
+			<Typography.Text>{post.description}</Typography.Text>
 		</div>
-	);
-};
+	)
+}
 
-export default CreatePostFormPreview;
+export default CreatePostFormPreview

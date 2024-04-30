@@ -1,4 +1,5 @@
-export interface MockFullUserResponse {
+export interface FullUserResponse {
+	uuid: string
 	fullName: string
 	description: string
 	country: string

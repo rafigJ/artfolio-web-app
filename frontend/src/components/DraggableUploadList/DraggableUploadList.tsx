@@ -1,7 +1,16 @@
 import { InboxOutlined } from '@ant-design/icons'
-import { DndContext, type DragEndEvent, PointerSensor, useSensor } from '@dnd-kit/core'
-import { arrayMove, rectSortingStrategy, SortableContext } from '@dnd-kit/sortable'
-import { message, Upload, type UploadFile, type UploadProps } from 'antd'
+import {
+	DndContext,
+	PointerSensor,
+	useSensor,
+	type DragEndEvent,
+} from '@dnd-kit/core'
+import {
+	SortableContext,
+	arrayMove,
+	rectSortingStrategy,
+} from '@dnd-kit/sortable'
+import { Upload, message, type UploadFile, type UploadProps } from 'antd'
 import React, { type FC } from 'react'
 import DraggableUploadListItem from '../DraggableUploadListItem/DraggableUploadListItem'
 
@@ -20,28 +29,30 @@ interface DraggableUploadListProps {
  * @param fileList список файлов, которые загружаются в Upload
  * @param setFileList функция, которая меняет состояние данного списка
  */
-const DraggableUploadList: FC<DraggableUploadListProps> = ({ fileList, setFileList }) => {
-	
+const DraggableUploadList: FC<DraggableUploadListProps> = ({
+	fileList,
+	setFileList,
+}) => {
 	const sensor = useSensor(PointerSensor, {
-		activationConstraint: { distance: 10 }
+		activationConstraint: { distance: 10 },
 	})
-	
+
 	const onDragEnd = ({ active, over }: DragEndEvent) => {
 		if (active.id !== over?.id) {
-			setFileList((prev) => {
-				const activeIndex = prev.findIndex((i) => i.uid === active.id)
-				const overIndex = prev.findIndex((i) => i.uid === over?.id)
+			setFileList(prev => {
+				const activeIndex = prev.findIndex(i => i.uid === active.id)
+				const overIndex = prev.findIndex(i => i.uid === over?.id)
 				return arrayMove(prev, activeIndex, overIndex)
 			})
 		}
 	}
-	
+
 	const onChange: UploadProps['onChange'] = ({ fileList: newFileList }) => {
 		setFileList(newFileList)
 	}
-	
+
 	const uploadProps: UploadProps = {
-		beforeUpload: (file) => {
+		beforeUpload: file => {
 			const isPNG = file.type === 'image/png'
 			const isJPG = file.type === 'image/jpg' || file.type === 'image/jpeg'
 			if (!isPNG && !isJPG) {
@@ -52,12 +63,15 @@ const DraggableUploadList: FC<DraggableUploadListProps> = ({ fileList, setFileLi
 		},
 		maxCount: 10,
 		multiple: true,
-		listType: 'picture-card'
+		listType: 'picture-card',
 	}
-	
+
 	return (
 		<DndContext sensors={[sensor]} onDragEnd={onDragEnd}>
-			<SortableContext items={fileList.map((i) => i.uid)} strategy={rectSortingStrategy}>
+			<SortableContext
+				items={fileList.map(i => i.uid)}
+				strategy={rectSortingStrategy}
+			>
 				<Upload.Dragger
 					fileList={fileList}
 					onChange={onChange}
@@ -65,14 +79,15 @@ const DraggableUploadList: FC<DraggableUploadListProps> = ({ fileList, setFileLi
 						<DraggableUploadListItem originNode={originNode} file={file} />
 					)}
 					showUploadList={{ showPreviewIcon: false }}
-					onPreview={() => {
-					}}
+					onPreview={() => {}}
 					{...uploadProps}
 				>
 					<p className='ant-upload-drag-icon'>
 						<InboxOutlined />
 					</p>
-					<p className='ant-upload-text'>Переместите изображения в эту область для их загрузки</p>
+					<p className='ant-upload-text'>
+						Переместите изображения в эту область для их загрузки
+					</p>
 				</Upload.Dragger>
 			</SortableContext>
 		</DndContext>

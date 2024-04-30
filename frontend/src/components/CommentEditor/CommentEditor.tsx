@@ -1,25 +1,42 @@
 import { Comment } from '@ant-design/compatible'
 import { Avatar, Button, Form, Input } from 'antd'
-import React, { useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
+import { useNavigate, useParams } from 'react-router-dom'
+import { API_URL } from '../../api'
+import PostService from '../../api/PostService'
+import { AuthContext } from '../../context'
+import { useFetching } from '../../hooks/useFetching'
+import type { FullPostResponse } from '../../types/FullPostResponse'
 import CommentList, { type CommentItem } from '../CommentList/CommentList'
 
 const { TextArea } = Input
 
 interface EditorProps {
-	onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
-	onSubmit: () => void;
-	submitting: boolean;
-	value: string;
+	onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void
+	onSubmit: () => void
+	submitting: boolean
+	value: string
 }
 
 // todo добавить в реализацию переход по ссылке, в случае если пользователь не вошел в профиль
 const Editor = ({ onChange, onSubmit, submitting, value }: EditorProps) => (
 	<>
 		<Form.Item>
-			<TextArea placeholder='Введите комментарий' maxLength={300} rows={4} onChange={onChange} value={value} />
+			<TextArea
+				placeholder='Введите комментарий'
+				maxLength={300}
+				rows={4}
+				onChange={onChange}
+				value={value}
+			/>
 		</Form.Item>
 		<Form.Item>
-			<Button htmlType='submit' loading={submitting} onClick={onSubmit} type='primary'>
+			<Button
+				htmlType='submit'
+				loading={submitting}
+				onClick={onSubmit}
+				type='primary'
+			>
 				Отправить
 			</Button>
 		</Form.Item>
@@ -31,7 +48,15 @@ const CommentEditor: React.FC = () => {
 	const [submitting, setSubmitting] = useState(false)
 	const [value, setValue] = useState('')
 	
+	const navigate = useNavigate()
+	const params = useParams()
+	const { isAuth, authCredential } = useContext(AuthContext)
+	
 	const handleSubmit = () => {
+		if (!isAuth) {
+			navigate('/login')
+		}
+		
 		if (!value) return
 		
 		setSubmitting(true)
@@ -39,28 +64,62 @@ const CommentEditor: React.FC = () => {
 		setTimeout(() => {
 			setSubmitting(false)
 			setValue('')
-			setComments([
-				...comments,
+			setComments(prevComments => [
+				...prevComments,
 				{
-					author: 'Han Solo',
-					avatar: 'https://api.dicebear.com/7.x/miniavs/svg?seed=3',
+					author: authCredential?.name,
+					avatar: `${API_URL}/user/${authCredential?.username}/avatar`,
 					content: <p>{value}</p>,
-					datetime: '2016-11-22'
+					datetime: new Date().toISOString(),
+					id: prevComments.length
 				}
 			])
 		}, 1000)
 	}
 	
 	const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+		if (!isAuth) {
+			navigate('/login')
+		}
 		setValue(e.target.value)
+	}
+	
+	const [post, setPost] = useState<FullPostResponse>({} as FullPostResponse)
+	
+	const [fetchPost, isLoading, isError] = useFetching(async (id) => {
+		const response = await PostService.getPostById(id)
+		setPost(response.data)
+	})
+	
+	useEffect(() => {
+		fetchPost(params.id)
+	}, [params.id])
+	
+	if (isLoading || isError) {
+		return <></>
 	}
 	
 	return (
 		<>
-			{comments.length > 0 ? <CommentList data={comments} /> : <div style={{ marginTop: 28 }} />}
+			{comments.length > 0 ? (
+				<CommentList data={comments} />
+			) : (
+				<div style={{ marginTop: 28 }} />
+			)}
 			<Comment
 				style={{ backgroundColor: 'transparent' }}
-				avatar={<Avatar src='https://api.dicebear.com/7.x/miniavs/svg?seed=3' alt='Han Solo' />}
+				avatar={isAuth ?
+					<Avatar
+						src={`${API_URL}/user/${authCredential?.username}/avatar`}
+						alt={authCredential?.name}
+						onClick={() => navigate('/profile/' + authCredential?.username)}
+					/>
+					:
+					<Avatar
+						src='https://api.dicebear.com/7.x/miniavs/svg?seed=3'
+						alt='Han Solo'
+					/>
+				}
 				content={
 					<Editor
 						onChange={handleChange}

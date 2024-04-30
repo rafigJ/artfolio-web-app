@@ -8,6 +8,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 import ru.vsu.cs.artfolio.auth.user.Role;
 import ru.vsu.cs.artfolio.auth.user.User;
 import ru.vsu.cs.artfolio.dto.auth.AuthRequestDto;
@@ -19,36 +21,40 @@ import ru.vsu.cs.artfolio.exception.ExistUserException;
 import ru.vsu.cs.artfolio.exception.IncorrectCredentialsException;
 import ru.vsu.cs.artfolio.exception.NotExistUserException;
 import ru.vsu.cs.artfolio.exception.RestException;
+import ru.vsu.cs.artfolio.mapper.wrappers.MinioResult;
 import ru.vsu.cs.artfolio.repository.UserRepository;
+import ru.vsu.cs.artfolio.service.impl.MinioService;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
 public class AuthenticationService {
+
     private final UserRepository repository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
+    private final MinioService minioService;
     private final AuthenticationManager authenticationManager;
 
-    public AuthResponseDto register(RegisterRequestDto request) throws DataIntegrityViolationException {
-
-        if (repository.existsByEmail(request.email())) {
+    @Transactional
+    public AuthResponseDto register(RegisterRequestDto request, MultipartFile avatarFile) {
+        if (repository.existsByEmailOrUsername(request.email(), request.username())) {
             throw new ExistUserException();
         }
 
-        UserEntity userEntity = convertRequestToEntity(request, passwordEncoder);
         try {
-            repository.saveAndFlush(userEntity);
-        } catch (DataIntegrityViolationException e) {
+            UserEntity userEntity = convertRequestToEntity(request, minioService.uploadFile(avatarFile), passwordEncoder);
+            User user = new User(repository.save(userEntity));
+            String jwtToken = jwtService.generateToken(user);
+            return convertEntityToAuthResponse(userEntity, jwtToken);
+        } catch (DataIntegrityViolationException | IOException e) {
             throw new RestException("Server error", HttpStatus.INTERNAL_SERVER_ERROR);
         }
-
-        User user = new User(userEntity);
-        String jwtToken = jwtService.generateToken(user);
-        return convertEntityToAuthResponse(userEntity, jwtToken);
     }
 
+    @Transactional
     public AuthResponseDto authenticate(AuthRequestDto request) {
         try {
             authenticationManager.authenticate(
@@ -68,6 +74,7 @@ public class AuthenticationService {
         return convertEntityToAuthResponse(userEntity, jwtToken);
     }
 
+    @Transactional
     public void changePassword(ChangePasswordRequestDto requestDto) {
         UserEntity user = repository.findByEmail(requestDto.email())
                 .orElseThrow(IncorrectCredentialsException::new);
@@ -82,19 +89,26 @@ public class AuthenticationService {
 
     private static AuthResponseDto convertEntityToAuthResponse(UserEntity userEntity, String token) {
         return AuthResponseDto.builder()
-                .name(userEntity.getName())
+                .username(userEntity.getUsername())
+                .name(userEntity.getFullName())
                 .email(userEntity.getEmail())
                 .role(userEntity.getRole().name())
                 .token(token)
                 .build();
     }
 
-    private static UserEntity convertRequestToEntity(RegisterRequestDto request, PasswordEncoder passwordEncoder) {
+    private static UserEntity convertRequestToEntity(RegisterRequestDto request, MinioResult avatarData, PasswordEncoder passwordEncoder) throws IOException {
         return UserEntity.builder()
-                .name(request.name())
                 .email(request.email())
+                .username(request.username())
                 .password(passwordEncoder.encode(request.password()))
                 .secretWord(passwordEncoder.encode(request.secretWord()))
+                .fullName(request.fullName())
+                .country(request.country())
+                .city(request.city())
+                .additionalInfo(request.description())
+                .avatarName(avatarData.name())
+                .avatarType(avatarData.contentType())
                 .role(Role.USER)
                 .createTime(LocalDateTime.now())
                 .updateTime(LocalDateTime.now())

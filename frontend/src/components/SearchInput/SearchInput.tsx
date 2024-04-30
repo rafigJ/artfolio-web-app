@@ -1,12 +1,12 @@
-import './SearchInput.css'
 import { Input } from 'antd'
 import type { SearchProps } from 'antd/es/input/Search'
-import React, { type FC } from 'react'
+import { type FC } from 'react'
+import './SearchInput.css'
 
 const { Search } = Input
 
-const onSearch: SearchProps['onSearch'] = (value, _e, info) => console.log(info?.source, value)
-
+const onSearch: SearchProps['onSearch'] = (value, _e, info) =>
+	console.log(info?.source, value)
 
 const SearchInput: FC = () => {
 	return (

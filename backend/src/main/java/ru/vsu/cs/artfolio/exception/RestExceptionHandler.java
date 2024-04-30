@@ -2,6 +2,7 @@ package ru.vsu.cs.artfolio.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -22,9 +23,16 @@ public class RestExceptionHandler {
                 .body(new RestExceptionDto(ex.getMessage()));
     }
 
-    @ExceptionHandler(value = {RuntimeException.class})
+    @ExceptionHandler(value = {AccessDeniedException.class})
     @ResponseBody
-    public ResponseEntity<RestExceptionDto> handler(RuntimeException ex) {
+    public ResponseEntity<RestExceptionDto> handler(AccessDeniedException ex) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(new RestExceptionDto(ex.getMessage()));
+    }
+
+    @ExceptionHandler(value = {Exception.class})
+    @ResponseBody
+    public ResponseEntity<RestExceptionDto> handler(Exception ex) {
         return ResponseEntity.status(HttpStatus.BAD_GATEWAY)
                 .body(new RestExceptionDto(ex.getMessage()));
     }
