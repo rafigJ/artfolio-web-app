@@ -8,21 +8,25 @@ import AppRouter from './routing/AppRouter'
 import type { AuthResponse } from './types/AuthResponse'
 
 const App: React.FC = () => {
-	const [authCredential, setAuthCredential] = useState<AuthResponse>({} as AuthResponse);
+	const [authCredential, setAuthCredential] = useState<AuthResponse>({} as AuthResponse)
 	const [isAuth, setIsAuth] = useState<boolean>(false)
 	
-	const [fetchUser] = useFetching(async () => {
-		const response = await AuthService.userCredentials();
-		setAuthCredential({...response.data});
-		setIsAuth(true);
+	const [fetchUser, isError] = useFetching(async () => {
+		const response = await AuthService.userCredentials()
+		setAuthCredential({ ...response.data })
+		setIsAuth(true)
 	})
 	
 	useEffect(() => {
-		const token = localStorage.getItem('token');
-		if (token !== null) {
-			fetchUser();
+		if (isError) {
+			localStorage.removeItem('token')
 		}
-	}, []);
+		const token = localStorage.getItem('token')
+		if (token !== null) {
+			console.log(token)
+			fetchUser()
+		}
+	}, [isError])
 	
 	return (
 		<BrowserRouter>

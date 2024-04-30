@@ -21,10 +21,11 @@ const beforeUpload = (file: FileType) => {
 }
 
 interface RegisterFormAvatarUploadProps {
-	setAvatar: React.Dispatch<React.SetStateAction<UploadFile>>
+	avatar: UploadFile[]
+	setAvatar: React.Dispatch<React.SetStateAction<UploadFile[]>>
 }
 
-const RegisterFormAvatarUpload: React.FC<RegisterFormAvatarUploadProps> = ({setAvatar }) => {
+const RegisterFormAvatarUpload: React.FC<RegisterFormAvatarUploadProps> = ({ avatar, setAvatar }) => {
 	
 	const uploadButton = (
 		<button style={{ border: 0, background: 'none' }} type='button'>
@@ -33,11 +34,8 @@ const RegisterFormAvatarUpload: React.FC<RegisterFormAvatarUploadProps> = ({setA
 		</button>
 	)
 	
-	const onChange: UploadProps['onChange'] = ({ file }) => {
-		if (file) {
-			setAvatar(file)
-			console.log(file)
-		}
+	const onChange: UploadProps['onChange'] = ({ fileList }) => {
+		setAvatar(fileList)
 	}
 	
 	return (
@@ -48,6 +46,7 @@ const RegisterFormAvatarUpload: React.FC<RegisterFormAvatarUploadProps> = ({setA
 				className='avatar-uploader'
 				showUploadList={{ showRemoveIcon: false, showDownloadIcon: false, showPreviewIcon: false }}
 				beforeUpload={beforeUpload}
+				fileList={avatar}
 				onChange={onChange}
 				maxCount={1}
 			>

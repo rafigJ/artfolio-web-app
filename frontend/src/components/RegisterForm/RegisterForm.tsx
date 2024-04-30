@@ -2,6 +2,7 @@ import { message, Steps, type UploadFile } from 'antd'
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import '../LoginForm/LoginForm.css'
+import AuthService from '../../api/AuthService'
 import type { RegistrationRequest } from '../../types/RegistrationRequest'
 import RegisterFormFirstStep from '../RegisterFormSteps/RegisterFormFirstStep'
 import RegisterFormSecondStep from '../RegisterFormSteps/RegisterFormSecondStep'
@@ -23,13 +24,13 @@ interface SecondStepSlice {
 	country: string
 	city: string
 	description: string
-	avatarFile: UploadFile
+	avatarFile: UploadFile[]
 }
 
 const RegisterForm: React.FC = () => {
 	const navigate = useNavigate()
 	const [currentStep, setCurrentStep] = useState<number>(0)
-	const [avatar, setAvatar] = useState<UploadFile>({} as UploadFile)
+	const [avatar, setAvatar] = useState<UploadFile[]>([] as UploadFile[])
 	const [firstStepData, setFirstStepData] = useState<FirstStepSlice>({} as FirstStepSlice)
 	const [secondStepData, setSecondStepData] = useState<SecondStepSlice>({} as SecondStepSlice)
 	
@@ -49,17 +50,17 @@ const RegisterForm: React.FC = () => {
 	}
 	
 	const onFinishStep2 = (values: SecondStepSlice) => {
-		if (Object.keys(avatar).length === 0) {
+		if (!avatar.length) {
 			message.error('Выберите аватар')
 			return
 		}
 		console.log('Step 2 values:', values)
 		setSecondStepData(values)
-		const registerRequest: RegistrationRequest = { ...firstStepData, ...values, avatarFile: avatar }
-		// Здесь можно добавить логику отправки данных на сервер
-		message.success('Вы успешно зарегистрировались')
+		const registerRequest: RegistrationRequest = { ...firstStepData, ...values }
 		console.log(registerRequest)
-		navigate('/')
+		AuthService.register(registerRequest, avatar.pop()?.originFileObj).then(r =>
+			console.log((`Вы успешно зарегистрировались + ${r}`))
+		).catch((reason) => console.log(reason))
 	}
 	
 	const steps = [
@@ -72,7 +73,7 @@ const RegisterForm: React.FC = () => {
 		{
 			title: 'Добавьте описание профиля',
 			content: (
-				<RegisterFormSecondStep onFinishStep2={onFinishStep2} setAvatar={setAvatar} />
+				<RegisterFormSecondStep onFinishStep2={onFinishStep2} avatar={avatar} setAvatar={setAvatar} />
 			)
 		}
 	]

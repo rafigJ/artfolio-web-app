@@ -19,7 +19,7 @@ const PostGrid = () => {
 	})
 
 	useEffect(() => {
-		fetchPosts(page)
+		// fetchPosts(page) // todo убрать
 	}, [page, activeTabKey])
 
 	if (isError) {

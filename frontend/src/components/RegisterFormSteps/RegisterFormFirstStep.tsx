@@ -27,6 +27,7 @@ const RegisterFormFirstStep:FC<RegisterFormFirstStep> = ({onFinishStep1}) => {
 				<Form.Item
 					name='username'
 					rules={[{ required: true, message: 'Введите логин!' }]}
+					initialValue='horem123'
 				>
 					<Input
 						prefix={<UserOutlined className='site-form-item-icon' />}
@@ -38,6 +39,7 @@ const RegisterFormFirstStep:FC<RegisterFormFirstStep> = ({onFinishStep1}) => {
 					rules={[
 						{ required: true, message: 'Введите электронную почту!' }
 					]}
+					initialValue='horem123@mail.ru'
 				>
 					<Input
 						prefix={<MailOutlined className='site-form-item-icon' />}
@@ -47,6 +49,7 @@ const RegisterFormFirstStep:FC<RegisterFormFirstStep> = ({onFinishStep1}) => {
 				<Form.Item
 					name='password'
 					rules={[{ required: true, message: 'Введите пароль!' }]}
+					initialValue='horem123maLLru'
 				>
 					<Input.Password
 						prefix={<LockOutlined className='site-form-item-icon' />}
@@ -58,6 +61,7 @@ const RegisterFormFirstStep:FC<RegisterFormFirstStep> = ({onFinishStep1}) => {
 				<Form.Item
 					name='confirmPassword'
 					rules={[{ required: true, message: 'Повторите пароль!' }]}
+					initialValue='horem123maLLru'
 				>
 					<Input.Password
 						prefix={<LockOutlined className='site-form-item-icon' />}
@@ -68,6 +72,7 @@ const RegisterFormFirstStep:FC<RegisterFormFirstStep> = ({onFinishStep1}) => {
 				<Form.Item
 					name='secretWord'
 					rules={[{ required: true, message: 'Введите секретное слово!' }]}
+					initialValue='horem123@mail.ru'
 				>
 					<Input
 						prefix={<LockOutlined className='site-form-item-icon' />}

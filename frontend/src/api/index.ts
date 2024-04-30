@@ -1,12 +1,12 @@
 import axios from 'axios'
 
-export const API_URL = `https://jsonplaceholder.typicode.com/` // DUMMY JSON
+export const API_URL = `http://localhost:8080/api/v1` // DUMMY JSON
 
 const $api = axios.create({
 	baseURL: API_URL,
-	headers: {
-		'Content-Type': 'application/json',
-	},
+	// headers: {
+	// 	'Content-Type': 'application/json',
+	// },
 })
 
 
@@ -19,7 +19,7 @@ $api.interceptors.request.use((config) => {
 });
 
 $api.interceptors.response.use((config) => {
-	if (config.status === 401 && config.data?.message?.startsWith("JWT")) {
+	if (config.status == 401) {
 		localStorage.removeItem('token')
 	}
 	return config;
