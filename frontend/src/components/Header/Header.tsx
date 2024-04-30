@@ -37,7 +37,7 @@ const Header = () => {
 				Опубликовать
 			</Button>
 			{isAuth ?
-				<HeaderProfileMenu src={`${API_URL}/user/${authCredential.username}/avatar`} />
+				<HeaderProfileMenu src={`${API_URL}/user/${authCredential?.username}/avatar`} />
 				:
 				<Button
 					icon={<LoginOutlined />}

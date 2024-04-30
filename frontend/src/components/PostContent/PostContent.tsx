@@ -24,16 +24,17 @@ interface AuthorLinkCardProps {
 const AuthorLinkCard: FC<AuthorLinkCardProps> = ({ owner, style }) => {
 	return (
 		<div style={style}>
-			<Link to='/profile/username'>
+			<Link to={`/profile/${owner?.username}`}>
 				<Avatar
-					src='https://api.dicebear.com/7.x/miniavs/svg?seed=10'
+					src={`${API_URL}/user/${owner?.username}/avatar`}
 					size={70}
+					style={{marginRight: '10px'}}
 					icon={<AntDesignOutlined />}
 				/>
 			</Link>
 			
 			<div style={{ display: 'flex', flexDirection: 'column' }}>
-				<Link to='/profile/username'>
+				<Link to={`/profile/${owner?.username}`}>
 					<Typography.Title style={{ marginTop: '15px' }} level={4}>
 						{owner?.fullName}
 					</Typography.Title>

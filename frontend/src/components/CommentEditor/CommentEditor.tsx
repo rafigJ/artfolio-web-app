@@ -1,6 +1,9 @@
 import { Comment } from '@ant-design/compatible'
 import { Avatar, Button, Form, Input } from 'antd'
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { API_URL } from '../../api'
+import { AuthContext } from '../../context'
 import CommentList, { type CommentItem } from '../CommentList/CommentList'
 
 const { TextArea } = Input
@@ -41,32 +44,42 @@ const CommentEditor: React.FC = () => {
 	const [comments, setComments] = useState<CommentItem[]>([])
 	const [submitting, setSubmitting] = useState(false)
 	const [value, setValue] = useState('')
-
+	const navigate = useNavigate()
+	const { isAuth, authCredential } = useContext(AuthContext)
+	
 	const handleSubmit = () => {
+		if (!isAuth) {
+			navigate('/login')
+		}
+		
 		if (!value) return
-
+		
 		setSubmitting(true)
-
+		
 		setTimeout(() => {
 			setSubmitting(false)
 			setValue('')
 			setComments(prevComments => [
 				...prevComments,
 				{
-					author: 'Han Solo',
-					avatar: 'https://api.dicebear.com/7.x/miniavs/svg?seed=3',
+					author: authCredential?.name,
+					avatar: `${API_URL}/user/${authCredential?.username}/avatar`,
 					content: <p>{value}</p>,
-					datetime: '2016-11-22',
-					id: prevComments.length,
-				},
+					datetime: new Date().toISOString(),
+					id: prevComments.length
+				}
 			])
 		}, 1000)
 	}
-
+	
 	const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+		if (!isAuth) {
+			navigate('/login')
+		}
+		
 		setValue(e.target.value)
 	}
-
+	
 	return (
 		<>
 			{comments.length > 0 ? (
@@ -76,7 +89,13 @@ const CommentEditor: React.FC = () => {
 			)}
 			<Comment
 				style={{ backgroundColor: 'transparent' }}
-				avatar={
+				avatar={isAuth ?
+					<Avatar
+						src={`${API_URL}/user/${authCredential?.username}/avatar`}
+						alt={authCredential?.name}
+						onClick={() => navigate('/profile/' + authCredential?.username)}
+					/>
+					:
 					<Avatar
 						src='https://api.dicebear.com/7.x/miniavs/svg?seed=3'
 						alt='Han Solo'

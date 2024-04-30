@@ -15,7 +15,7 @@ const HeaderProfileMenu: FC<HeaderProfileMenuProps> = ({ src }) => {
 	const navigate = useNavigate()
 	const handleMenuClick: MenuProps['onClick'] = (e) => {
 		if (e.key === '1') {
-			navigate('/')
+			navigate(`/profile/${authCredential?.username}`)
 		}
 		if (e.key === '2') {
 		
