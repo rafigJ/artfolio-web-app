@@ -86,7 +86,7 @@ const CommentEditor: React.FC = () => {
 	
 	const [post, setPost] = useState<FullPostResponse>({} as FullPostResponse)
 	
-	const [fetchPost, isError] = useFetching(async (id) => {
+	const [fetchPost, isLoading, isError] = useFetching(async (id) => {
 		const response = await PostService.getPostById(id)
 		setPost(response.data)
 	})
@@ -95,7 +95,7 @@ const CommentEditor: React.FC = () => {
 		fetchPost(params.id)
 	}, [params.id])
 	
-	if (isError) {
+	if (isLoading || isError) {
 		return <></>
 	}
 	
