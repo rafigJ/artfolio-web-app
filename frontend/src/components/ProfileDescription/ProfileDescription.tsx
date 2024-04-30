@@ -28,11 +28,11 @@ const ProfileDescription: FC<ProfileDescriptionProps> = ({ profile }) => {
 				{ text: 'Описание:', bold: true },
 				profile?.description,
 				{ text: 'Количество лайков: ', bold: true },
-				profile?.likeCount,
+				100,
 				{ text: 'Количество публикаций: ', bold: true },
-				profile?.postCount,
+				5,
 				{ text: 'Количество подписчиков: ', bold: true },
-				profile?.subscribersCount,
+				100,
 			]
 		}
 
@@ -78,13 +78,13 @@ const ProfileDescription: FC<ProfileDescriptionProps> = ({ profile }) => {
 				</Button>
 				<Statistic
 					title='Количество лайков'
-					value={profile?.likeCount}
+					value={3}
 					prefix={<HeartOutlined />}
 				/>
-				<Statistic title='Количество публикаций' value={profile?.postCount} />
+				<Statistic title='Количество публикаций' value={3} />
 				<Statistic
 					title='Количество подписчиков'
-					value={profile?.subscribersCount}
+					value={100}
 				/>
 			</Flex>
 		</Flex >
