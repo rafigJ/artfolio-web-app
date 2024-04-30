@@ -1,5 +1,5 @@
-import React from 'react'
 import { Navigate, Route, Routes } from 'react-router-dom'
+import AdminPanelPage from '../pages/AdminPanelPage/AdminPanelPage'
 import CreatePostPage from '../pages/CreatePostPage/CreatePostPage'
 import ForgotPasswordPage from '../pages/ForgotPasswordPage/ForgotPasswordPage'
 import LoginPage from '../pages/LoginPage/LoginPage'
@@ -18,6 +18,7 @@ const AppRouter = () => {
 			<Route path='/register' element={<RegisterPage />} />
 			<Route path='/posts/:id' element={<PostPage />} />
 			<Route path='/profile/:username' element={<ProfilePage />} />
+			<Route path='/admin' element={<AdminPanelPage />} />
 			<Route path='*' element={<Navigate replace to='/' />} />
 		</Routes>
 	)

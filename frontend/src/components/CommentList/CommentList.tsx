@@ -1,58 +1,79 @@
 import { Comment } from '@ant-design/compatible'
 import { DeleteOutlined, EllipsisOutlined, FlagFilled } from '@ant-design/icons'
 import { Dropdown, List, MenuProps, Typography } from 'antd'
-import React, { type FC } from 'react'
+import React, { useState, type FC } from 'react'
+import ReportWindow from '../ReportWindow/ReportWindow'
 import './CommentList.css'
 
 export interface CommentItem {
-	author: string;
-	avatar: string;
-	content: React.ReactNode;
-	datetime: React.ReactNode;
+	id: number
+	author: string
+	avatar: string
+	content: React.ReactNode
+	datetime: React.ReactNode
 }
 
 interface CommentListProps {
 	data: CommentItem[]
 }
 
-const items: MenuProps['items'] = [
-	{
-		key: '1',
-		label: ('Удалить'),
-		icon: <DeleteOutlined />
-	},
-	{
-		key: '2',
-		label: ('Пожаловаться'),
-		icon: <FlagFilled color='red' />,
-		danger: true
-	}
-]
-
 const CommentList: FC<CommentListProps> = ({ data }) => {
+	const [activeComment, setActiveComment] = useState<number | null>(null)
+
+	const handleCommentHover = (id: number) => {
+		setActiveComment(id)
+	}
+
+	const handleCommentLeave = () => {
+		setActiveComment(null)
+	}
+
+	const [open, setOpen] = useState(false)
+
+	const showModal = () => {
+		setOpen(true)
+	}
+
+	const items: MenuProps['items'] = [
+		{
+			key: '1',
+			label: 'Удалить',
+			icon: <DeleteOutlined />,
+		},
+		{
+			key: '2',
+			onClick: showModal,
+			label: 'Пожаловаться',
+			icon: <FlagFilled color='red' />,
+			danger: true,
+		},
+	]
+
 	return (
-		<List
+		<><ReportWindow open={open} setOpen={setOpen} /><List
 			style={{ backgroundColor: 'transparent' }}
 			header={<Typography.Title level={5}> Комментарии </Typography.Title>}
 			itemLayout='horizontal'
 			dataSource={data}
 			renderItem={item => (
-				<li>
+				<li
+					onMouseEnter={() => handleCommentHover(item.id)}
+					onMouseLeave={handleCommentLeave}
+				>
 					<div className='comment-container'>
 						<Comment
 							style={{ backgroundColor: 'transparent' }}
 							author={item.author}
 							avatar={item.avatar}
 							content={item.content}
-							datetime={item.datetime}
-						/>
+							datetime={item.datetime} />
 						<Dropdown menu={{ items }} placement='bottomLeft' arrow>
-							<EllipsisOutlined className='menu-icon' />
+							<EllipsisOutlined
+								className={activeComment === item.id ? 'menu-icon' : 'menu-icon-disable'} />
 						</Dropdown>
 					</div>
 				</li>
-			)}
-		/>
+			)} /></>
 	)
 }
 

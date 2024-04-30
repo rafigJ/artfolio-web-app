@@ -1,51 +1,64 @@
-import { EnvironmentOutlined, LockOutlined, MailOutlined, PlusOutlined, UserOutlined } from '@ant-design/icons'
-import { Button, Form, Input, message, Steps, Typography, Upload } from 'antd'
+import { message, Steps, type UploadFile } from 'antd'
 import React, { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import '../LoginForm/LoginForm.css'
-import { Link, useNavigate } from 'react-router-dom'
+import type { RegistrationRequest } from '../../types/RegistrationRequest'
+import RegisterFormFirstStep from '../RegisterFormSteps/RegisterFormFirstStep'
+import RegisterFormSecondStep from '../RegisterFormSteps/RegisterFormSecondStep'
 
 const { Step } = Steps
 
-interface RegistrationFormValues {
-	username: string;
-	email: string;
-	password: string;
-	confirmPassword: string;
-	secretWord: string;
-	fullName: string;
-	country: string;
-	city: string;
-	profileDescription: string;
+// Объект, который мы получаем в конце первого этапа регистрации
+interface FirstStepSlice {
+	username: string
+	email: string
+	password: string
+	confirmPassword: string
+	secretWord: string
+}
+
+// Объект, который мы получаем в конце второго этапа регистрации
+interface SecondStepSlice {
+	fullName: string
+	country: string
+	city: string
+	description: string
+	avatarFile: UploadFile
 }
 
 const RegisterForm: React.FC = () => {
 	const navigate = useNavigate()
 	const [currentStep, setCurrentStep] = useState<number>(0)
+	const [avatar, setAvatar] = useState<UploadFile>({} as UploadFile)
+	const [firstStepData, setFirstStepData] = useState<FirstStepSlice>({} as FirstStepSlice)
+	const [secondStepData, setSecondStepData] = useState<SecondStepSlice>({} as SecondStepSlice)
+	
 	
 	const nextStep = () => {
 		setCurrentStep(currentStep + 1)
 	}
 	
-	const onFinishStep1 = (values: RegistrationFormValues) => {
+	const onFinishStep1 = (values: FirstStepSlice) => {
 		if (values.password !== values.confirmPassword) {
 			message.error('Пароли не совпадают')
 			return
 		}
 		console.log('Step 1 values:', values)
+		setFirstStepData(values)
 		nextStep()
 	}
 	
-	const normFile = (e: any) => {
-		if (Array.isArray(e)) {
-			return e
+	const onFinishStep2 = (values: SecondStepSlice) => {
+		if (Object.keys(avatar).length === 0) {
+			message.error('Выберите аватар')
+			return
 		}
-		return e?.fileList
-	}
-	
-	const onFinishStep2 = (values: RegistrationFormValues) => {
 		console.log('Step 2 values:', values)
+		setSecondStepData(values)
+		const registerRequest: RegistrationRequest = { ...firstStepData, ...values, avatarFile: avatar }
 		// Здесь можно добавить логику отправки данных на сервер
 		message.success('Вы успешно зарегистрировались')
+		console.log(registerRequest)
 		navigate('/')
 	}
 	
@@ -53,124 +66,13 @@ const RegisterForm: React.FC = () => {
 		{
 			title: 'Введите учётные данные',
 			content: (
-				<div className='login-form-container'>
-					<Form
-						name='register_step_1'
-						className='login-form'
-						initialValues={{ remember: true }}
-						onFinish={onFinishStep1}
-					>
-						<Typography.Title style={{ margin: '0 0 22px 0' }} level={3} className='login-title'>
-							Регистрация
-						</Typography.Title>
-						<Form.Item
-							name='username'
-							rules={[{ required: true, message: 'Введите логин!' }]}
-						>
-							<Input prefix={<UserOutlined className='site-form-item-icon' />} placeholder='Логин' />
-						</Form.Item>
-						
-						<Form.Item
-							name='email'
-							rules={[{ required: true, message: 'Введите электронную почту!' }]}
-						>
-							<Input prefix={<MailOutlined className='site-form-item-icon' />} placeholder='Электронная почта' />
-						</Form.Item>
-						
-						<Form.Item
-							name='password'
-							rules={[{ required: true, message: 'Введите пароль!' }]}
-						>
-							<Input.Password
-								prefix={<LockOutlined className='site-form-item-icon' />}
-								type='password'
-								placeholder='Пароль'
-							/>
-						</Form.Item>
-						
-						<Form.Item
-							name='confirmPassword'
-							rules={[{ required: true, message: 'Повторите пароль!' }]}
-						>
-							<Input.Password
-								prefix={<LockOutlined className='site-form-item-icon' />}
-								type='password'
-								placeholder='Повторите пароль'
-							/>
-						</Form.Item>
-						
-						<Form.Item
-							name='secretWord'
-							rules={[{ required: true, message: 'Введите секретное слово!' }]}
-						>
-							<Input
-								prefix={<LockOutlined className='site-form-item-icon' />}
-								placeholder='Секретное слово'
-							/>
-						</Form.Item>
-						
-						<Form.Item>
-							<Button type='primary' htmlType='submit' className='login-form-button'>
-								Продолжить
-							</Button>
-							У вас уже есть аккаунт? <Link to='/login'>Войти</Link>
-						</Form.Item>
-					</Form>
-				</div>
+				<RegisterFormFirstStep onFinishStep1={onFinishStep1} />
 			)
 		},
 		{
 			title: 'Добавьте описание профиля',
 			content: (
-				<div className='description-step'>
-					<Form
-						name='register_step_2'
-						className='login-form'
-						initialValues={{ remember: true }}
-						onFinish={onFinishStep2}
-					>
-						<Typography.Title level={3} className='login-title'>Регистрация</Typography.Title>
-						
-						<Form.Item name='fullName'>
-							<Input prefix={<UserOutlined className='site-form-item-icon' />} placeholder='Полное имя' />
-						</Form.Item>
-						
-						<Form.Item name='country'>
-							<Input
-								prefix={<EnvironmentOutlined className='site-form-item-icon' />}
-								placeholder='Страна'
-							/>
-						</Form.Item>
-						
-						<Form.Item name='city'>
-							<Input
-								prefix={<EnvironmentOutlined className='site-form-item-icon' />}
-								placeholder='Город'
-							/>
-						</Form.Item>
-						<Form.Item valuePropName='avatar' getValueFromEvent={normFile}>
-							Фото профиля:
-							<Upload listType='picture-card'>
-								<button style={{ border: 0, background: 'none' }} type='button'>
-									<PlusOutlined />
-									<div style={{ marginTop: 8 }}>Upload</div>
-								</button>
-							</Upload>
-						</Form.Item>
-						
-						<Form.Item name='description'>
-							<Input.TextArea
-								placeholder='Описание профиля'
-								rows={4}
-							/>
-						</Form.Item>
-						<Form.Item>
-							<Button type='primary' htmlType='submit' className='login-form-button'>
-								Зарегистрироваться
-							</Button>
-						</Form.Item>
-					</Form>
-				</div>
+				<RegisterFormSecondStep onFinishStep2={onFinishStep2} setAvatar={setAvatar} />
 			)
 		}
 	]

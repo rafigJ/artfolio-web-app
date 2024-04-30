@@ -1,14 +1,11 @@
 import { Layout } from 'antd'
-import React, { type FC, type PropsWithChildren } from 'react'
+import { type FC, type PropsWithChildren } from 'react'
 import Footer from '../Footer/Footer'
 import Header from '../Header/Header'
 
-
 const { Content } = Layout
 
-interface LayoutProps extends PropsWithChildren {
-
-}
+interface LayoutProps extends PropsWithChildren {}
 
 const StandardLayout: FC<LayoutProps> = ({ children }) => {
 	return (
@@ -17,7 +14,7 @@ const StandardLayout: FC<LayoutProps> = ({ children }) => {
 			<Content style={{ padding: '0 48px' }}>
 				<div
 					style={{
-						padding: 24
+						padding: 24,
 					}}
 				>
 					{children}

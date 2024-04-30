@@ -17,6 +17,10 @@
     "@types/react-router-dom": "^5.3.3",
     "antd": "^5.15.0",
     "axios": "^1.6.7",
+    "file-saver": "^2.0.5",
+    "jspdf": "^2.5.1",
+    "jspdf-autotable": "^3.8.2",
+    "pdfmake": "^0.2.10",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-infinite-scroll-component": "^6.1.0",
@@ -50,6 +54,7 @@
     ]
   },
   "devDependencies": {
-    "@babel/plugin-proposal-private-property-in-object": "^7.21.11"
+    "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
+    "@types/pdfmake": "^0.2.9"
   }
 }
