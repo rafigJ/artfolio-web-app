@@ -21,4 +21,7 @@
 
 ## Видео
 [Видеопрезентация 1 аттестация](https://drive.google.com/drive/folders/1AvF7BeIEMuA4yHOka8-E2L98p2-NjuXV?usp=sharing)  
+
+[Видеопрезентация 2 аттестация](https://drive.google.com/file/d/1XPzvDkrKQy9Lxy4fbOVKVUbzqQrX0jv9/view?usp=sharing)
+
 [Видеодемонстрация экранов 2 аттестация](https://drive.google.com/file/d/1XPzvDkrKQy9Lxy4fbOVKVUbzqQrX0jv9/view?usp=sharing)
