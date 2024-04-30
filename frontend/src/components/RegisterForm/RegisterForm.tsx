@@ -37,7 +37,7 @@ const RegisterForm: React.FC = () => {
 	const [secondStepData, setSecondStepData] = useState<SecondStepSlice>({} as SecondStepSlice)
 	const { setAuthCredential, setIsAuth } = useContext(AuthContext)
 	
-	const [register, isLoading, isError] = useFetching(async (registerRequest: RegistrationRequest, avatar: any) => {
+	const [register, isLoading, isError, error] = useFetching(async (registerRequest: RegistrationRequest, avatar: any) => {
 		const response = await AuthService.register(registerRequest, avatar)
 		setAuthCredential(response.data)
 		localStorage.setItem('token', response.data.token)
@@ -84,6 +84,10 @@ const RegisterForm: React.FC = () => {
 			)
 		}
 	]
+	
+	if (!isLoading && isError) {
+		message.error(`Ошибка регистрации ${error}`)
+	}
 	
 	return (
 		<div className='steps'>
