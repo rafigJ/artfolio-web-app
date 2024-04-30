@@ -12,7 +12,7 @@ const App: React.FC = () => {
 	const [authCredential, setAuthCredential] = useState<AuthResponse>({} as AuthResponse)
 	const [isAuth, setIsAuth] = useState<boolean>(false)
 	
-	const [fetchUser, isError] = useFetching(async () => {
+	const [fetchUser] = useFetching(async () => {
 		const response = await AuthService.userCredentials()
 		setAuthCredential({ ...response.data })
 		setIsAuth(true)
@@ -24,7 +24,7 @@ const App: React.FC = () => {
 			console.log(token)
 			fetchUser()
 		}
-	}, [isError])
+	}, [])
 	
 	return (
 		<AuthContext.Provider value={{
