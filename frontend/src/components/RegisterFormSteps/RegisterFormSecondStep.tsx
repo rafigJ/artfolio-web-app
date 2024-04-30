@@ -23,21 +23,18 @@ const RegisterFormSecondStep: FC<RegisterFormSecondStep> = ({ onFinishStep2, ava
 				<Typography.Title level={3} className='login-title'>
 					Регистрация
 				</Typography.Title>
-				
 				<Form.Item name='fullName' initialValue='fullNAME__ASDKLLAJKSD'>
 					<Input
 						prefix={<UserOutlined className='site-form-item-icon' />}
 						placeholder='Полное имя'
 					/>
 				</Form.Item>
-				
 				<Form.Item name='country' initialValue='fullNAME__ASDKLLAJKSD'>
 					<Input
 						prefix={<EnvironmentOutlined className='site-form-item-icon' />}
 						placeholder='Страна'
 					/>
 				</Form.Item>
-				
 				<Form.Item name='city' initialValue='horem'>
 					<Input
 						prefix={<EnvironmentOutlined className='site-form-item-icon' />}
@@ -47,7 +44,6 @@ const RegisterFormSecondStep: FC<RegisterFormSecondStep> = ({ onFinishStep2, ava
 				
 				Фото профиля:
 				<RegisterFormAvatarUpload avatar={avatar} setAvatar={setAvatar} />
-				
 				<Form.Item name='description' initialValue='fullNAME__ASDKLLAJKSD'>
 					<Input.TextArea placeholder='Описание профиля' rows={4} />
 				</Form.Item>

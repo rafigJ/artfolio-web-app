@@ -3,7 +3,7 @@ export interface PostResponse {
 	name: string
 	description: string
 	likeCount: number
-	previewMedia: number
+	previewMediaId: number
 	owner: Owner
 }
 

@@ -8,7 +8,7 @@ import SearchInput from '../SearchInput/SearchInput'
 
 const Header = () => {
 	const navigate = useNavigate()
-	const { isAuth, setIsAuth } = useContext(AuthContext)
+	const { isAuth, authCredential, setIsAuth } = useContext(AuthContext)
 	
 	return (
 		<Layout.Header
@@ -36,8 +36,9 @@ const Header = () => {
 				Опубликовать
 			</Button>
 			{isAuth ?
-				<Avatar size={48} alt='Аватар пользователя' src={<img alt='Аватар пользователя' style={{ width: '48px', height: '48px' }}
-				                            src={`${API_URL}/user/designer18234/avatar`} />} />
+				<Avatar size={48} alt='Аватар пользователя'
+				        src={<img alt='Аватар пользователя' style={{ width: '48px', height: '48px' }}
+				                  src={`${API_URL}/user/${authCredential.username}/avatar`} />} />
 				:
 				<Button
 					icon={<LoginOutlined />}

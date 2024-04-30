@@ -30,9 +30,9 @@ const AppRouter = () => {
 				:
 				<Route path='/posts/create' element={<Navigate replace to='/login' />} />
 			}
-			{isAuth && authCredential.role === 'ADMIN' &&
-				<Route path='/admin' element={<AdminPanelPage />} />
-			}
+			{/* {isAuth && authCredential.role === 'ADMIN' && */}
+			<Route path='/admin' element={<AdminPanelPage />} />
+			{/* } */}
 			<Route path='*' element={<Navigate replace to='/' />} />
 		</Routes>
 	)

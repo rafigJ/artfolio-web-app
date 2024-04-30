@@ -11,6 +11,7 @@ const LoginForm = () => {
 	const { setAuthCredential, setIsAuth } = useContext(AuthContext)
 	
 	const [login, isLoading, isError, error] = useFetching(async (email: string, password: string) => {
+		console.log(1)
 		const response = await AuthService.login(email, password)
 		setAuthCredential(response.data)
 		localStorage.setItem('token', response.data.token)

@@ -16,7 +16,7 @@ const NewTabs: FC<NewTabsProps> = ({ label, onChange }) => {
 			items={label.map((lab, index) => {
 				return {
 					label: lab,
-					key: index.toString(),
+					key: index.toString()
 				}
 			})}
 		/>
