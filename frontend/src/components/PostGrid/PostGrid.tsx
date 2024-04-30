@@ -15,7 +15,7 @@ const PostGrid = () => {
 	const [activeTabKey, setActiveTabKey] = useState<FeedSection | null>(FeedSection.NEW)
 	
 	const [fetchPosts, isLoading, isError, error] = useFetching(async _page => {
-		const response = await FeedService.getFeed(activeTabKey, page, 20)
+		const response = await FeedService.getFeed(FeedSection.NEW, page, 20)
 		setData([...data, ...response.data.content])
 		setTotalElements(response.data.totalElements)
 	})
@@ -40,7 +40,7 @@ const PostGrid = () => {
 					setData([])
 					setPage(0)
 					setTotalElements(0)
-					// setActiveTabKey(FEED_VALUES[Number(activeKey)])
+					setActiveTabKey(FEED_VALUES[Number(activeKey)])
 				}}
 				label={['Новые', 'Популярные', 'Для вас']}
 			/>

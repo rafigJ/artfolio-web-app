@@ -1,4 +1,5 @@
 import type { AxiosResponse } from 'axios'
+import type { FullPostResponse } from '../types/MockTypes/FullPostResponse'
 import type { Product } from '../types/MockTypes/Product'
 import type { PostRequest } from '../types/PostRequest'
 import type { PostResponse } from '../types/PostResponse'
@@ -24,7 +25,10 @@ export default class PostService {
 		files.forEach(file => {
 			bodyFormData.append('file', file);
 		});
-		return await $api.post<PostResponse>(`/posts`, bodyFormData)
+		return await $api.post<PostResponse>('/posts', bodyFormData)
 	}
 	
+	static async getPostById(postId: number): Promise<AxiosResponse<FullPostResponse>> {
+		return $api.get(`/posts/${postId}`)
+	}
 }
