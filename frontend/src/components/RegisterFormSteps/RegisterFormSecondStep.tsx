@@ -10,8 +10,8 @@ interface RegisterFormSecondStep {
 }
 
 const RegisterFormSecondStep: FC<RegisterFormSecondStep> = ({ onFinishStep2, avatar, setAvatar }) => {
-	
-	
+
+
 	return (
 		<div className='description-step'>
 			<Form
@@ -23,28 +23,28 @@ const RegisterFormSecondStep: FC<RegisterFormSecondStep> = ({ onFinishStep2, ava
 				<Typography.Title level={3} className='login-title'>
 					Регистрация
 				</Typography.Title>
-				<Form.Item name='fullName' initialValue='fullNAME__ASDKLLAJKSD'>
+				<Form.Item name='fullName'>
 					<Input
 						prefix={<UserOutlined className='site-form-item-icon' />}
 						placeholder='Полное имя'
 					/>
 				</Form.Item>
-				<Form.Item name='country' initialValue='fullNAME__ASDKLLAJKSD'>
+				<Form.Item name='country'>
 					<Input
 						prefix={<EnvironmentOutlined className='site-form-item-icon' />}
 						placeholder='Страна'
 					/>
 				</Form.Item>
-				<Form.Item name='city' initialValue='horem'>
+				<Form.Item name='city' >
 					<Input
 						prefix={<EnvironmentOutlined className='site-form-item-icon' />}
 						placeholder='Город'
 					/>
 				</Form.Item>
-				
+
 				Фото профиля:
 				<RegisterFormAvatarUpload avatar={avatar} setAvatar={setAvatar} />
-				<Form.Item name='description' initialValue='fullNAME__ASDKLLAJKSD'>
+				<Form.Item name='description' >
 					<Input.TextArea placeholder='Описание профиля' rows={4} />
 				</Form.Item>
 				<Form.Item>

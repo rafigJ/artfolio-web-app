@@ -1,14 +1,14 @@
 import { LockOutlined, MailOutlined, UserOutlined } from '@ant-design/icons'
 import { Button, Form, Input, Typography } from 'antd'
-import React, { type FC } from 'react'
+import { type FC } from 'react'
 import { Link } from 'react-router-dom'
 
 interface RegisterFormFirstStep {
 	onFinishStep1: ((values: any) => void) | undefined
 }
 
-const RegisterFormFirstStep:FC<RegisterFormFirstStep> = ({onFinishStep1}) => {
-	
+const RegisterFormFirstStep: FC<RegisterFormFirstStep> = ({ onFinishStep1 }) => {
+
 	return (
 		<div className='login-form-container'>
 			<Form
@@ -27,7 +27,6 @@ const RegisterFormFirstStep:FC<RegisterFormFirstStep> = ({onFinishStep1}) => {
 				<Form.Item
 					name='username'
 					rules={[{ required: true, message: 'Введите логин!' }]}
-					initialValue='designer1823'
 				>
 					<Input
 						prefix={<UserOutlined className='site-form-item-icon' />}
@@ -39,7 +38,6 @@ const RegisterFormFirstStep:FC<RegisterFormFirstStep> = ({onFinishStep1}) => {
 					rules={[
 						{ required: true, message: 'Введите электронную почту!' }
 					]}
-					initialValue='designer1823@mail.ru'
 				>
 					<Input
 						prefix={<MailOutlined className='site-form-item-icon' />}
@@ -49,7 +47,6 @@ const RegisterFormFirstStep:FC<RegisterFormFirstStep> = ({onFinishStep1}) => {
 				<Form.Item
 					name='password'
 					rules={[{ required: true, message: 'Введите пароль!' }]}
-					initialValue='somePassword18'
 				>
 					<Input.Password
 						prefix={<LockOutlined className='site-form-item-icon' />}
@@ -57,11 +54,10 @@ const RegisterFormFirstStep:FC<RegisterFormFirstStep> = ({onFinishStep1}) => {
 						placeholder='Пароль'
 					/>
 				</Form.Item>
-				
+
 				<Form.Item
 					name='confirmPassword'
 					rules={[{ required: true, message: 'Повторите пароль!' }]}
-					initialValue='somePassword18'
 				>
 					<Input.Password
 						prefix={<LockOutlined className='site-form-item-icon' />}
@@ -72,14 +68,13 @@ const RegisterFormFirstStep:FC<RegisterFormFirstStep> = ({onFinishStep1}) => {
 				<Form.Item
 					name='secretWord'
 					rules={[{ required: true, message: 'Введите секретное слово!' }]}
-					initialValue='someSecret'
 				>
 					<Input
 						prefix={<LockOutlined className='site-form-item-icon' />}
 						placeholder='Секретное слово'
 					/>
 				</Form.Item>
-				
+
 				<Form.Item>
 					<Button
 						type='primary'
