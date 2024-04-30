@@ -21,7 +21,9 @@ import ru.vsu.cs.artfolio.exception.ExistUserException;
 import ru.vsu.cs.artfolio.exception.IncorrectCredentialsException;
 import ru.vsu.cs.artfolio.exception.NotExistUserException;
 import ru.vsu.cs.artfolio.exception.RestException;
+import ru.vsu.cs.artfolio.mapper.wrappers.MinioResult;
 import ru.vsu.cs.artfolio.repository.UserRepository;
+import ru.vsu.cs.artfolio.service.impl.MinioService;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -29,9 +31,11 @@ import java.time.LocalDateTime;
 @Service
 @RequiredArgsConstructor
 public class AuthenticationService {
+
     private final UserRepository repository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
+    private final MinioService minioService;
     private final AuthenticationManager authenticationManager;
 
     @Transactional
@@ -41,14 +45,13 @@ public class AuthenticationService {
         }
 
         try {
-            UserEntity userEntity = convertRequestToEntity(request, avatarFile, passwordEncoder);
+            UserEntity userEntity = convertRequestToEntity(request, minioService.uploadFile(avatarFile), passwordEncoder);
             User user = new User(repository.save(userEntity));
             String jwtToken = jwtService.generateToken(user);
             return convertEntityToAuthResponse(userEntity, jwtToken);
         } catch (DataIntegrityViolationException | IOException e) {
             throw new RestException("Server error", HttpStatus.INTERNAL_SERVER_ERROR);
         }
-
     }
 
     @Transactional
@@ -71,6 +74,7 @@ public class AuthenticationService {
         return convertEntityToAuthResponse(userEntity, jwtToken);
     }
 
+    @Transactional
     public void changePassword(ChangePasswordRequestDto requestDto) {
         UserEntity user = repository.findByEmail(requestDto.email())
                 .orElseThrow(IncorrectCredentialsException::new);
@@ -85,6 +89,7 @@ public class AuthenticationService {
 
     private static AuthResponseDto convertEntityToAuthResponse(UserEntity userEntity, String token) {
         return AuthResponseDto.builder()
+                .username(userEntity.getUsername())
                 .name(userEntity.getFullName())
                 .email(userEntity.getEmail())
                 .role(userEntity.getRole().name())
@@ -92,7 +97,7 @@ public class AuthenticationService {
                 .build();
     }
 
-    private static UserEntity convertRequestToEntity(RegisterRequestDto request, MultipartFile avatar, PasswordEncoder passwordEncoder) throws IOException {
+    private static UserEntity convertRequestToEntity(RegisterRequestDto request, MinioResult avatarData, PasswordEncoder passwordEncoder) throws IOException {
         return UserEntity.builder()
                 .email(request.email())
                 .username(request.username())
@@ -102,8 +107,8 @@ public class AuthenticationService {
                 .country(request.country())
                 .city(request.city())
                 .additionalInfo(request.description())
-                .avatar(avatar.getBytes())
-                .avatarType(avatar.getContentType())
+                .avatarName(avatarData.name())
+                .avatarType(avatarData.contentType())
                 .role(Role.USER)
                 .createTime(LocalDateTime.now())
                 .updateTime(LocalDateTime.now())

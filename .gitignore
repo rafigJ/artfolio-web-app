@@ -5,6 +5,8 @@ backend/.mvn/wrapper/maven-wrapper.jar
 !**/src/test/**/target/
 backend/src/main/resources/application.yml
 
+.env
+minio/storage/
 ### STS ###
 .apt_generated
 .classpath

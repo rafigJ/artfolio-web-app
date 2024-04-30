@@ -2,7 +2,11 @@ package ru.vsu.cs.artfolio.mapper;
 
 import ru.vsu.cs.artfolio.dto.user.FullUserResponseDto;
 import ru.vsu.cs.artfolio.dto.user.UserResponseDto;
+import ru.vsu.cs.artfolio.dto.user.request.UserUpdateRequestDto;
 import ru.vsu.cs.artfolio.entity.UserEntity;
+import ru.vsu.cs.artfolio.mapper.wrappers.MinioResult;
+
+import java.time.LocalDateTime;
 
 public class UserMapper {
 
@@ -11,7 +15,7 @@ public class UserMapper {
                 .uuid(user.getUuid())
                 .fullName(user.getFullName())
                 .email(user.getEmail())
-                .username(null)
+                .username(user.getUsername())
                 .build();
     }
 
@@ -28,5 +32,18 @@ public class UserMapper {
                 .subscribersCount(null)
                 .likeCount(null)
                 .build();
+    }
+
+    public static UserEntity updateEntity(UserEntity oldEntity, UserUpdateRequestDto updatedUser, MinioResult avatarData) {
+        oldEntity.setFullName(updatedUser.fullName());
+        oldEntity.setAdditionalInfo(updatedUser.description());
+        oldEntity.setCountry(updatedUser.country());
+        oldEntity.setCity(updatedUser.city());
+        oldEntity.setUsername(updatedUser.username());
+        oldEntity.setEmail(updatedUser.email());
+        oldEntity.setAvatarName(avatarData.name());
+        oldEntity.setAvatarType(avatarData.contentType());
+        oldEntity.setUpdateTime(LocalDateTime.now());
+        return oldEntity;
     }
 }

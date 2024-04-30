@@ -1,7 +1,18 @@
 package ru.vsu.cs.artfolio.entity;
 
-import jakarta.persistence.*;
-import lombok.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import ru.vsu.cs.artfolio.auth.user.Role;
 
 import java.time.LocalDateTime;
@@ -45,13 +56,9 @@ public class UserEntity {
     @Column(name = "additional_info")
     private String additionalInfo;
 
-    @Lob
-    @Column(name = "avatar_file")
-    @Basic(fetch = FetchType.LAZY)
-    private byte[] avatar;
-    // для работы ленивой загрузки, необходимо создать ещё одну сущность, оборачивающее данное поле avatar
+    @Column(name = "avatar_name")
+    private String avatarName;
 
-    @Lob
     @Column(name = "avatar_type")
     private String avatarType;
 

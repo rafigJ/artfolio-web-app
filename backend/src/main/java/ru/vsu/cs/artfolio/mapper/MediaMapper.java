@@ -1,25 +1,30 @@
 package ru.vsu.cs.artfolio.mapper;
 
-import org.springframework.web.multipart.MultipartFile;
 import ru.vsu.cs.artfolio.entity.MediaFileEntity;
 import ru.vsu.cs.artfolio.entity.PostEntity;
+import ru.vsu.cs.artfolio.mapper.wrappers.MinioResult;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class MediaMapper {
-    public static List<MediaFileEntity> toEntityList(List<MultipartFile> mediaFiles, PostEntity post) throws IOException {
+
+    /**
+     * @param mediaFiles - упорядоченный список файлов, которые необходимо преобразовать в сущность
+     * @param post       - публикация, к которому будут ссылаться данные сущности
+     */
+    public static List<MediaFileEntity> toEntityList(List<MinioResult> mediaFiles, PostEntity post) {
         List<MediaFileEntity> entities = new ArrayList<>();
         int pos = 0;
-        for (MultipartFile mediaFile : mediaFiles) {
+        for (MinioResult mediaFile : mediaFiles) {
             entities.add(MediaFileEntity.builder()
                     .post(post)
-                    .file(mediaFile.getBytes())
+                    .fileName(mediaFile.name())
                     .position(pos++)
-                    .type(mediaFile.getContentType())
+                    .type(mediaFile.contentType())
                     .build());
         }
         return entities;
     }
 }
+
