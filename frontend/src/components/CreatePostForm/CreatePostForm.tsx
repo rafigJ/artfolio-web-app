@@ -1,5 +1,6 @@
 import { Affix, Button, Flex, Form, Input, message, Typography, type UploadFile } from 'antd'
 import React, { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import PostService from '../../api/PostService'
 import { useFetching } from '../../hooks/useFetching'
 import type { MockPostRequest } from '../../types/MockTypes/MockPostRequest'
@@ -16,6 +17,7 @@ import DraggableUploadList from '../DraggableUploadList/DraggableUploadList'
  * TODO: добавить элемент формы загрузка Preview (обложки публикации).
  */
 const CreatePostForm = () => {
+	const navigate = useNavigate()
 	const [post, setPost] = useState<MockPostRequest>({
 		title: 'Заголовок публикации',
 		description:
@@ -31,6 +33,7 @@ const CreatePostForm = () => {
 	
 	const [createPost, isLoading, isError, error] = useFetching(async (post: PostRequest, files: File[]) => {
 		const response = await PostService.createPost(post, files)
+		navigate(`/posts/${response.data.id}`)
 		message.success(`Вы успешно создали пост ${response.data.name}`)
 	})
 	
@@ -40,8 +43,6 @@ const CreatePostForm = () => {
 			message.error('Должна быть загружена хотя бы одна фотография')
 			return
 		}
-		console.log(values)
-		fileList.forEach(e => console.log(e.name))
 		createPost(values, fileList.map(e => e?.originFileObj as File))
 	}
 	
