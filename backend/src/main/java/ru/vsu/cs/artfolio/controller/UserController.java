@@ -4,11 +4,18 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import ru.vsu.cs.artfolio.auth.user.User;
 import ru.vsu.cs.artfolio.dto.user.FullUserResponseDto;
@@ -48,12 +55,11 @@ public class UserController {
     }
 
     @GetMapping("/{username}/avatar")
-    public ResponseEntity<?> getUserAvatar(@PathVariable("username") String username) {
-        LOGGER.info("Получение аватарки {}", username);
+    public ResponseEntity<InputStreamResource> getUserAvatar(@PathVariable("username") String username) {
         var avatar = service.downloadAvatar(username);
         return ResponseEntity.ok()
                 .contentType(MediaType.valueOf(avatar.contentType()))
-                .body(avatar.avatarFile());
+                .body(new InputStreamResource(avatar.fileStream()));
     }
 
 }

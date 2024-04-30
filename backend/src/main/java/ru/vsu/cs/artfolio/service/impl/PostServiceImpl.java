@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import ru.vsu.cs.artfolio.auth.user.Role;
+import ru.vsu.cs.artfolio.dto.MediaDto;
 import ru.vsu.cs.artfolio.dto.PageDto;
 import ru.vsu.cs.artfolio.dto.post.FullPostResponseDto;
 import ru.vsu.cs.artfolio.dto.post.PostRequestDto;
@@ -23,12 +24,12 @@ import ru.vsu.cs.artfolio.exception.NotFoundException;
 import ru.vsu.cs.artfolio.exception.RestException;
 import ru.vsu.cs.artfolio.mapper.MediaMapper;
 import ru.vsu.cs.artfolio.mapper.PostMapper;
+import ru.vsu.cs.artfolio.mapper.wrappers.MinioResult;
 import ru.vsu.cs.artfolio.repository.MediaRepository;
 import ru.vsu.cs.artfolio.repository.PostRepository;
 import ru.vsu.cs.artfolio.repository.UserRepository;
 import ru.vsu.cs.artfolio.service.PostService;
 
-import java.io.IOException;
 import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
@@ -38,6 +39,9 @@ import java.util.UUID;
 public class PostServiceImpl implements PostService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PostServiceImpl.class);
+
+    private final MinioService minioService;
+
     private final PostRepository postRepository;
     private final UserRepository userRepository;
     private final MediaRepository mediaRepository;
@@ -47,22 +51,20 @@ public class PostServiceImpl implements PostService {
     public FullPostResponseDto createPost(UUID userId,
                                           PostRequestDto requestDto,
                                           List<MultipartFile> files) {
-
-        LOGGER.info("Получение следующих данных {}, {}, {}", userId, requestDto, files);
+        LOGGER.info("Получение следующих данных {}, {} для сохранения", userId, requestDto);
         UserEntity ownerEntity = userRepository.getReferenceById(userId);
 
-        try {
-            PostEntity post = PostMapper.toEntity(requestDto, ownerEntity, files);
-            LOGGER.info("Сохранение поста");
-            PostEntity createdPost = postRepository.save(post);
-            List<MediaFileEntity> medias = mediaRepository.saveAll(MediaMapper.toEntityList(files, createdPost));
-            LOGGER.info("Возврат ответа");
-            List<Long> mediaIds = medias.stream().sorted(Comparator.comparingInt(MediaFileEntity::getPosition)).map(MediaFileEntity::getId).toList();
-            return PostMapper.toFullDto(createdPost, mediaIds);
-        } catch (IOException e) {
-            LOGGER.error("ОШИБКА {}", e.getMessage());
-            throw new RestException(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        PostEntity post = PostMapper.toEntity(requestDto, ownerEntity);
+
+        LOGGER.info("Сохранение поста");
+        PostEntity createdPost = postRepository.save(post);
+        List<MinioResult> mediaFiles = files.stream().map(minioService::uploadFile).toList();
+
+        List<MediaFileEntity> medias = mediaRepository.saveAll(MediaMapper.toEntityList(mediaFiles, createdPost));
+
+        LOGGER.info("Возврат ответа");
+        List<Long> mediaIds = medias.stream().map(MediaFileEntity::getId).toList();
+        return PostMapper.toFullDto(createdPost, mediaIds);
     }
 
     @Override
@@ -79,6 +81,8 @@ public class PostServiceImpl implements PostService {
         PostEntity post = postRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Post by id: " + id + " not found"));
         if (post.getOwner().getUuid().equals(userId) || executor.getRole() == Role.ADMIN) {
+            List<String> fileNames = post.getMedias().stream().map(MediaFileEntity::getFileName).toList();
+            minioService.deleteFiles(fileNames);
             postRepository.delete(post);
         } else {
             throw new RestException("Insufficient rights to delete", HttpStatus.UNAUTHORIZED);
@@ -88,6 +92,8 @@ public class PostServiceImpl implements PostService {
     @Override
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public FullPostResponseDto updatePost(UUID userId, Long id, PostRequestDto requestDto, List<MultipartFile> files) {
+        LOGGER.info("Получение следующих данных {}, {}, {} для обновления", userId, id, requestDto);
+
         PostEntity postToUpdate = postRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Post by id: " + id + " not found"));
 
@@ -97,32 +103,40 @@ public class PostServiceImpl implements PostService {
         }
 
         UserEntity ownerEntity = userRepository.getReferenceById(userId);
+        PostEntity newPost = PostMapper.toEntity(requestDto, ownerEntity);
+        newPost.setId(id);
 
-        try {
-            PostEntity newPost = PostMapper.toEntity(requestDto, ownerEntity, files);
-            newPost.setId(id);
-            mediaRepository.deleteAllByPostIdEquals(id);
-            PostEntity updatedPost = postRepository.save(newPost);
-            List<MediaFileEntity> medias = mediaRepository.saveAll(MediaMapper.toEntityList(files, updatedPost));
-            List<Long> mediaIds = medias.stream().sorted(Comparator.comparingInt(MediaFileEntity::getPosition)).map(MediaFileEntity::getId).toList();
-            return PostMapper.toFullDto(updatedPost, mediaIds);
-        } catch (IOException e) {
-            LOGGER.error("ОШИБКА {}", e.getMessage());
-            throw new RestException(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        List<String> fileNames = postToUpdate.getMedias().stream().map(MediaFileEntity::getFileName).toList();
+        minioService.deleteFiles(fileNames);
+        mediaRepository.deleteAllByPostIdEquals(id);
+
+        PostEntity updatedPost = postRepository.save(newPost);
+        List<MinioResult> mediaFiles = files.stream().map(minioService::uploadFile).toList();
+
+        List<MediaFileEntity> medias = mediaRepository.saveAll(MediaMapper.toEntityList(mediaFiles, updatedPost));
+        List<Long> mediaIds = medias.stream().map(MediaFileEntity::getId).toList();
+        return PostMapper.toFullDto(updatedPost, mediaIds);
     }
 
     @Override
     public PageDto<PostResponseDto> getPostsPageByUserId(UUID userId, Pageable page) {
         Page<PostEntity> posts = postRepository.findAllByOwnerUuid(userId, page);
-        List<Long> medias = mediaRepository.findAllByPostInAndPositionOrderByPost(posts.getContent(), 1).stream().map(MediaFileEntity::getId).toList();
+        List<Long> medias = posts.getContent().stream()
+                .map(post -> post.getMedias().stream()
+                        .sorted(Comparator.comparingInt(MediaFileEntity::getPosition)).toList()
+                        .get(0).getId())
+                .toList();
         return PostMapper.toPageDto(posts, medias);
     }
 
     @Override
     public PageDto<PostResponseDto> getPostsPageBySpecifications(Specification<PostEntity> specification, Pageable page) {
         Page<PostEntity> posts = postRepository.findAll(specification, page);
-        List<Long> medias = posts.getContent().stream().map(post -> post.getMedias().get(0).getId()).toList();
+        List<Long> medias = posts.getContent().stream()
+                .map(post -> post.getMedias().stream()
+                        .sorted(Comparator.comparingInt(MediaFileEntity::getPosition)).toList()
+                        .get(0).getId())
+                .toList();
         return PostMapper.toPageDto(posts, medias);
     }
 
@@ -139,8 +153,9 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public MediaFileEntity getMediaById(Long mediaId) {
-        return mediaRepository.findById(mediaId)
+    public MediaDto getMediaById(Long mediaId) {
+        MediaFileEntity media = mediaRepository.findById(mediaId)
                 .orElseThrow(() -> new NotFoundException("Media by id: " + mediaId + " not found"));
+        return new MediaDto(minioService.downloadFile(media.getFileName()), media.getType());
     }
 }
