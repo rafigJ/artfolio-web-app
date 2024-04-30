@@ -1,13 +1,30 @@
 import { LockOutlined, UserOutlined } from '@ant-design/icons'
-import { Button, Form, Input, Typography } from 'antd'
+import { Button, Form, Input, message, Typography } from 'antd'
+import { useContext } from 'react'
 import { Link } from 'react-router-dom'
 import './LoginForm.css'
+import AuthService from '../../api/AuthService'
+import { AuthContext } from '../../context'
+import { useFetching } from '../../hooks/useFetching'
 
 const LoginForm = () => {
+	const { setAuthCredential, setIsAuth } = useContext(AuthContext)
+	
+	const [login, isLoading, isError, error] = useFetching(async (email: string, password: string) => {
+		const response = await AuthService.login(email, password)
+		setAuthCredential(response.data)
+		localStorage.setItem('token', response.data.token)
+		setIsAuth(true)
+	})
+	
 	const onFinish = (values: any) => {
-		console.log('Received values of form: ', values)
+		login(values.email, values.password)
 	}
-
+	
+	if (isError) {
+		message.error('Ошибка Входа ' + error)
+	}
+	
 	return (
 		<div className='login-form-container'>
 			<Form
@@ -25,6 +42,7 @@ const LoginForm = () => {
 				</Typography.Title>
 				<Form.Item
 					name='email'
+					initialValue='designer1823@mail.ru'
 					rules={[{ required: true, message: 'Введите электронную почту!' }]}
 				>
 					<Input
@@ -32,9 +50,9 @@ const LoginForm = () => {
 						placeholder='Электронная почта'
 					/>
 				</Form.Item>
-
 				<Form.Item
 					name='password'
+					initialValue='somePassword18'
 					rules={[{ required: true, message: 'Введите пароль!' }]}
 				>
 					<Input.Password
@@ -53,6 +71,7 @@ const LoginForm = () => {
 						type='primary'
 						htmlType='submit'
 						className='login-form-button'
+						loading={isLoading}
 					>
 						Войти
 					</Button>

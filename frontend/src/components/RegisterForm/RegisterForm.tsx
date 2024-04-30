@@ -1,8 +1,10 @@
 import { message, Steps, type UploadFile } from 'antd'
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import '../LoginForm/LoginForm.css'
 import AuthService from '../../api/AuthService'
+import { AuthContext } from '../../context'
+import { useFetching } from '../../hooks/useFetching'
 import type { RegistrationRequest } from '../../types/RegistrationRequest'
 import RegisterFormFirstStep from '../RegisterFormSteps/RegisterFormFirstStep'
 import RegisterFormSecondStep from '../RegisterFormSteps/RegisterFormSecondStep'
@@ -33,7 +35,15 @@ const RegisterForm: React.FC = () => {
 	const [avatar, setAvatar] = useState<UploadFile[]>([] as UploadFile[])
 	const [firstStepData, setFirstStepData] = useState<FirstStepSlice>({} as FirstStepSlice)
 	const [secondStepData, setSecondStepData] = useState<SecondStepSlice>({} as SecondStepSlice)
+	const { setAuthCredential, setIsAuth } = useContext(AuthContext)
 	
+	const [register, isLoading, isError] = useFetching(async (registerRequest: RegistrationRequest, avatar: any) => {
+		const response = await AuthService.register(registerRequest, avatar)
+		setAuthCredential(response.data)
+		localStorage.setItem('token', response.data.token)
+		setIsAuth(true)
+		message.success((`Вы успешно зарегистрировались ${response.status}`))
+	})
 	
 	const nextStep = () => {
 		setCurrentStep(currentStep + 1)
@@ -57,10 +67,7 @@ const RegisterForm: React.FC = () => {
 		console.log('Step 2 values:', values)
 		setSecondStepData(values)
 		const registerRequest: RegistrationRequest = { ...firstStepData, ...values }
-		console.log(registerRequest)
-		AuthService.register(registerRequest, avatar.pop()?.originFileObj).then(r =>
-			console.log((`Вы успешно зарегистрировались + ${r}`))
-		).catch((reason) => console.log(reason))
+		register(registerRequest, avatar.pop()?.originFileObj)
 	}
 	
 	const steps = [

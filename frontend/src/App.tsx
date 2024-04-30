@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react'
 import { BrowserRouter } from 'react-router-dom'
 import AuthService from './api/AuthService'
 import StandardLayout from './components/StandardLayout/StandardLayout'
+import { AuthContext } from './context'
 import { useFetching } from './hooks/useFetching'
 import AppRouter from './routing/AppRouter'
 import type { AuthResponse } from './types/AuthResponse'
@@ -29,11 +30,18 @@ const App: React.FC = () => {
 	}, [isError])
 	
 	return (
-		<BrowserRouter>
-			<StandardLayout>
-				<AppRouter />
-			</StandardLayout>
-		</BrowserRouter>
+		<AuthContext.Provider value={{
+			authCredential,
+			isAuth,
+			setIsAuth,
+			setAuthCredential
+		}}>
+			<BrowserRouter>
+				<StandardLayout>
+					<AppRouter />
+				</StandardLayout>
+			</BrowserRouter>
+		</AuthContext.Provider>
 	)
 }
 
