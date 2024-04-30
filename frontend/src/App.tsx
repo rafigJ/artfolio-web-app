@@ -19,9 +19,6 @@ const App: React.FC = () => {
 	})
 	
 	useEffect(() => {
-		if (isError) {
-			localStorage.removeItem('token')
-		}
 		const token = localStorage.getItem('token')
 		if (token !== null) {
 			console.log(token)
