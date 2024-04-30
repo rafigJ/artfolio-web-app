@@ -6,13 +6,14 @@ import {
 	FlagFilled,
 	HeartFilled
 } from '@ant-design/icons'
-import { Avatar, Button, Divider, Dropdown, Flex, MenuProps, Result, Skeleton, Typography } from 'antd'
+import { Avatar, Button, Divider, Dropdown, Flex, MenuProps, Skeleton, Typography } from 'antd'
 import { type CSSProperties, type FC, useEffect, useState } from 'react'
-import { Link, useNavigate, useParams } from 'react-router-dom'
+import { Link, useParams } from 'react-router-dom'
 import { API_URL } from '../../api'
 import PostService from '../../api/PostService'
 import { useFetching } from '../../hooks/useFetching'
-import type { FullPostResponse, Owner } from '../../types/MockTypes/FullPostResponse'
+import type { FullPostResponse, Owner } from '../../types/FullPostResponse'
+import Error404Result from '../Error404Result/Error404Result'
 import ReportWindow from '../ReportWindow/ReportWindow'
 import './PostContent.css'
 
@@ -28,7 +29,7 @@ const AuthorLinkCard: FC<AuthorLinkCardProps> = ({ owner, style }) => {
 				<Avatar
 					src={`${API_URL}/user/${owner?.username}/avatar`}
 					size={70}
-					style={{marginRight: '10px'}}
+					style={{ marginRight: '10px' }}
 					icon={<AntDesignOutlined />}
 				/>
 			</Link>
@@ -48,7 +49,6 @@ const AuthorLinkCard: FC<AuthorLinkCardProps> = ({ owner, style }) => {
 
 const PostContent = () => {
 	const [open, setOpen] = useState(false)
-	const navigate = useNavigate()
 	const showModal = () => {
 		setOpen(true)
 	}
@@ -83,8 +83,7 @@ const PostContent = () => {
 	
 	useEffect(() => {
 		fetchPost(params.id)
-		console.log(isLoading)
-	}, [])
+	}, [params.id])
 	
 	if (isLoading) {
 		return <PostLoadingContent />
@@ -92,14 +91,10 @@ const PostContent = () => {
 	
 	if (isError) {
 		return (
-			<Result status='404'
-			        title='404'
-			        subTitle='Страница не найдена'
-			        extra={<Button title='Вернуться на главную' onClick={() => navigate('/')} />}
-			/>
+			<Error404Result />
 		)
 	}
-
+	
 	return (
 		<>
 			<ReportWindow open={open} setOpen={setOpen} />
@@ -147,7 +142,7 @@ const PostContent = () => {
 
 const PostLoadingContent = () => {
 	return (
-		<div style={{minWidth: '600px'}}>
+		<div style={{ minWidth: '600px' }}>
 			<div className='title-container'>
 				<Skeleton active />
 				<Skeleton active />

@@ -1,9 +1,12 @@
 import { Comment } from '@ant-design/compatible'
 import { Avatar, Button, Form, Input } from 'antd'
-import React, { useContext, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import React, { useContext, useEffect, useState } from 'react'
+import { useNavigate, useParams } from 'react-router-dom'
 import { API_URL } from '../../api'
+import PostService from '../../api/PostService'
 import { AuthContext } from '../../context'
+import { useFetching } from '../../hooks/useFetching'
+import type { FullPostResponse } from '../../types/FullPostResponse'
 import CommentList, { type CommentItem } from '../CommentList/CommentList'
 
 const { TextArea } = Input
@@ -44,7 +47,9 @@ const CommentEditor: React.FC = () => {
 	const [comments, setComments] = useState<CommentItem[]>([])
 	const [submitting, setSubmitting] = useState(false)
 	const [value, setValue] = useState('')
+	
 	const navigate = useNavigate()
+	const params = useParams()
 	const { isAuth, authCredential } = useContext(AuthContext)
 	
 	const handleSubmit = () => {
@@ -76,8 +81,22 @@ const CommentEditor: React.FC = () => {
 		if (!isAuth) {
 			navigate('/login')
 		}
-		
 		setValue(e.target.value)
+	}
+	
+	const [post, setPost] = useState<FullPostResponse>({} as FullPostResponse)
+	
+	const [fetchPost, isError] = useFetching(async (id) => {
+		const response = await PostService.getPostById(id)
+		setPost(response.data)
+	})
+	
+	useEffect(() => {
+		fetchPost(params.id)
+	}, [params.id])
+	
+	if (isError) {
+		return <></>
 	}
 	
 	return (

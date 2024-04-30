@@ -1,5 +1,5 @@
 import type { AxiosResponse } from 'axios'
-import type { FullPostResponse } from '../types/MockTypes/FullPostResponse'
+import type { FullPostResponse } from '../types/FullPostResponse'
 import type { Product } from '../types/MockTypes/Product'
 import type { PostRequest } from '../types/PostRequest'
 import type { PostResponse } from '../types/PostResponse'

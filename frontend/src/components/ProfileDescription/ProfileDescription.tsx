@@ -3,14 +3,14 @@ import { Button, Descriptions, Flex, Statistic, Typography } from 'antd'
 import pdfMake from 'pdfmake/build/pdfmake'
 import pdfFonts from 'pdfmake/build/vfs_fonts'
 import { type FC } from 'react'
-import type { MockFullUserResponse } from '../../types/MockTypes/MockFullUserResponse'
+import type { FullUserResponse } from '../../types/FullUserResponse'
 
 const { Paragraph } = Typography
 
 pdfMake.vfs = pdfFonts.pdfMake.vfs
 
 interface ProfileDescriptionProps {
-	profile: MockFullUserResponse
+	profile: FullUserResponse
 }
 
 const ProfileDescription: FC<ProfileDescriptionProps> = ({ profile }) => {
@@ -18,21 +18,21 @@ const ProfileDescription: FC<ProfileDescriptionProps> = ({ profile }) => {
 		const docDefinition = {
 			content: [
 				{ text: 'Имя пользователя: ', bold: true },
-				'Иван Васильевич',
+				profile?.fullName,
 				{ text: 'Электронная почта: ', bold: true },
-				'ivanbalyk@mail.ru',
+				profile?.email,
 				{ text: 'Город проживания: ', bold: true },
-				'Воронеж',
+				profile?.city,
 				{ text: 'Страна проживания: ', bold: true },
-				'Россия',
+				profile?.country,
 				{ text: 'Описание:', bold: true },
-				profile.description,
+				profile?.description,
 				{ text: 'Количество лайков: ', bold: true },
-				profile.likeCount,
+				profile?.likeCount,
 				{ text: 'Количество публикаций: ', bold: true },
-				profile.postCount,
+				profile?.postCount,
 				{ text: 'Количество подписчиков: ', bold: true },
-				profile.subscribersCount,
+				profile?.subscribersCount,
 			]
 		}
 
@@ -67,7 +67,7 @@ const ProfileDescription: FC<ProfileDescriptionProps> = ({ profile }) => {
 						},
 					]}
 				/>
-				<Paragraph>{profile.description}</Paragraph>
+				<Paragraph>{profile?.description}</Paragraph>
 			</Flex>
 			<Flex vertical>
 				<Button
@@ -78,13 +78,13 @@ const ProfileDescription: FC<ProfileDescriptionProps> = ({ profile }) => {
 				</Button>
 				<Statistic
 					title='Количество лайков'
-					value={profile.likeCount}
+					value={profile?.likeCount}
 					prefix={<HeartOutlined />}
 				/>
-				<Statistic title='Количество публикаций' value={profile.postCount} />
+				<Statistic title='Количество публикаций' value={profile?.postCount} />
 				<Statistic
 					title='Количество подписчиков'
-					value={profile.subscribersCount}
+					value={profile?.subscribersCount}
 				/>
 			</Flex>
 		</Flex >

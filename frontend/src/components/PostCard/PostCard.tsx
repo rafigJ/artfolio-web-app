@@ -40,15 +40,15 @@ const PostCard: FC<PostCardProps> = ({ post }) => {
 					</Link>
 				}
 				avatar={
-					<Link to='/profile/username'>
+					<Link to={`/profile/${post?.owner?.username}`}>
 						<Avatar
-							src={`${API_URL}/user/${post.owner.username}/avatar`}
+							src={`${API_URL}/user/${post?.owner?.username}/avatar`}
 						/>
 					</Link>
 				}
 				description={
-					<Link className='ant-card-meta-description' to='/profile/username'>
-						{post.owner.fullName}
+					<Link className='ant-card-meta-description' to={`/profile/${post?.owner?.username}`}>
+						{post?.owner?.fullName}
 					</Link>
 				}
 			/>
