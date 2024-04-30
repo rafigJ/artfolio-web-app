@@ -1,5 +1,3 @@
-import type { UploadFile } from 'antd'
-
 export interface RegistrationRequest {
 	username: string
 	email: string
@@ -9,5 +7,4 @@ export interface RegistrationRequest {
 	country: string
 	city: string
 	description: string
-	avatarFile: UploadFile
 }

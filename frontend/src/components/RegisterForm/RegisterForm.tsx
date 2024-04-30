@@ -1,7 +1,10 @@
 import { message, Steps, type UploadFile } from 'antd'
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import '../LoginForm/LoginForm.css'
+import AuthService from '../../api/AuthService'
+import { AuthContext } from '../../context'
+import { useFetching } from '../../hooks/useFetching'
 import type { RegistrationRequest } from '../../types/RegistrationRequest'
 import RegisterFormFirstStep from '../RegisterFormSteps/RegisterFormFirstStep'
 import RegisterFormSecondStep from '../RegisterFormSteps/RegisterFormSecondStep'
@@ -23,16 +26,24 @@ interface SecondStepSlice {
 	country: string
 	city: string
 	description: string
-	avatarFile: UploadFile
+	avatarFile: UploadFile[]
 }
 
 const RegisterForm: React.FC = () => {
 	const navigate = useNavigate()
 	const [currentStep, setCurrentStep] = useState<number>(0)
-	const [avatar, setAvatar] = useState<UploadFile>({} as UploadFile)
+	const [avatar, setAvatar] = useState<UploadFile[]>([] as UploadFile[])
 	const [firstStepData, setFirstStepData] = useState<FirstStepSlice>({} as FirstStepSlice)
 	const [secondStepData, setSecondStepData] = useState<SecondStepSlice>({} as SecondStepSlice)
+	const { setAuthCredential, setIsAuth } = useContext(AuthContext)
 	
+	const [register, isLoading, isError, error] = useFetching(async (registerRequest: RegistrationRequest, avatar: any) => {
+		const response = await AuthService.register(registerRequest, avatar)
+		setAuthCredential(response.data)
+		localStorage.setItem('token', response.data.token)
+		setIsAuth(true)
+		message.success((`Вы успешно зарегистрировались ${response.status}`))
+	})
 	
 	const nextStep = () => {
 		setCurrentStep(currentStep + 1)
@@ -49,17 +60,14 @@ const RegisterForm: React.FC = () => {
 	}
 	
 	const onFinishStep2 = (values: SecondStepSlice) => {
-		if (Object.keys(avatar).length === 0) {
+		if (!avatar.length) {
 			message.error('Выберите аватар')
 			return
 		}
 		console.log('Step 2 values:', values)
 		setSecondStepData(values)
-		const registerRequest: RegistrationRequest = { ...firstStepData, ...values, avatarFile: avatar }
-		// Здесь можно добавить логику отправки данных на сервер
-		message.success('Вы успешно зарегистрировались')
-		console.log(registerRequest)
-		navigate('/')
+		const registerRequest: RegistrationRequest = { ...firstStepData, ...values }
+		register(registerRequest, avatar.pop()?.originFileObj)
 	}
 	
 	const steps = [
@@ -72,10 +80,14 @@ const RegisterForm: React.FC = () => {
 		{
 			title: 'Добавьте описание профиля',
 			content: (
-				<RegisterFormSecondStep onFinishStep2={onFinishStep2} setAvatar={setAvatar} />
+				<RegisterFormSecondStep onFinishStep2={onFinishStep2} avatar={avatar} setAvatar={setAvatar} />
 			)
 		}
 	]
+	
+	if (!isLoading && isError) {
+		message.error(`Ошибка регистрации ${error}`)
+	}
 	
 	return (
 		<div className='steps'>

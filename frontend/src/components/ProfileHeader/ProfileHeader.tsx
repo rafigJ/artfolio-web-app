@@ -1,28 +1,34 @@
 import { AntDesignOutlined } from '@ant-design/icons'
 import { Avatar, Button, Flex, Typography } from 'antd'
-import { useState } from 'react'
+import { type FC, useState } from 'react'
+import { API_URL } from '../../api'
+import type { FullUserResponse } from '../../types/FullUserResponse'
 
-const ProfileHeader = () => {
+interface ProfileHeaderProps {
+	profile: FullUserResponse
+}
+
+const ProfileHeader: FC<ProfileHeaderProps> = ({ profile }) => {
 	const [userIsSubscribed, setIsSubscribed] = useState(false)
-
+	
 	return (
 		<Flex
 			style={{
 				background: 'white',
 				minHeight: 280,
 				padding: 24,
-				borderRadius: 8,
+				borderRadius: 8
 			}}
 			justify={'center'}
 		>
 			<Avatar
-				src='https://api.dicebear.com/7.x/miniavs/svg?seed=3'
+				src={`${API_URL}/user/${profile?.username}/avatar`}
 				size={150}
 				icon={<AntDesignOutlined />}
 			/>
 			<Flex vertical style={{ marginLeft: '15px' }}>
-				<Typography.Title level={3}>Иван Васильевич</Typography.Title>
-				<Typography.Text>Воронеж, Россия</Typography.Text>
+				<Typography.Title level={3}>{profile?.fullName}</Typography.Title>
+				<Typography.Text>{`${profile?.city}, ${profile?.country}`}</Typography.Text>
 				<Button
 					style={{ margin: '10px 0' }}
 					danger={userIsSubscribed}
@@ -31,7 +37,7 @@ const ProfileHeader = () => {
 				>
 					{userIsSubscribed ? 'Отписаться' : 'Подписаться'}
 				</Button>
-				<Button href='mailto://rafigdzabbarov0410@gmail.com'>Связаться</Button>
+				<Button href={`mailto://${profile?.email}`}>Связаться</Button>
 			</Flex>
 		</Flex>
 	)

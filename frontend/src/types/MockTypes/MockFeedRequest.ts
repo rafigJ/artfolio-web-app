@@ -1,5 +1,7 @@
 export enum FeedSection {
-	NEW = "new",
-	POPULAR = "popular",
-	SUBSCRIBE = "subscribe"
+	NEW = "NEW",
+	POPULAR = "POPULAR",
+	SUBSCRIBE = "SUBSCRIBE"
 }
+
+export const FEED_VALUES = [FeedSection.NEW, FeedSection.POPULAR, FeedSection.SUBSCRIBE]

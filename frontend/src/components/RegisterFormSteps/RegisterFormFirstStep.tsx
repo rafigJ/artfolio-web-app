@@ -1,14 +1,14 @@
 import { LockOutlined, MailOutlined, UserOutlined } from '@ant-design/icons'
 import { Button, Form, Input, Typography } from 'antd'
-import React, { type FC } from 'react'
+import { type FC } from 'react'
 import { Link } from 'react-router-dom'
 
 interface RegisterFormFirstStep {
 	onFinishStep1: ((values: any) => void) | undefined
 }
 
-const RegisterFormFirstStep:FC<RegisterFormFirstStep> = ({onFinishStep1}) => {
-	
+const RegisterFormFirstStep: FC<RegisterFormFirstStep> = ({ onFinishStep1 }) => {
+
 	return (
 		<div className='login-form-container'>
 			<Form
@@ -54,7 +54,7 @@ const RegisterFormFirstStep:FC<RegisterFormFirstStep> = ({onFinishStep1}) => {
 						placeholder='Пароль'
 					/>
 				</Form.Item>
-				
+
 				<Form.Item
 					name='confirmPassword'
 					rules={[{ required: true, message: 'Повторите пароль!' }]}
@@ -74,7 +74,7 @@ const RegisterFormFirstStep:FC<RegisterFormFirstStep> = ({onFinishStep1}) => {
 						placeholder='Секретное слово'
 					/>
 				</Form.Item>
-				
+
 				<Form.Item>
 					<Button
 						type='primary'
