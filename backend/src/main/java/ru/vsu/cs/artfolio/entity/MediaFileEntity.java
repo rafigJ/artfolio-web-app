@@ -16,8 +16,8 @@ public class MediaFileEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "post_id")
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "post_id", nullable = false)
     private PostEntity post;
 
     @Column(nullable = false)
