@@ -6,7 +6,8 @@ export interface ReportResponce {
   reason: string;
   reviewed: boolean;
   targetUser: User;
-  sendler: User;
+  sender: User;
+  time: string;
 }
 
 interface User {

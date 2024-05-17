@@ -1,6 +1,7 @@
 import { DownOutlined } from '@ant-design/icons'
-import { Checkbox, Dropdown, MenuProps, Space, Table, TableProps } from 'antd'
+import { Button, Dropdown, MenuProps, Space, Table, TableProps } from 'antd'
 import { FC, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { ReportResponce } from '../../types/ReportResponce'
 
 
@@ -30,15 +31,25 @@ const ReportTablePost: FC = () => {
 		},
 		{
 			title: 'Отправитель жалобы',
-			dataIndex: ['sendler', 'username'],
+			dataIndex: ['sender', 'username'],
 			key: 'senderProfile',
-			render: (text) => <span>{text}</span>,
+			render: (sender) =>
+				<span>
+					<Link to={`/profile/${sender}`}>
+						{sender}
+					</Link>
+				</span>,
 		},
 		{
 			title: 'Публикация',
 			dataIndex: 'postId',
 			key: 'post',
-			render: (text) => <span>{text}</span>,
+			render: (post) =>
+				<span>
+					<Link to={`/posts/${post}`}>
+						{post}
+					</Link>
+				</span>,
 		},
 		{
 			title: 'Текст жалобы',
@@ -50,13 +61,34 @@ const ReportTablePost: FC = () => {
 			title: 'Профиль автора поста',
 			dataIndex: ['targetUser', 'username'],
 			key: 'authorProfile',
-			render: (text) => <span>{text}</span>,
+			render: (author) =>
+				<span>
+					<Link to={`/profile/${author}`}>
+						{author}
+					</Link>
+				</span>,
+		},
+		{
+			title: 'Время оставления жалобы',
+			dataIndex: 'time',
+			key: 'time',
 		},
 		{
 			title: 'Статус',
 			dataIndex: 'reviewed',
 			key: 'reviewed',
-			render: (reviewed) => <span><Checkbox defaultChecked={reviewed}>Рассмотрена</Checkbox></span>,
+			render: (reviewed) =>
+				<span>
+					{reviewed ? (
+						<Button type="link">
+							Отметить как нерассмотренную
+						</Button>
+					) : (
+						<Button type="link">
+							Отметить как рассмотренную
+						</Button>
+					)}
+				</span>,
 		},
 	]
 
@@ -66,11 +98,12 @@ const ReportTablePost: FC = () => {
 			postId: 20,
 			reason: "Какой-то текст жалобы здесь",
 			reviewed: true,
+			time: '2022-03-30 12:45',
 			targetUser: {
 				fullName: "Джон Сноу",
 				username: 'commentator456',
 			},
-			sendler: {
+			sender: {
 				fullName: "Джон Сноу",
 				username: 'user123',
 			}
@@ -80,11 +113,12 @@ const ReportTablePost: FC = () => {
 			postId: 33,
 			reason: "Очень много крови!",
 			reviewed: false,
+			time: '2022-03-30 12:45',
 			targetUser: {
 				fullName: "Рамси Болтон",
 				username: 'boltonArts'
 			},
-			sendler: {
+			sender: {
 				fullName: "Рамси Болтон",
 				username: 'boltonArts'
 			}
@@ -94,11 +128,12 @@ const ReportTablePost: FC = () => {
 			postId: 45,
 			reason: "Слишком много рекламы",
 			reviewed: true,
+			time: '2022-03-30 12:45',
 			targetUser: {
 				fullName: "Джон Сноу",
 				username: 'johnsnow22'
 			},
-			sendler: {
+			sender: {
 				fullName: "Санса Старк",
 				username: 'sansa_stark'
 			}
@@ -108,11 +143,12 @@ const ReportTablePost: FC = () => {
 			postId: 54,
 			reason: "Нецензурные выражения",
 			reviewed: false,
+			time: '2022-03-30 12:45',
 			targetUser: {
 				fullName: "Арья Старк",
 				username: 'aryastark11'
 			},
-			sendler: {
+			sender: {
 				fullName: "Тирион Ланнистер",
 				username: 'the_imp'
 			}
@@ -122,11 +158,12 @@ const ReportTablePost: FC = () => {
 			postId: 67,
 			reason: "Нарушение правил сообщества",
 			reviewed: true,
+			time: '2022-03-30 12:45',
 			targetUser: {
 				fullName: "Тирион Ланнистер",
 				username: 'the_imp'
 			},
-			sendler: {
+			sender: {
 				fullName: "Серсея Ланнистер",
 				username: 'cersei_queen'
 			}
