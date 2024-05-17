@@ -31,10 +31,14 @@ const CreatePostForm = () => {
 	
 	const [fileList, setFileList] = useState<UploadFile[]>([])
 	
-	const [createPost, isLoading, isError, error] = useFetching(async (post: PostRequest, files: File[]) => {
-		const response = await PostService.createPost(post, files)
-		navigate(`/posts/${response.data.id}`)
-		message.success(`Вы успешно создали пост ${response.data.name}`)
+	const [createPost, isLoading] = useFetching(async (post: PostRequest, files: File[]) => {
+		await PostService.createPost(post, files)
+			.then(r => {
+				navigate(`/posts/${r.data.id}`)
+				message.success(`Вы успешно создали пост ${r.data.name}`)
+			}).catch(e => {
+				message.error(`Ошибка создания публикации ${e}`)
+			})
 	})
 	
 	
@@ -52,10 +56,6 @@ const CreatePostForm = () => {
 	
 	const handleDescriptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
 		setPost({ ...post, description: e.target.value })
-	}
-	
-	if (!isLoading && isError) {
-		message.error(`Ошибка создания публикации ${error}`)
 	}
 	
 	return (
@@ -82,8 +82,9 @@ const CreatePostForm = () => {
 							<Input.TextArea
 								onChange={handleDescriptionChange}
 								showCount
-								rows={6}
-								maxLength={500}
+								rows={3}
+								maxLength={400}
+								styles={{ textarea: { maxHeight: '5rem' } }}
 							/>
 						</Form.Item>
 						<DraggableUploadList

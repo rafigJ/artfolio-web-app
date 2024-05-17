@@ -1,5 +1,5 @@
 import { LockOutlined, UserOutlined } from '@ant-design/icons'
-import { Button, Form, Input, Typography, message } from 'antd'
+import { Button, Form, Input, message, Typography } from 'antd'
 import { useContext } from 'react'
 import { Link } from 'react-router-dom'
 import AuthService from '../../api/AuthService'
@@ -9,23 +9,21 @@ import './LoginForm.css'
 
 const LoginForm = () => {
 	const { setAuthCredential, setIsAuth } = useContext(AuthContext)
-
-	const [login, isLoading, isError, error] = useFetching(async (email: string, password: string) => {
-		console.log(1)
-		const response = await AuthService.login(email, password)
-		setAuthCredential(response.data)
-		localStorage.setItem('token', response.data.token)
-		setIsAuth(true)
+	
+	const [login, isLoading] = useFetching(async (email: string, password: string) => {
+		await AuthService.login(email, password)
+			.then(response => {
+				setAuthCredential(response.data)
+				localStorage.setItem('token', response.data.token)
+				setIsAuth(true)
+			})
+			.catch((e) => message.error('Ошибка Входа ' + e))
 	})
-
+	
 	const onFinish = (values: any) => {
 		login(values.email, values.password)
 	}
-
-	if (isError) {
-		message.error('Ошибка Входа ' + error)
-	}
-
+	
 	return (
 		<div className='login-form-container'>
 			<Form
