@@ -7,6 +7,7 @@ import ru.vsu.cs.artfolio.dto.post.PostRequestDto;
 import ru.vsu.cs.artfolio.dto.post.PostResponseDto;
 import ru.vsu.cs.artfolio.entity.PostEntity;
 import ru.vsu.cs.artfolio.entity.UserEntity;
+import ru.vsu.cs.artfolio.mapper.wrappers.MinioResult;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -23,35 +24,29 @@ public class PostMapper {
                 .build();
     }
 
-    public static PostEntity toEntity(PostRequestDto post, UserEntity owner) {
+    public static PostEntity toEntity(PostRequestDto post, UserEntity owner, MinioResult previewMedia) {
         return PostEntity.builder()
                 .name(post.getName())
                 .description(post.getDescription())
                 .createTime(LocalDateTime.now())
                 .owner(owner)
+                .previewMediaName(previewMedia.name())
+                .previewType(previewMedia.contentType())
                 .build();
     }
 
-    public static PostResponseDto toDto(PostEntity postEntity, Long previewMediaId) {
+    public static PostResponseDto toDto(PostEntity postEntity) {
         return PostResponseDto.builder()
                 .id(postEntity.getId())
                 .name(postEntity.getName())
-                .previewMediaId(previewMediaId)
                 .owner(UserMapper.toDto(postEntity.getOwner()))
                 .likeCount(null)
                 .build();
     }
 
 
-    public static PageDto<PostResponseDto> toPageDto(Page<PostEntity> postEntityPage, List<Long> previewMediaIds) {
-        if (previewMediaIds.size() != postEntityPage.getContent().size()) {
-            throw new IllegalArgumentException("previewMediaIds size must be equal postEntityPage size");
-        }
-        List<PostEntity> postEntityList = postEntityPage.getContent();
-        List<PostResponseDto> mappedPosts = new ArrayList<>();
-        for (int i = 0; i < postEntityList.size(); i++) {
-            mappedPosts.add(toDto(postEntityList.get(i), previewMediaIds.get(i)));
-        }
-        return new PageDto<>(mappedPosts, postEntityPage.getTotalElements(), postEntityPage.getTotalPages());
+    public static PageDto<PostResponseDto> toPageDto(Page<PostEntity> postEntityPage) {
+        List<PostResponseDto> postResponseDto = postEntityPage.getContent().stream().map(PostMapper::toDto).toList();
+        return new PageDto<>(postResponseDto, postEntityPage.getTotalElements(), postEntityPage.getTotalPages());
     }
 }

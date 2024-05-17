@@ -34,4 +34,5 @@ public interface PostService {
 
     MediaDto getMediaById(Long mediaId);
 
+    MediaDto getPreviewByPostId(Long postId);
 }

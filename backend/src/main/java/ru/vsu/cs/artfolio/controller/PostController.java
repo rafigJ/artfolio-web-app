@@ -75,6 +75,15 @@ public class PostController {
         return ResponseEntity.ok("post " + id + " is deleted");
     }
 
+    @GetMapping("/{id}/preview")
+    public ResponseEntity<InputStreamResource> downloadPreview(@PathVariable Long id) {
+        MediaDto media = service.getPreviewByPostId(id);
+        LOGGER.info("Получение превью поста: " + id);
+        return ResponseEntity.ok()
+                .contentType(MediaType.valueOf(media.contentType()))
+                .body(new InputStreamResource(media.fileStream()));
+    }
+
     @GetMapping("/medias/{id}")
     public ResponseEntity<InputStreamResource> downloadMedia(@PathVariable Long id) {
         MediaDto media = service.getMediaById(id);

@@ -20,6 +20,7 @@ import ru.vsu.cs.artfolio.dto.post.PostResponseDto;
 import ru.vsu.cs.artfolio.entity.MediaFileEntity;
 import ru.vsu.cs.artfolio.entity.PostEntity;
 import ru.vsu.cs.artfolio.entity.UserEntity;
+import ru.vsu.cs.artfolio.exception.BadRequestException;
 import ru.vsu.cs.artfolio.exception.NotFoundException;
 import ru.vsu.cs.artfolio.exception.RestException;
 import ru.vsu.cs.artfolio.mapper.MediaMapper;
@@ -53,8 +54,12 @@ public class PostServiceImpl implements PostService {
                                           List<MultipartFile> files) {
         LOGGER.info("Получение следующих данных {}, {} для сохранения", userId, requestDto);
         UserEntity ownerEntity = userRepository.getReferenceById(userId);
+        if (files.isEmpty()) {
+            throw new BadRequestException("Multipart files must have min one file");
+        }
 
-        PostEntity post = PostMapper.toEntity(requestDto, ownerEntity);
+        MultipartFile file = files.get(0);
+        PostEntity post = PostMapper.toEntity(requestDto, ownerEntity, minioService.uploadPreviewFile(file));
 
         LOGGER.info("Сохранение поста");
         PostEntity createdPost = postRepository.save(post);
@@ -103,7 +108,8 @@ public class PostServiceImpl implements PostService {
         }
 
         UserEntity ownerEntity = userRepository.getReferenceById(userId);
-        PostEntity newPost = PostMapper.toEntity(requestDto, ownerEntity);
+        MultipartFile file = files.get(0);
+        PostEntity newPost = PostMapper.toEntity(requestDto, ownerEntity, minioService.uploadPreviewFile(file));
         newPost.setId(id);
 
         List<String> fileNames = postToUpdate.getMedias().stream().map(MediaFileEntity::getFileName).toList();
@@ -121,23 +127,13 @@ public class PostServiceImpl implements PostService {
     @Override
     public PageDto<PostResponseDto> getPostsPageByUserId(UUID userId, Pageable page) {
         Page<PostEntity> posts = postRepository.findAllByOwnerUuid(userId, page);
-        List<Long> medias = posts.getContent().stream()
-                .map(post -> post.getMedias().stream()
-                        .sorted(Comparator.comparingInt(MediaFileEntity::getPosition)).toList()
-                        .get(0).getId())
-                .toList();
-        return PostMapper.toPageDto(posts, medias);
+        return PostMapper.toPageDto(posts);
     }
 
     @Override
     public PageDto<PostResponseDto> getPostsPageBySpecifications(Specification<PostEntity> specification, Pageable page) {
         Page<PostEntity> posts = postRepository.findAll(specification, page);
-        List<Long> medias = posts.getContent().stream()
-                .map(post -> post.getMedias().stream()
-                        .sorted(Comparator.comparingInt(MediaFileEntity::getPosition)).toList()
-                        .get(0).getId())
-                .toList();
-        return PostMapper.toPageDto(posts, medias);
+        return PostMapper.toPageDto(posts);
     }
 
     @Override
@@ -157,5 +153,12 @@ public class PostServiceImpl implements PostService {
         MediaFileEntity media = mediaRepository.findById(mediaId)
                 .orElseThrow(() -> new NotFoundException("Media by id: " + mediaId + " not found"));
         return new MediaDto(minioService.downloadFile(media.getFileName()), media.getType());
+    }
+
+    @Override
+    public MediaDto getPreviewByPostId(Long postId) {
+        PostEntity post = postRepository.findById(postId)
+                .orElseThrow(() -> new NotFoundException("Post by id: " + postId + " not found"));
+        return new MediaDto(minioService.downloadFile(post.getPreviewMediaName()), post.getPreviewType());
     }
 }

@@ -23,7 +23,11 @@ public class PostEntity {
 
     private String description;
 
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "post", cascade = CascadeType.ALL)
+    private String previewMediaName;
+
+    private String previewType;
+
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
     private List<MediaFileEntity> medias;
 
     @ManyToOne(fetch = FetchType.EAGER)
