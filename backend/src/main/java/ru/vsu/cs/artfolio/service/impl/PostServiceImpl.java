@@ -29,6 +29,7 @@ import ru.vsu.cs.artfolio.mapper.wrappers.MinioResult;
 import ru.vsu.cs.artfolio.repository.MediaRepository;
 import ru.vsu.cs.artfolio.repository.PostRepository;
 import ru.vsu.cs.artfolio.repository.UserRepository;
+import ru.vsu.cs.artfolio.service.LikeService;
 import ru.vsu.cs.artfolio.service.PostService;
 
 import java.util.Comparator;
@@ -42,6 +43,7 @@ public class PostServiceImpl implements PostService {
     private static final Logger LOGGER = LoggerFactory.getLogger(PostServiceImpl.class);
 
     private final MinioService minioService;
+    private final LikeService likeService;
 
     private final PostRepository postRepository;
     private final UserRepository userRepository;
@@ -69,7 +71,7 @@ public class PostServiceImpl implements PostService {
 
         LOGGER.info("Возврат ответа");
         List<Long> mediaIds = medias.stream().map(MediaFileEntity::getId).toList();
-        return PostMapper.toFullDto(createdPost, mediaIds);
+        return PostMapper.toFullDto(createdPost, mediaIds, 0L);
     }
 
     @Override
@@ -77,7 +79,7 @@ public class PostServiceImpl implements PostService {
         PostEntity postEntity = postRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Post by id: " + id + " not found"));
         List<Long> mediaIds = postEntity.getMedias().stream().sorted(Comparator.comparingInt(MediaFileEntity::getPosition)).map(MediaFileEntity::getId).toList();
-        return PostMapper.toFullDto(postEntity, mediaIds);
+        return PostMapper.toFullDto(postEntity, mediaIds, likeService.getLikeCount(id));
     }
 
     @Override
@@ -121,25 +123,33 @@ public class PostServiceImpl implements PostService {
 
         List<MediaFileEntity> medias = mediaRepository.saveAll(MediaMapper.toEntityList(mediaFiles, updatedPost));
         List<Long> mediaIds = medias.stream().map(MediaFileEntity::getId).toList();
-        return PostMapper.toFullDto(updatedPost, mediaIds);
+        return PostMapper.toFullDto(updatedPost, mediaIds, likeService.getLikeCount(id));
     }
 
     @Override
     public PageDto<PostResponseDto> getPostsPageByUserId(UUID userId, Pageable page) {
         Page<PostEntity> posts = postRepository.findAllByOwnerUuid(userId, page);
-        return PostMapper.toPageDto(posts);
+        List<Long> likeCountsEachPostInList = likeService.getLikeCountsEachPostInList(posts.getContent().stream().map(PostEntity::getId).toList());
+        return PostMapper.toPageDto(posts, likeCountsEachPostInList);
     }
 
     @Override
     public PageDto<PostResponseDto> getPostsPageBySpecifications(Specification<PostEntity> specification, Pageable page) {
         Page<PostEntity> posts = postRepository.findAll(specification, page);
-        return PostMapper.toPageDto(posts);
+        List<Long> likeCountsEachPostInList = likeService.getLikeCountsEachPostInList(posts.getContent().stream().map(PostEntity::getId).toList());
+        return PostMapper.toPageDto(posts, likeCountsEachPostInList);
     }
 
     @Override
-    public void likePost(UUID userId, Long postId) {
-        // TODO implement
-        throw new UnsupportedOperationException();
+    public Long likePost(UUID userId, Long postId) {
+        likeService.createLike(userId, postId);
+        return likeService.getLikeCount(postId);
+    }
+
+    @Override
+    public Long deleteLikeFromPost(UUID userId, Long postId) {
+        likeService.deleteLike(userId, postId);
+        return likeService.getLikeCount(postId);
     }
 
     @Override

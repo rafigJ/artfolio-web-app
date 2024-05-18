@@ -28,7 +28,9 @@ public interface PostService {
 
     PageDto<PostResponseDto> getPostsPageBySpecifications(Specification<PostEntity> specification, Pageable page);
 
-    void likePost(UUID userId, Long postId);
+    Long likePost(UUID userId, Long postId);
+
+    Long deleteLikeFromPost(UUID userId, Long postId);
 
     void sendReportToPost(UUID userId, Long postId, String reasonText);
 

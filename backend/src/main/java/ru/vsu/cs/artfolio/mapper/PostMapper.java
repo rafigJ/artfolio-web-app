@@ -14,13 +14,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PostMapper {
-    public static FullPostResponseDto toFullDto(PostEntity postEntity, List<Long> mediaIds) {
+    public static FullPostResponseDto toFullDto(PostEntity postEntity, List<Long> mediaIds, Long likeCount) {
         return FullPostResponseDto.builder()
                 .id(postEntity.getId())
                 .mediaIds(mediaIds)
                 .name(postEntity.getName())
                 .owner(UserMapper.toDto(postEntity.getOwner()))
                 .description(postEntity.getDescription())
+                .likeCount(likeCount)
                 .build();
     }
 
@@ -35,7 +36,7 @@ public class PostMapper {
                 .build();
     }
 
-    public static PostResponseDto toDto(PostEntity postEntity) {
+    private static PostResponseDto toDto(PostEntity postEntity) {
         return PostResponseDto.builder()
                 .id(postEntity.getId())
                 .name(postEntity.getName())
@@ -45,8 +46,15 @@ public class PostMapper {
     }
 
 
-    public static PageDto<PostResponseDto> toPageDto(Page<PostEntity> postEntityPage) {
+    public static PageDto<PostResponseDto> toPageDto(Page<PostEntity> postEntityPage, List<Long> likeCounts) {
+        if (postEntityPage.getContent().size() != likeCounts.size()) {
+            throw new IllegalArgumentException("postEntityPage.content size is not equal likeCount size");
+        }
         List<PostResponseDto> postResponseDto = postEntityPage.getContent().stream().map(PostMapper::toDto).toList();
+        for (int i = 0; i < likeCounts.size(); i++) {
+            Long likeCount = likeCounts.get(i);
+            postResponseDto.get(i).setLikeCount(likeCount == null ? 0L : likeCount);
+        }
         return new PageDto<>(postResponseDto, postEntityPage.getTotalElements(), postEntityPage.getTotalPages());
     }
 }
