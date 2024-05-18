@@ -1,5 +1,7 @@
 package ru.vsu.cs.artfolio.mapper;
 
+import org.springframework.data.domain.Page;
+import ru.vsu.cs.artfolio.dto.PageDto;
 import ru.vsu.cs.artfolio.dto.user.FullUserResponseDto;
 import ru.vsu.cs.artfolio.dto.user.UserResponseDto;
 import ru.vsu.cs.artfolio.dto.user.request.UserUpdateRequestDto;
@@ -7,6 +9,7 @@ import ru.vsu.cs.artfolio.entity.UserEntity;
 import ru.vsu.cs.artfolio.mapper.wrappers.MinioResult;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 public class UserMapper {
 
@@ -45,5 +48,10 @@ public class UserMapper {
         oldEntity.setAvatarType(avatarData.contentType());
         oldEntity.setUpdateTime(LocalDateTime.now());
         return oldEntity;
+    }
+
+    public static PageDto<UserResponseDto> toPageDto(Page<UserEntity> userEntityPage) {
+        List<UserResponseDto> userResponseDtoList = userEntityPage.getContent().stream().map(UserMapper::toDto).toList();
+        return new PageDto<>(userResponseDtoList, userEntityPage.getTotalElements(), userEntityPage.getTotalPages());
     }
 }
