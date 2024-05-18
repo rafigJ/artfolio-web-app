@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import ru.vsu.cs.artfolio.auth.user.User;
 import ru.vsu.cs.artfolio.dto.MediaDto;
+import ru.vsu.cs.artfolio.dto.PostLikeResponse;
 import ru.vsu.cs.artfolio.dto.post.FullPostResponseDto;
 import ru.vsu.cs.artfolio.dto.post.PostRequestDto;
 import ru.vsu.cs.artfolio.service.PostService;
@@ -73,6 +74,22 @@ public class PostController {
         LOGGER.info("Пользователь {} удаляет пост с идентификатором {}", user.getUsername(), id);
         service.deletePost(user.getUserEntity().getUuid(), id);
         return ResponseEntity.ok("post " + id + " is deleted");
+    }
+
+    @PostMapping("/{id}/like")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<PostLikeResponse> likePost(@PathVariable("id") Long id, @AuthenticationPrincipal User user) {
+        LOGGER.info("Пользователь {} лайкает пост c id {}", user.getUsername(), id);
+        Long likeCount = service.likePost(user.getUserEntity().getUuid(), id);
+        return ResponseEntity.ok(new PostLikeResponse(id, likeCount));
+    }
+
+    @DeleteMapping("/{id}/like")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<PostLikeResponse> deleteLike(@PathVariable("id") Long id, @AuthenticationPrincipal User user) {
+        LOGGER.info("Пользователь {} удаляет лайк с поста c id {}", user.getUsername(), id);
+        Long likeCount = service.deleteLikeFromPost(user.getUserEntity().getUuid(), id);
+        return ResponseEntity.ok(new PostLikeResponse(id, likeCount));
     }
 
     @GetMapping("/{id}/preview")
