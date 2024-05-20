@@ -142,12 +142,18 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public Long likePost(UUID userId, Long postId) {
+        if (!postRepository.existsById(postId)) {
+            throw new NotFoundException("post by id: " + postId + " not found");
+        }
         likeService.createLike(userId, postId);
         return likeService.getLikeCount(postId);
     }
 
     @Override
     public Long deleteLikeFromPost(UUID userId, Long postId) {
+        if (!postRepository.existsById(postId)) {
+            throw new NotFoundException("post by id: " + postId + " not found");
+        }
         likeService.deleteLike(userId, postId);
         return likeService.getLikeCount(postId);
     }
