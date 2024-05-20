@@ -86,14 +86,14 @@ public class UserController {
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> subscribe(@PathVariable("username") String username, @AuthenticationPrincipal User user) {
         service.subscribe(user.getUserEntity().getUuid(), username);
-        return ResponseEntity.ok("subscribed to " + username);
+        return ResponseEntity.ok("{\"message\": \"subscribed to " + username + "\"}");
     }
 
     @DeleteMapping("/{username}/subscribes")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> deleteSubscribe(@PathVariable("username") String username, @AuthenticationPrincipal User user) {
         service.deleteSubscribe(user.getUserEntity().getUuid(), username);
-        return ResponseEntity.ok("delete subscribe from " + username);
+        return ResponseEntity.ok("{\"message\": \"delete subscribe from " + username + "\"}");
     }
 
     @GetMapping("/{username}/followers")

@@ -62,6 +62,9 @@ public class UserServiceImpl implements UserService {
     public void subscribe(UUID subscriberUuid, String followedUsername) {
         UserEntity followedUser = userRepository.findByUsername(followedUsername)
                 .orElseThrow(() -> new NotFoundException("user by " + followedUsername + " username not found"));
+        if (followedUser.getUuid().equals(subscriberUuid)) {
+            throw new BadRequestException("user can't subscribe to himself");
+        }
         followService.subscribe(subscriberUuid, followedUser.getUuid());
     }
 
@@ -69,6 +72,9 @@ public class UserServiceImpl implements UserService {
     public void deleteSubscribe(UUID subscriberUuid, String followedUsername) {
         UserEntity followedUser = userRepository.findByUsername(followedUsername)
                 .orElseThrow(() -> new NotFoundException("user by " + followedUsername + " username not found"));
+        if (followedUser.getUuid().equals(subscriberUuid)) {
+            throw new BadRequestException("user can't delete/subscribe to himself");
+        }
         followService.deleteSubscribe(subscriberUuid, followedUser.getUuid());
     }
 
