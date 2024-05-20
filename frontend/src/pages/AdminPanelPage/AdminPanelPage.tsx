@@ -1,6 +1,7 @@
 import { Tabs, Typography } from 'antd'
 import { FC } from 'react'
-import ReportTable from '../../components/ReportTable/ReportTable'
+import ReportTableComments from '../../components/ReportTable/ReportTableComments'
+import ReportTablePost from '../../components/ReportTable/ReportTablePost'
 
 const AdminPanelPage: FC = () => {
 	return (
@@ -12,16 +13,17 @@ const AdminPanelPage: FC = () => {
 				items={[
 					{
 						key: '1',
-						label: 'Нерассмотренные',
-						children: <ReportTable getChecked={false} />,
+						label: 'Жалобы на публикации',
+						children: <ReportTablePost />,
 					},
 					{
 						key: '2',
-						label: 'Рассмотренные',
-						children: <ReportTable getChecked={true} />,
+						label: 'Жалобы на комментарии',
+						children: <ReportTableComments />,
 					},
 				]}
-			/></>
+			/>
+		</>
 	)
 }
 

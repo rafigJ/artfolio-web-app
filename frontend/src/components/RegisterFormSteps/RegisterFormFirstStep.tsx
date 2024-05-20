@@ -26,7 +26,11 @@ const RegisterFormFirstStep: FC<RegisterFormFirstStep> = ({ onFinishStep1 }) => 
 				</Typography.Title>
 				<Form.Item
 					name='username'
-					rules={[{ required: true, message: 'Введите логин!' }]}
+					rules={[
+						{ required: true, message: 'Введите логин!' },
+						{ min: 5, message: 'Логин должен быть не меньше 5 символов!' },
+						{ max: 150, message: 'Логин должен содержать не более 150 символов' }
+					]}
 				>
 					<Input
 						prefix={<UserOutlined className='site-form-item-icon' />}
@@ -36,7 +40,9 @@ const RegisterFormFirstStep: FC<RegisterFormFirstStep> = ({ onFinishStep1 }) => 
 				<Form.Item
 					name='email'
 					rules={[
-						{ required: true, message: 'Введите электронную почту!' }
+						{ required: true, message: 'Введите электронную почту!' },
+						{ type: 'email', message: 'Введите корректный адрес электронной почты!' },
+						{ max: 150, message: 'Электронная почта должна содержать не более 150 символов' }
 					]}
 				>
 					<Input
@@ -46,7 +52,17 @@ const RegisterFormFirstStep: FC<RegisterFormFirstStep> = ({ onFinishStep1 }) => 
 				</Form.Item>
 				<Form.Item
 					name='password'
-					rules={[{ required: true, message: 'Введите пароль!' }]}
+					rules={[
+						{ required: true, message: 'Введите пароль!' },
+						{
+							pattern: /^(?=.*[A-Za-z])(?=.*\d).{8,}$/,
+							message: 'Пароль должен содержать минимум 8 символов, хотя бы одну букву и цифру'
+						},
+						{
+							pattern: /^[A-Za-z\d]+$/,
+							message: 'Пароль не должен содержать служебные символы!'
+						}
+					]}
 				>
 					<Input.Password
 						prefix={<LockOutlined className='site-form-item-icon' />}
@@ -67,7 +83,9 @@ const RegisterFormFirstStep: FC<RegisterFormFirstStep> = ({ onFinishStep1 }) => 
 				</Form.Item>
 				<Form.Item
 					name='secretWord'
-					rules={[{ required: true, message: 'Введите секретное слово!' }]}
+					rules={[{ required: true, message: 'Введите секретное слово!' },
+					{ min: 5, message: 'Секретное слово должно быть не меньше 5 символов!' }
+					]}
 				>
 					<Input
 						prefix={<LockOutlined className='site-form-item-icon' />}
