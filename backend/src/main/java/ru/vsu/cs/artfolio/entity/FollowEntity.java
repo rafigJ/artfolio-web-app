@@ -20,7 +20,7 @@ import lombok.Setter;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "follower")
+@Table(name = "follower", schema = "artfolio")
 public class FollowEntity {
 
     @Id

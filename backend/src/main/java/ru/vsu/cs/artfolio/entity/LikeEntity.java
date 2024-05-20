@@ -20,7 +20,7 @@ import java.util.UUID;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "_like")
+@Table(name = "_like", schema = "artfolio")
 public class LikeEntity {
 
     @Id
