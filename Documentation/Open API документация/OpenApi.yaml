@@ -135,6 +135,7 @@ paths:
                 $ref: '#/components/schemas/Error'
       security:
         - bearerAuth: [ ]
+
   # like post
   /api/v1/posts/{postId}/like:
     post:
@@ -152,6 +153,10 @@ paths:
       responses:
         '200':
           description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostLikeResponse'
         default:
           description: Error
           content:
@@ -175,6 +180,10 @@ paths:
       responses:
         '200':
           description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostLikeResponse'
         default:
           description: Error
           content:
@@ -183,6 +192,40 @@ paths:
                 $ref: '#/components/schemas/Error'
       security:
         - bearerAuth: [ ]
+  # get preview post
+  /api/v1/posts/{postId}/preview:
+    get:
+      tags:
+        - posts
+      summary: Получить превью поста
+      description: Позволяет получить сжатое превью публикации
+      parameters:
+        - name: postId
+          in: path
+          required: true
+          schema:
+            type: integer
+      operationId: getPreviewMediaByPostId
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            image/jpg:
+              schema:
+                type: string
+                format: binary
+            image/png:
+              schema:
+                type: string
+                format: binary
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  # get full media by id
   /api/v1/posts/medias/{mediaId}:
     get:
       tags:
@@ -213,6 +256,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+
   # comment post
   /api/v1/posts/{postId}/comments:
     get:
@@ -1226,6 +1270,10 @@ components:
         reviewed:
           type: boolean
           example: false
+        createTime:
+          type: string
+          example: 2024-03-23 12:00
+          format: yyyy-MM-dd HH:mm
         targetUser:
           $ref: '#/components/schemas/UserResponse'
         sender:
@@ -1243,6 +1291,16 @@ components:
         totalPages:
           type: integer
           example: 10
+    PostLikeResponse:
+      type: object
+      properties:
+        postId:
+          type: integer
+          example: 1
+        likeCount:
+          type: integer
+          example: 10
+          description: Обновленное количество лайков после операции
     # comment report
     CommentReportRequest:
       type: object
@@ -1271,6 +1329,10 @@ components:
         reviewed:
           type: boolean
           example: false
+        createTime:
+          type: string
+          example: 2024-03-23 12:00
+          format: yyyy-MM-dd HH:mm
         targetUser:
           $ref: '#/components/schemas/UserResponse'
         sendler:
