@@ -9,7 +9,7 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "media_file")
+@Table(name = "media_file", schema = "artfolio")
 public class MediaFileEntity {
 
     @Id

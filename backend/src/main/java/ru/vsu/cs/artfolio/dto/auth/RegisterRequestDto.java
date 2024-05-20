@@ -10,10 +10,13 @@ public record RegisterRequestDto(
         @Size(min = 3, max = 40, message = "should contain minimum 3 characters, maximum 40 characters")
         String fullName,
 
+        @Size(max = 401)
         String description,
 
+        @Size(max = 40)
         String country,
 
+        @Size(max = 40)
         String city,
 
         @NotBlank(message = "should be not blank")
