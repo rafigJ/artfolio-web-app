@@ -1,4 +1,3 @@
-import './styles/App.css'
 import React, { useEffect, useState } from 'react'
 import { Simulate } from 'react-dom/test-utils'
 import { BrowserRouter } from 'react-router-dom'
@@ -7,8 +6,8 @@ import StandardLayout from './components/StandardLayout/StandardLayout'
 import { AuthContext } from './context'
 import { useFetching } from './hooks/useFetching'
 import AppRouter from './routing/AppRouter'
+import './styles/App.css'
 import type { AuthResponse } from './types/AuthResponse'
-import error = Simulate.error
 
 const App: React.FC = () => {
 	const [authCredential, setAuthCredential] = useState<AuthResponse>({} as AuthResponse)
@@ -23,12 +22,7 @@ const App: React.FC = () => {
 	useEffect(() => {
 		const token = localStorage.getItem('token')
 		if (token !== null) {
-			console.log("Отправка запроса")
 			fetchUser()
-			console.log("Получение ответа ", isError)
-			if (isError) {
-				localStorage.removeItem('token')
-			}
 		}
 	}, [])
 	
