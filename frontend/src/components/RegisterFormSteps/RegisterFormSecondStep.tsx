@@ -23,19 +23,30 @@ const RegisterFormSecondStep: FC<RegisterFormSecondStep> = ({ onFinishStep2, ava
 				<Typography.Title level={3} className='login-title'>
 					Регистрация
 				</Typography.Title>
-				<Form.Item name='fullName'>
+				<Form.Item name='fullName'
+					rules={[
+						{ required: true, message: 'Введите имя!' },
+						{ min: 3, message: 'Имя должно быть не меньше 3 символов!' },
+						{ max: 40, message: 'Имя должно содержать не более 40 символов' }
+					]}>
 					<Input
 						prefix={<UserOutlined className='site-form-item-icon' />}
 						placeholder='Полное имя'
 					/>
 				</Form.Item>
-				<Form.Item name='country'>
+				<Form.Item name='country'
+					rules={[
+						{ max: 40, message: 'Название страны должно содержать не более 40 символов' }
+					]}>
 					<Input
 						prefix={<EnvironmentOutlined className='site-form-item-icon' />}
 						placeholder='Страна'
 					/>
 				</Form.Item>
-				<Form.Item name='city' >
+				<Form.Item name='city'
+					rules={[
+						{ max: 40, message: 'Название города должно содержать не более 40 символов' }
+					]}>
 					<Input
 						prefix={<EnvironmentOutlined className='site-form-item-icon' />}
 						placeholder='Город'
@@ -44,7 +55,11 @@ const RegisterFormSecondStep: FC<RegisterFormSecondStep> = ({ onFinishStep2, ava
 
 				Фото профиля:
 				<RegisterFormAvatarUpload avatar={avatar} setAvatar={setAvatar} />
-				<Form.Item name='description' >
+
+				<Form.Item name='description'
+					rules={[
+						{ max: 400, message: 'Описание профиля должно содержать не более 400 символов' }
+					]}>
 					<Input.TextArea placeholder='Описание профиля' rows={4} />
 				</Form.Item>
 				<Form.Item>
