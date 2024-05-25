@@ -3,6 +3,7 @@ package ru.vsu.cs.artfolio.service.impl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.vsu.cs.artfolio.entity.LikeEntity;
+import ru.vsu.cs.artfolio.entity.PostEntity;
 import ru.vsu.cs.artfolio.repository.LikeRepository;
 import ru.vsu.cs.artfolio.service.LikeService;
 
@@ -27,6 +28,7 @@ public class LikeServiceImpl implements LikeService {
                 LikeEntity.builder()
                         .userUuid(executorId)
                         .postId(postId)
+                        .post(PostEntity.builder().id(postId).build())
                         .build()
         );
     }

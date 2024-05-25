@@ -95,7 +95,6 @@ public class PostController {
     @GetMapping("/{id}/preview")
     public ResponseEntity<InputStreamResource> downloadPreview(@PathVariable Long id) {
         MediaDto media = service.getPreviewByPostId(id);
-        LOGGER.info("Получение превью поста: " + id);
         return ResponseEntity.ok()
                 .contentType(MediaType.valueOf(media.contentType()))
                 .body(new InputStreamResource(media.fileStream()));
