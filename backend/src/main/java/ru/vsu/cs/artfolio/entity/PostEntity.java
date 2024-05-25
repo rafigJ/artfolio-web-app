@@ -36,4 +36,7 @@ public class PostEntity {
 
     @Column(name = "create_time")
     private LocalDateTime createTime;
+
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<LikeEntity> likes;
 }
