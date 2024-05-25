@@ -11,12 +11,14 @@ import ru.vsu.cs.artfolio.entity.PostEntity;
 import ru.vsu.cs.artfolio.entity.UserEntity;
 
 public class PostSpecifications {
-    public static Specification<PostEntity> nameContainsIgnoreCase(String name) {
+    public static Specification<PostEntity> nameContainsIgnoreCaseSortByCreateTime(String name) {
         if (!StringUtils.hasText(name)) {
             return null;
         }
-        return (root, query, criteriaBuilder) ->
-                criteriaBuilder.like(criteriaBuilder.lower(root.get("name")), "%" + name.toLowerCase() + "%");
+        return (root, query, criteriaBuilder) -> {
+            query.orderBy(criteriaBuilder.desc(root.get("createTime")));
+            return criteriaBuilder.like(criteriaBuilder.lower(root.get("name")), "%" + name.toLowerCase() + "%");
+        };
     }
 
     public static Specification<PostEntity> sortByCreateTime() {

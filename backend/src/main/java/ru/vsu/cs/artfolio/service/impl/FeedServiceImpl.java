@@ -15,7 +15,7 @@ import ru.vsu.cs.artfolio.service.PostService;
 
 import java.util.UUID;
 
-import static ru.vsu.cs.artfolio.criteria.PostSpecifications.nameContainsIgnoreCase;
+import static ru.vsu.cs.artfolio.criteria.PostSpecifications.nameContainsIgnoreCaseSortByCreateTime;
 import static ru.vsu.cs.artfolio.criteria.PostSpecifications.postsByFollowedUsers;
 import static ru.vsu.cs.artfolio.criteria.PostSpecifications.sortByCreateTime;
 import static ru.vsu.cs.artfolio.criteria.PostSpecifications.sortByLikeCount;
@@ -35,7 +35,7 @@ public class FeedServiceImpl implements FeedService {
 
     @Override
     public PageDto<PostResponseDto> getPostsPageByName(String name, Pageable page) {
-        Specification<PostEntity> specification = Specification.allOf(nameContainsIgnoreCase(name), sortByCreateTime());
+        Specification<PostEntity> specification = nameContainsIgnoreCaseSortByCreateTime(name);
         return postService.getPostsPageBySpecifications(specification, page);
     }
 

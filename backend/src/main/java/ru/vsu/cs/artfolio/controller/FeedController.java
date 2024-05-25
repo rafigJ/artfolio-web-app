@@ -1,6 +1,8 @@
 package ru.vsu.cs.artfolio.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +23,7 @@ import ru.vsu.cs.artfolio.service.FeedService;
 @RequiredArgsConstructor
 public class FeedController {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(FeedController.class);
     private final FeedService feedService;
 
     @GetMapping()
@@ -29,9 +32,16 @@ public class FeedController {
                                                                  @RequestParam(value = "section", defaultValue = "NEW") FeedSection section, @AuthenticationPrincipal User user) {
         Pageable pageable = PageRequest.of(page, limit);
         PageDto<PostResponseDto> posts = switch (section) {
-            case NEW -> feedService.getPostsPageOrderedByTime(pageable);
-            case POPULAR -> feedService.getPostsPageOrderedByPopularity(pageable);
+            case NEW -> {
+                LOGGER.info("Получение постов NEW page = {}, limit = {}", page, limit);
+                yield feedService.getPostsPageOrderedByTime(pageable);
+            }
+            case POPULAR -> {
+                LOGGER.info("Получение постов POPULAR page = {}, limit = {}", page, limit);
+                yield feedService.getPostsPageOrderedByPopularity(pageable);
+            }
             case SUBSCRIBE -> {
+                LOGGER.info("Пользователь {} получает посты SUBSCRIBE page = {}, limit = {}", user.getUserEntity().getUsername(), page, limit);
                 if (user == null) {
                     throw new BadRequestException("user must be logged in for SUBSCRIBE query");
                 }
