@@ -10,7 +10,6 @@ import ru.vsu.cs.artfolio.entity.PostEntity;
 import ru.vsu.cs.artfolio.entity.UserEntity;
 import ru.vsu.cs.artfolio.repository.UserRepository;
 import ru.vsu.cs.artfolio.service.FeedService;
-import ru.vsu.cs.artfolio.service.FollowService;
 import ru.vsu.cs.artfolio.service.PostService;
 
 import java.util.UUID;
@@ -26,7 +25,6 @@ public class FeedServiceImpl implements FeedService {
 
     private final PostService postService;
     private final UserRepository userRepository;
-    private final FollowService followService;
 
     @Override
     public PageDto<PostResponseDto> getPostsPageOrderedByTime(Pageable page) {
