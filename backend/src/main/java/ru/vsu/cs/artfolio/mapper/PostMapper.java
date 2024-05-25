@@ -10,7 +10,6 @@ import ru.vsu.cs.artfolio.entity.UserEntity;
 import ru.vsu.cs.artfolio.mapper.wrappers.MinioResult;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 public class PostMapper {
@@ -36,6 +35,10 @@ public class PostMapper {
                 .build();
     }
 
+    /**
+     * Используется для краткой информации о публикации
+     * Количество лайков пустое, вставляется в toPageDto
+     */
     private static PostResponseDto toDto(PostEntity postEntity) {
         return PostResponseDto.builder()
                 .id(postEntity.getId())

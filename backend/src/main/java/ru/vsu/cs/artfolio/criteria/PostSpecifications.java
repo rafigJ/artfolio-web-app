@@ -19,4 +19,11 @@ public class PostSpecifications {
             return null;
         };
     }
+
+    public static Specification<PostEntity> sortByLikeCount() {
+        return (root, query, criteriaBuilder) -> {
+
+            return null;
+        };
+    }
 }

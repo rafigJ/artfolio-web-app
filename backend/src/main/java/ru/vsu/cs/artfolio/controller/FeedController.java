@@ -41,4 +41,12 @@ public class FeedController {
         return ResponseEntity.ok(posts);
     }
 
+    @GetMapping("/search")
+    public ResponseEntity<PageDto<PostResponseDto>> searchPosts(@RequestParam(value = "_page", defaultValue = "0") Integer page,
+                                                                @RequestParam(value = "_limit", defaultValue = "10") Integer limit,
+                                                                @RequestParam(value = "name") String name) {
+        Pageable pageable = PageRequest.of(page, limit);
+        PageDto<PostResponseDto> posts = feedService.getPostsPageByName(name, pageable);
+        return ResponseEntity.ok(posts);
+    }
 }
