@@ -715,8 +715,8 @@ paths:
           schema:
             type: string
             enum:
-              - post
-              - comment
+              - POST
+              - COMMENT
         - name: _page
           description: Номер страницы (отчет от 0)
           in: query
@@ -736,9 +736,9 @@ paths:
           schema:
             type: string
             enum:
-              - all
-              - 'true'
-              - 'false'
+              - ALL
+              - 'TRUE'
+              - 'FALSE'
       responses:
         '200':
           description: Successful operation
@@ -758,13 +758,13 @@ paths:
                 $ref: '#/components/schemas/Error'
       security:
         - bearerAuth: [ ]
-  /api/v1/reports/{reportId}:
+  /api/v1/reports/posts/{reportId}:
     patch:
       tags:
         - reports
       summary: Отметить жалобу рассмотренной или не рассмотренной (Доступно только администраторам)
       description: Позволяет администратору отметить жалобу рассмотренной или не рассмотренной
-      operationId: setReviewedReport
+      operationId: setPostReviewedReport
       parameters:
         - name: reportId
           in: path
@@ -788,11 +788,9 @@ paths:
             application/json:
               schema:
                 type: array
-                description: Страница из жалоб на посты или на комментарии
+                description: Страница из жалоб на посты
                 items:
-                  oneOf:
-                    - $ref: '#/components/schemas/PostReportResponse'
-                    - $ref: '#/components/schemas/CommentReportResponse'
+                  $ref: '#/components/schemas/PostReportResponse'
         default:
           description: Error
           content:
@@ -801,7 +799,47 @@ paths:
                 $ref: '#/components/schemas/Error'
       security:
         - bearerAuth: [ ]
-  /api/v1/posts/{postId}/reports:
+  /api/v1/reports/comments/{reportId}:
+    patch:
+      tags:
+        - reports
+      summary: Отметить жалобу рассмотренной или не рассмотренной (Доступно только администраторам)
+      description: Позволяет администратору отметить жалобу рассмотренной или не рассмотренной
+      operationId: setCommentReviewedReport
+      parameters:
+        - name: reportId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                reviewed:
+                  type: boolean
+                  example: true
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommentReportResponse'
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      security:
+        - bearerAuth: [ ]
+
+
+  /api/v1/reports/posts/{postId}:
     post:
       tags:
         - reports
@@ -835,7 +873,7 @@ paths:
                 $ref: '#/components/schemas/Error'
       security:
         - bearerAuth: [ ]
-  /api/v1/comments/{commentId}/reports:
+  /api/v1/reports/comments/{commentId}:
     post:
       tags:
         - reports
@@ -1356,7 +1394,7 @@ components:
           format: yyyy-MM-dd HH:mm
         targetUser:
           $ref: '#/components/schemas/UserResponse'
-        sendler:
+        sender:
           $ref: '#/components/schemas/UserResponse'
     CommentReportPage:
       type: object
