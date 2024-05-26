@@ -1,0 +1,73 @@
+package ru.vsu.cs.artfolio.service.impl;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
+import ru.vsu.cs.artfolio.auth.user.Role;
+import ru.vsu.cs.artfolio.dto.PageDto;
+import ru.vsu.cs.artfolio.dto.report.CommentReportResponseDto;
+import ru.vsu.cs.artfolio.dto.report.PostReportResponseDto;
+import ru.vsu.cs.artfolio.dto.report.ReportRequestDto;
+import ru.vsu.cs.artfolio.dto.report.ReportReviewRequestDto;
+import ru.vsu.cs.artfolio.entity.CommentEntity;
+import ru.vsu.cs.artfolio.entity.PostEntity;
+import ru.vsu.cs.artfolio.entity.UserEntity;
+import ru.vsu.cs.artfolio.exception.NotFoundException;
+import ru.vsu.cs.artfolio.exception.RestException;
+import ru.vsu.cs.artfolio.repository.CommentRepository;
+import ru.vsu.cs.artfolio.repository.PostRepository;
+import ru.vsu.cs.artfolio.service.report.CommentReportService;
+import ru.vsu.cs.artfolio.service.report.PostReportService;
+import ru.vsu.cs.artfolio.service.report.ReportService;
+
+@Service
+@RequiredArgsConstructor
+public class ReportServiceImpl implements ReportService {
+
+    private final PostReportService postReportService;
+    private final CommentReportService commentReportService;
+
+    private final PostRepository postRepository;
+    private final CommentRepository commentRepository;
+
+    @Override
+    public CommentReportResponseDto createCommentReport(UserEntity sender, Long commentId, ReportRequestDto report) {
+        CommentEntity commentEntity = commentRepository.findById(commentId)
+                .orElseThrow(() -> new NotFoundException("Comment by " + commentId + " not found"));
+        return commentReportService.createCommentReport(sender, commentEntity, report);
+    }
+
+    @Override
+    public CommentReportResponseDto setCommentReportReviewed(UserEntity executor, Long commentReportId, ReportReviewRequestDto reviewDto) {
+        if (!executor.getRole().equals(Role.ADMIN)) {
+            throw new RestException("Insufficient rights to update report", HttpStatus.UNAUTHORIZED);
+        }
+        return commentReportService.setReviewed(executor, commentReportId, reviewDto);
+    }
+
+    @Override
+    public PageDto<CommentReportResponseDto> getCommentReportsPage(Pageable page) {
+        return commentReportService.getCommentReportsPage(page);
+    }
+
+    @Override
+    public PostReportResponseDto createPostReport(UserEntity sender, Long postId, ReportRequestDto report) {
+        PostEntity postEntity = postRepository.findById(postId)
+                .orElseThrow(() -> new NotFoundException("Post by " + postId + " not found"));
+        return postReportService.createPostReport(sender, postEntity, report);
+    }
+
+    @Override
+    public PostReportResponseDto setPostReportReviewed(UserEntity executor, Long postReportId, ReportReviewRequestDto reviewDto) {
+        if (!executor.getRole().equals(Role.ADMIN)) {
+            throw new RestException("Insufficient rights to update report", HttpStatus.UNAUTHORIZED);
+        }
+        return postReportService.setReviewed(executor, postReportId, reviewDto);
+    }
+
+    @Override
+    public PageDto<PostReportResponseDto> getPostReportsPage(Pageable page) {
+        return postReportService.getPostReportsPage(page);
+    }
+}
