@@ -1,8 +1,9 @@
 import { AntDesignOutlined } from '@ant-design/icons'
 import { Avatar, Button, Modal, Table, message } from 'antd'
-import { FC, useEffect, useState } from 'react'
+import { FC, useContext, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import $api, { API_URL } from '../../api'
+import { AuthContext } from '../../context'
 import { FullUserResponse } from '../../types/FullUserResponse'
 
 interface SubscriptionsWindowProps {
@@ -27,6 +28,8 @@ const SubscriptionWindow: FC<SubscriptionsWindowProps> = ({ user, open, setOpen 
 			handleSubscribtions()
 		}
 	}, [open])
+
+	const { authCredential } = useContext(AuthContext)
 
 	const columns = [
 		{
@@ -73,6 +76,9 @@ const SubscriptionWindow: FC<SubscriptionsWindowProps> = ({ user, open, setOpen 
 			),
 		},
 	]
+	if (authCredential.username != user.username) {
+		columns.pop()
+	}
 
 	const handleCancel = () => {
 		setOpen(false)
