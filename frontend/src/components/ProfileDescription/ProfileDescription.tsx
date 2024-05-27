@@ -2,8 +2,9 @@ import { FileTextOutlined, HeartOutlined } from '@ant-design/icons'
 import { Button, Descriptions, Flex, Statistic, Typography } from 'antd'
 import pdfMake from 'pdfmake/build/pdfmake'
 import pdfFonts from 'pdfmake/build/vfs_fonts'
-import { type FC } from 'react'
+import { useState, type FC } from 'react'
 import type { FullUserResponse } from '../../types/FullUserResponse'
+import SubscribersWindow from '../SubscribersWindow/SubscribersWindow'
 
 const { Paragraph } = Typography
 
@@ -14,6 +15,11 @@ interface ProfileDescriptionProps {
 }
 
 const ProfileDescription: FC<ProfileDescriptionProps> = ({ profile }) => {
+	const [open, setOpen] = useState(false)
+	const showModal = () => {
+		setOpen(true)
+	}
+
 	const handleExportDescription = () => {
 		const docDefinition = {
 			content: [
@@ -40,54 +46,56 @@ const ProfileDescription: FC<ProfileDescriptionProps> = ({ profile }) => {
 	}
 
 	return (
-		<Flex justify='space-evenly' align='center'>
-			<Flex vertical style={{ maxWidth: '60%' }}>
-				<Descriptions
-					column={2}
-					items={[
-						{
-							key: '1',
-							label: 'Имя пользователя',
-							children: 'Иван Васильевич',
-						},
-						{
-							key: '2',
-							label: 'Электронная почта',
-							children: 'ivanbalyk@mail.ru',
-						},
-						{
-							key: '3',
-							label: 'Город проживания',
-							children: 'Воронеж',
-						},
-						{
-							key: '4',
-							label: 'Страна проживания',
-							children: 'Россия',
-						},
-					]}
-				/>
-				<Paragraph>{profile?.description}</Paragraph>
+		<>
+			<SubscribersWindow open={open} setOpen={setOpen} user={''} />
+			<Flex justify='space-evenly' align='center'>
+				<Flex vertical style={{ maxWidth: '60%' }}>
+					<Descriptions
+						column={2}
+						items={[
+							{
+								key: '1',
+								label: 'Имя пользователя',
+								children: profile.username,
+							},
+							{
+								key: '2',
+								label: 'Электронная почта',
+								children: profile.email,
+							},
+							{
+								key: '3',
+								label: 'Город проживания',
+								children: profile.city,
+							},
+							{
+								key: '4',
+								label: 'Страна проживания',
+								children: profile.country,
+							},
+						]} />
+					<Paragraph>{profile?.description}</Paragraph>
+				</Flex>
+				<Flex vertical>
+					<Button
+						icon={<FileTextOutlined />}
+						style={{ marginBottom: 20 }}
+						onClick={handleExportDescription}>
+						Экспортировать описание
+					</Button>
+					<Statistic
+						title='Количество лайков'
+						value={3}
+						prefix={<HeartOutlined />} />
+					<Statistic title='Количество публикаций' value={3} />
+					<div onClick={showModal} style={{ cursor: 'pointer' }}>
+						<Statistic
+							title='Количество подписчиков'
+							value={profile?.subscribersCount} />
+					</div>
+				</Flex>
 			</Flex>
-			<Flex vertical>
-				<Button
-					icon={<FileTextOutlined />}
-					style={{ marginBottom: 20 }}
-					onClick={handleExportDescription}>
-					Экспортировать описание
-				</Button>
-				<Statistic
-					title='Количество лайков'
-					value={3}
-					prefix={<HeartOutlined />}
-				/>
-				<Statistic title='Количество публикаций' value={3} />
-				<Statistic
-					title='Количество подписчиков'
-					value={100}
-				/>
-			</Flex>
-		</Flex >
+		</>
 	)
 }
 
