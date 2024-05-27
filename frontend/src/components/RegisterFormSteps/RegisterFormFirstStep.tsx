@@ -14,8 +14,9 @@ const RegisterFormFirstStep: FC<RegisterFormFirstStep> = ({ onFinishStep1 }) => 
 			<Form
 				name='register_step_1'
 				className='login-form'
-				initialValues={{ remember: true }}
+				initialValues={{ username: '', password: '' }}
 				onFinish={onFinishStep1}
+				autoComplete='off'
 			>
 				<Typography.Title
 					style={{ margin: '0 0 22px 0' }}
@@ -35,6 +36,7 @@ const RegisterFormFirstStep: FC<RegisterFormFirstStep> = ({ onFinishStep1 }) => 
 					<Input
 						prefix={<UserOutlined className='site-form-item-icon' />}
 						placeholder='Логин'
+						autoComplete='off'
 					/>
 				</Form.Item>
 				<Form.Item
@@ -68,6 +70,7 @@ const RegisterFormFirstStep: FC<RegisterFormFirstStep> = ({ onFinishStep1 }) => 
 						prefix={<LockOutlined className='site-form-item-icon' />}
 						type='password'
 						placeholder='Пароль'
+						autoComplete='off'
 					/>
 				</Form.Item>
 
@@ -90,6 +93,7 @@ const RegisterFormFirstStep: FC<RegisterFormFirstStep> = ({ onFinishStep1 }) => 
 					<Input
 						prefix={<LockOutlined className='site-form-item-icon' />}
 						placeholder='Секретное слово'
+						autoComplete='off'
 					/>
 				</Form.Item>
 

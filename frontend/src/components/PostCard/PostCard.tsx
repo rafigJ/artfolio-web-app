@@ -13,7 +13,7 @@ interface PostCardProps {
 
 const PostCard: FC<PostCardProps> = ({ post }) => {
 	const navigate = useNavigate()
-	
+
 	return (
 		<Card
 			hoverable
@@ -27,7 +27,7 @@ const PostCard: FC<PostCardProps> = ({ post }) => {
 						cursor: 'pointer'
 					}}
 					alt={post.name}
-					src={`${API_URL}/posts/medias/${post.previewMediaId}`}
+					src={`${API_URL}/posts/${post.id}/preview`}
 					onClick={() => navigate(`/posts/${post.id}`)}
 				/>
 			}

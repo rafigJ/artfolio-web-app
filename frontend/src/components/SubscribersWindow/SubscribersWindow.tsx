@@ -1,41 +1,59 @@
-import { Button, Modal, Table } from 'antd'
-import { FC, useState } from 'react'
-import { UserResponce } from '../../types/UserResponce'
+import { AntDesignOutlined } from '@ant-design/icons'
+import { Avatar, Modal, Table, message } from 'antd'
+import { FC, useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
+import $api, { API_URL } from '../../api'
+import { FullUserResponse } from '../../types/FullUserResponse'
 
 interface SubscribersWindowProps {
-	user: string
+	user: FullUserResponse
 	open: boolean
 	setOpen: (state: boolean) => void
 }
 
+interface Subscriber {
+	uuid: string
+	fullName: string
+	username: string
+	email: string
+	isSubscribed: boolean
+}
+
 const SubscribersWindow: FC<SubscribersWindowProps> = ({ user, open, setOpen }) => {
-	const [userIsSubscribed, setIsSubscribed] = useState(true)
+	const [subscribers, setSubscribers] = useState<Subscriber[]>([])
+
+	useEffect(() => {
+		if (open) {
+			handleSubscribers()
+		}
+	}, [open])
+
 	const columns = [
 		{
-			title: 'Полное имя',
-			dataIndex: 'fullName',
-			key: 'fullName',
+			dataIndex: 'username',
+			key: 'avatar',
+			render: (username: string) => (
+				<Link to={`/profile/${username}`} onClick={() => setOpen(false)}>
+					<Avatar src={`${API_URL}/user/${username}/avatar`}
+						icon={<AntDesignOutlined />}
+					/>
+				</Link>
+			),
 		},
 		{
 			title: 'Имя пользователя',
 			dataIndex: 'username',
 			key: 'username',
+			render: (username: string) => (
+				<Link to={`/profile/${username}`} onClick={() => setOpen(false)}>
+					{username}
+				</Link>
+			),
 		},
 		{
-			title: '',
-			dataIndex: 'user',
-			key: 'userIsSubscribed',
-			render: (text: string) =>
-				<span>
-					<Button
-						style={{ margin: '10px 0' }}
-						danger={userIsSubscribed}
-						type='primary'
-						onClick={() => setIsSubscribed(!userIsSubscribed)}
-					>
-						{userIsSubscribed ? 'Отписаться' : 'Подписаться'}
-					</Button>
-				</span>,
+			title: 'Полное имя',
+			dataIndex: 'fullName',
+			key: 'fullName',
 		},
 	]
 
@@ -43,19 +61,25 @@ const SubscribersWindow: FC<SubscribersWindowProps> = ({ user, open, setOpen }) 
 		setOpen(false)
 	}
 
-	const subscribers: UserResponce[] = [
-		{
-			fullName: "Джон Сноу",
-			username: 'commentator456'
-		},
-		{
-			fullName: "Рамси Болтон",
-			username: 'boltonArts'
+	const handleSubscribers = async () => {
+		try {
+			const response = await $api.get(`/user/${user.username}/followers`)
+			if (response.status === 200) {
+				// Извлечение и преобразование данных из ответа
+				const subscribersData = response.data.content.map((subscriber: any) => ({
+					...subscriber,
+					key: subscriber.uuid, // Используем uuid как ключ
+				}))
+				setSubscribers(subscribersData)
+			}
+		} catch (error) {
+			message.error('Произошла ошибка при получении списка подписчиков')
 		}
-	]
+	}
 
 	return (
 		<Modal
+			width={600}
 			title="Список подписчиков"
 			open={open}
 			onCancel={handleCancel}
