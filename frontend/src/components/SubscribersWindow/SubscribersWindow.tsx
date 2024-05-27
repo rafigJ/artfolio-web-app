@@ -1,6 +1,8 @@
-import { Button, Modal, Table, message } from 'antd'
+import { AntDesignOutlined } from '@ant-design/icons'
+import { Avatar, Modal, Table, message } from 'antd'
 import { FC, useEffect, useState } from 'react'
-import $api from '../../api'
+import { Link } from 'react-router-dom'
+import $api, { API_URL } from '../../api'
 import { FullUserResponse } from '../../types/FullUserResponse'
 
 interface SubscribersWindowProps {
@@ -28,36 +30,30 @@ const SubscribersWindow: FC<SubscribersWindowProps> = ({ user, open, setOpen }) 
 
 	const columns = [
 		{
-			title: 'Полное имя',
-			dataIndex: 'fullName',
-			key: 'fullName',
+			dataIndex: 'username',
+			key: 'avatar',
+			render: (username: string) => (
+				<Link to={`/profile/${username}`} onClick={() => setOpen(false)}>
+					<Avatar src={`${API_URL}/user/${username}/avatar`}
+						icon={<AntDesignOutlined />}
+					/>
+				</Link>
+			),
 		},
 		{
 			title: 'Имя пользователя',
 			dataIndex: 'username',
 			key: 'username',
-		},
-		{
-			title: 'Электронная почта',
-			dataIndex: 'email',
-			key: 'email',
-		},
-		{
-			title: '',
-			dataIndex: 'isSubscribed',
-			key: 'isSubscribed',
-			render: (isSubscribed: boolean, record: Subscriber) => (
-				<span>
-					<Button
-						style={{ margin: '10px 0' }}
-						danger={isSubscribed}
-						type='primary'
-						onClick={() => handleSubscribeToggle(record.username, isSubscribed)}
-					>
-						{isSubscribed ? 'Отписаться' : 'Подписаться'}
-					</Button>
-				</span>
+			render: (username: string) => (
+				<Link to={`/profile/${username}`} onClick={() => setOpen(false)}>
+					{username}
+				</Link>
 			),
+		},
+		{
+			title: 'Полное имя',
+			dataIndex: 'fullName',
+			key: 'fullName',
 		},
 	]
 
@@ -72,7 +68,6 @@ const SubscribersWindow: FC<SubscribersWindowProps> = ({ user, open, setOpen }) 
 				// Извлечение и преобразование данных из ответа
 				const subscribersData = response.data.content.map((subscriber: any) => ({
 					...subscriber,
-					isSubscribed: true, // Предположительно, все пользователи в списке подписок изначально подписаны
 					key: subscriber.uuid, // Используем uuid как ключ
 				}))
 				setSubscribers(subscribersData)
@@ -82,30 +77,9 @@ const SubscribersWindow: FC<SubscribersWindowProps> = ({ user, open, setOpen }) 
 		}
 	}
 
-	const handleSubscribeToggle = async (username: string, isSubscribed: boolean) => {
-		try {
-			if (isSubscribed) {
-				await $api.delete(`/user/${username}/subscribes`)
-				message.success(`Вы отписались от пользователя ${username}`)
-			} else {
-				await $api.post(`/user/${username}/subscribes`)
-				message.success(`Вы подписались на пользователя ${username}`)
-			}
-			// Обновить состояние подписки
-			setSubscribers((prev) =>
-				prev.map((subscriber) =>
-					subscriber.username === username
-						? { ...subscriber, isSubscribed: !isSubscribed }
-						: subscriber
-				)
-			)
-		} catch (error) {
-			message.error('Произошла ошибка при изменении подписки')
-		}
-	}
-
 	return (
 		<Modal
+			width={600}
 			title="Список подписчиков"
 			open={open}
 			onCancel={handleCancel}

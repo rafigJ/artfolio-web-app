@@ -5,6 +5,7 @@ import pdfFonts from 'pdfmake/build/vfs_fonts'
 import { useState, type FC } from 'react'
 import type { FullUserResponse } from '../../types/FullUserResponse'
 import SubscribersWindow from '../SubscribersWindow/SubscribersWindow'
+import SubscriptionWindow from '../SubscribtionWindow/SubscriptionWindow'
 
 const { Paragraph } = Typography
 
@@ -15,9 +16,13 @@ interface ProfileDescriptionProps {
 }
 
 const ProfileDescription: FC<ProfileDescriptionProps> = ({ profile }) => {
-	const [open, setOpen] = useState(false)
-	const showModal = () => {
-		setOpen(true)
+	const [openSubscribers, setOpenSubscribers] = useState(false)
+	const showSubscribers = () => {
+		setOpenSubscribers(true)
+	}
+	const [openSubscriptions, setOpenSubscribtions] = useState(false)
+	const showSubscribtions = () => {
+		setOpenSubscribtions(true)
 	}
 
 	const handleExportDescription = () => {
@@ -47,7 +52,8 @@ const ProfileDescription: FC<ProfileDescriptionProps> = ({ profile }) => {
 
 	return (
 		<>
-			<SubscribersWindow open={open} setOpen={setOpen} user={profile} />
+			<SubscribersWindow open={openSubscribers} setOpen={setOpenSubscribers} user={profile} />
+			<SubscriptionWindow open={openSubscriptions} setOpen={setOpenSubscribtions} user={profile} />
 			<Flex justify='space-evenly' align='center'>
 				<Flex vertical style={{ maxWidth: '60%' }}>
 					<Descriptions
@@ -88,12 +94,12 @@ const ProfileDescription: FC<ProfileDescriptionProps> = ({ profile }) => {
 						value={3}
 						prefix={<HeartOutlined />} />
 					<Statistic title='Количество публикаций' value={3} />
-					<div onClick={showModal} style={{ cursor: 'pointer' }}>
+					<div onClick={showSubscribers} style={{ cursor: 'pointer' }}>
 						<Statistic
 							title='Подписчики:'
 							value={profile?.subscribersCount} />
 					</div>
-					<div onClick={showModal} style={{ cursor: 'pointer' }}>
+					<div onClick={showSubscribtions} style={{ cursor: 'pointer' }}>
 						<Statistic
 							title='Подписки'
 							value=' ' />
