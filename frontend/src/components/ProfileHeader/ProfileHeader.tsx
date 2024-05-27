@@ -1,7 +1,9 @@
 import { AntDesignOutlined } from '@ant-design/icons'
-import { Avatar, Button, Flex, Typography } from 'antd'
-import { type FC, useState } from 'react'
+import { Avatar, Button, Flex, Typography, message } from 'antd'
+import { useEffect, useState, type FC } from 'react'
 import { API_URL } from '../../api'
+import $api from '../../api/index'
+
 import type { FullUserResponse } from '../../types/FullUserResponse'
 
 interface ProfileHeaderProps {
@@ -10,7 +12,33 @@ interface ProfileHeaderProps {
 
 const ProfileHeader: FC<ProfileHeaderProps> = ({ profile }) => {
 	const [userIsSubscribed, setIsSubscribed] = useState(false)
-	
+
+	useEffect(() => {
+		// Проверка начального состояния подписки (можно добавить запрос к API для получения статуса подписки)
+	}, [])
+
+	const handleSubscribe = async () => {
+		try {
+			const response = await $api.post(`/user/${profile.username}/subscribes`)
+			if (response.status === 200) {
+				setIsSubscribed(true)
+			}
+		} catch (error) {
+			message.error('Произошла ошибка при подписке')
+		}
+	}
+
+	const handleUnsubscribe = async () => {
+		try {
+			const response = await $api.delete(`/user/${profile.username}/subscribes`)
+			if (response.status === 200) {
+				setIsSubscribed(false)
+			}
+		} catch (error) {
+			message.error('Произошла ошибка при отписке')
+		}
+	}
+
 	return (
 		<Flex
 			style={{
@@ -33,7 +61,7 @@ const ProfileHeader: FC<ProfileHeaderProps> = ({ profile }) => {
 					style={{ margin: '10px 0' }}
 					danger={userIsSubscribed}
 					type='primary'
-					onClick={() => setIsSubscribed(!userIsSubscribed)}
+					onClick={userIsSubscribed ? handleUnsubscribe : handleSubscribe}
 				>
 					{userIsSubscribed ? 'Отписаться' : 'Подписаться'}
 				</Button>

@@ -1,15 +1,31 @@
-import { Button, Modal, Table } from 'antd'
-import { FC, useState } from 'react'
-import { UserResponce } from '../../types/UserResponce'
+import { Button, Modal, Table, message } from 'antd'
+import { FC, useEffect, useState } from 'react'
+import $api from '../../api'
+import { FullUserResponse } from '../../types/FullUserResponse'
 
 interface SubscribersWindowProps {
-	user: string
+	user: FullUserResponse
 	open: boolean
 	setOpen: (state: boolean) => void
 }
 
+interface Subscriber {
+	uuid: string
+	fullName: string
+	username: string
+	email: string
+	isSubscribed: boolean
+}
+
 const SubscribersWindow: FC<SubscribersWindowProps> = ({ user, open, setOpen }) => {
-	const [userIsSubscribed, setIsSubscribed] = useState(true)
+	const [subscribers, setSubscribers] = useState<Subscriber[]>([])
+
+	useEffect(() => {
+		if (open) {
+			handleSubscribers()
+		}
+	}, [open])
+
 	const columns = [
 		{
 			title: 'Полное имя',
@@ -22,20 +38,26 @@ const SubscribersWindow: FC<SubscribersWindowProps> = ({ user, open, setOpen }) 
 			key: 'username',
 		},
 		{
+			title: 'Электронная почта',
+			dataIndex: 'email',
+			key: 'email',
+		},
+		{
 			title: '',
-			dataIndex: 'user',
-			key: 'userIsSubscribed',
-			render: (text: string) =>
+			dataIndex: 'isSubscribed',
+			key: 'isSubscribed',
+			render: (isSubscribed: boolean, record: Subscriber) => (
 				<span>
 					<Button
 						style={{ margin: '10px 0' }}
-						danger={userIsSubscribed}
+						danger={isSubscribed}
 						type='primary'
-						onClick={() => setIsSubscribed(!userIsSubscribed)}
+						onClick={() => handleSubscribeToggle(record.username, isSubscribed)}
 					>
-						{userIsSubscribed ? 'Отписаться' : 'Подписаться'}
+						{isSubscribed ? 'Отписаться' : 'Подписаться'}
 					</Button>
-				</span>,
+				</span>
+			),
 		},
 	]
 
@@ -43,16 +65,44 @@ const SubscribersWindow: FC<SubscribersWindowProps> = ({ user, open, setOpen }) 
 		setOpen(false)
 	}
 
-	const subscribers: UserResponce[] = [
-		{
-			fullName: "Джон Сноу",
-			username: 'commentator456'
-		},
-		{
-			fullName: "Рамси Болтон",
-			username: 'boltonArts'
+	const handleSubscribers = async () => {
+		try {
+			const response = await $api.get(`/user/${user.username}/followers`)
+			if (response.status === 200) {
+				// Извлечение и преобразование данных из ответа
+				const subscribersData = response.data.content.map((subscriber: any) => ({
+					...subscriber,
+					isSubscribed: true, // Предположительно, все пользователи в списке подписок изначально подписаны
+					key: subscriber.uuid, // Используем uuid как ключ
+				}))
+				setSubscribers(subscribersData)
+			}
+		} catch (error) {
+			message.error('Произошла ошибка при получении списка подписчиков')
 		}
-	]
+	}
+
+	const handleSubscribeToggle = async (username: string, isSubscribed: boolean) => {
+		try {
+			if (isSubscribed) {
+				await $api.delete(`/user/${username}/subscribes`)
+				message.success(`Вы отписались от пользователя ${username}`)
+			} else {
+				await $api.post(`/user/${username}/subscribes`)
+				message.success(`Вы подписались на пользователя ${username}`)
+			}
+			// Обновить состояние подписки
+			setSubscribers((prev) =>
+				prev.map((subscriber) =>
+					subscriber.username === username
+						? { ...subscriber, isSubscribed: !isSubscribed }
+						: subscriber
+				)
+			)
+		} catch (error) {
+			message.error('Произошла ошибка при изменении подписки')
+		}
+	}
 
 	return (
 		<Modal

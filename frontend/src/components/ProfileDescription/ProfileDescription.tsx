@@ -47,7 +47,7 @@ const ProfileDescription: FC<ProfileDescriptionProps> = ({ profile }) => {
 
 	return (
 		<>
-			<SubscribersWindow open={open} setOpen={setOpen} user={''} />
+			<SubscribersWindow open={open} setOpen={setOpen} user={profile} />
 			<Flex justify='space-evenly' align='center'>
 				<Flex vertical style={{ maxWidth: '60%' }}>
 					<Descriptions
@@ -90,8 +90,13 @@ const ProfileDescription: FC<ProfileDescriptionProps> = ({ profile }) => {
 					<Statistic title='Количество публикаций' value={3} />
 					<div onClick={showModal} style={{ cursor: 'pointer' }}>
 						<Statistic
-							title='Количество подписчиков'
+							title='Подписчики:'
 							value={profile?.subscribersCount} />
+					</div>
+					<div onClick={showModal} style={{ cursor: 'pointer' }}>
+						<Statistic
+							title='Подписки'
+							value=' ' />
 					</div>
 				</Flex>
 			</Flex>
