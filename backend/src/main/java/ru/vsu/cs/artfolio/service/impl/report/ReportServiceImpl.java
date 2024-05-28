@@ -1,10 +1,11 @@
-package ru.vsu.cs.artfolio.service.impl;
+package ru.vsu.cs.artfolio.service.impl.report;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import ru.vsu.cs.artfolio.auth.user.Role;
+import ru.vsu.cs.artfolio.controller.enums.ReportReviewed;
 import ru.vsu.cs.artfolio.dto.PageDto;
 import ru.vsu.cs.artfolio.dto.report.CommentReportResponseDto;
 import ru.vsu.cs.artfolio.dto.report.PostReportResponseDto;
@@ -47,8 +48,8 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public PageDto<CommentReportResponseDto> getCommentReportsPage(Pageable page) {
-        return commentReportService.getCommentReportsPage(page);
+    public PageDto<CommentReportResponseDto> getCommentReportsPage(ReportReviewed reportReviewed, Pageable page) {
+        return commentReportService.getCommentReportsPage(reportReviewed, page);
     }
 
     @Override
@@ -67,7 +68,7 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public PageDto<PostReportResponseDto> getPostReportsPage(Pageable page) {
-        return postReportService.getPostReportsPage(page);
+    public PageDto<PostReportResponseDto> getPostReportsPage(ReportReviewed reportReviewed, Pageable page) {
+        return postReportService.getPostReportsPage(reportReviewed,page);
     }
 }

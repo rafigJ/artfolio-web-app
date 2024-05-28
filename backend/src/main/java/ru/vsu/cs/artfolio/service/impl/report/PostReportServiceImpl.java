@@ -1,10 +1,11 @@
-package ru.vsu.cs.artfolio.service.impl;
+package ru.vsu.cs.artfolio.service.impl.report;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.vsu.cs.artfolio.controller.enums.ReportReviewed;
 import ru.vsu.cs.artfolio.dto.PageDto;
 import ru.vsu.cs.artfolio.dto.report.PostReportResponseDto;
 import ru.vsu.cs.artfolio.dto.report.ReportRequestDto;
@@ -21,28 +22,32 @@ import ru.vsu.cs.artfolio.service.report.PostReportService;
 @RequiredArgsConstructor
 public class PostReportServiceImpl implements PostReportService {
 
-    private final PostReportRepository reportRepository;
+    private final PostReportRepository repository;
 
     @Override
     public PostReportResponseDto createPostReport(UserEntity sender, PostEntity post, ReportRequestDto report) {
         PostReportEntity postReport = ReportMapper.postReportToEntity(report, sender, post);
-        PostReportEntity savedReport = reportRepository.save(postReport);
+        PostReportEntity savedReport = repository.save(postReport);
         return ReportMapper.postReportToDto(savedReport);
     }
 
     @Override
     @Transactional
     public PostReportResponseDto setReviewed(UserEntity executor, Long postReportId, ReportReviewRequestDto reviewDto) {
-        PostReportEntity postReport = reportRepository.findById(postReportId)
+        PostReportEntity postReport = repository.findById(postReportId)
                 .orElseThrow(() -> new NotFoundException("Report by " + postReportId + " id not found"));
         postReport.setReviewed(reviewDto.reviewed());
-        PostReportEntity updatedReport = reportRepository.save(postReport);
+        PostReportEntity updatedReport = repository.save(postReport);
         return ReportMapper.postReportToDto(updatedReport);
     }
 
     @Override
-    public PageDto<PostReportResponseDto> getPostReportsPage(Pageable page) {
-        Page<PostReportEntity> reportEntityPage = reportRepository.findAll(page);
+    public PageDto<PostReportResponseDto> getPostReportsPage(ReportReviewed reportReviewed, Pageable page) {
+        Page<PostReportEntity> reportEntityPage = switch (reportReviewed) {
+            case ALL -> repository.findAll(page);
+            case TRUE -> repository.findAllByReviewed(true, page);
+            case FALSE -> repository.findAllByReviewed(false, page);
+        };
         return ReportMapper.postToPageDto(reportEntityPage);
     }
 }

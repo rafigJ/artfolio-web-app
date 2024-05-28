@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -34,16 +35,15 @@ public class ReportController {
 
     @GetMapping()
     @PreAuthorize("isAuthenticated() and hasAuthority('ADMIN')")
-    // todo Нужно подавать страницы в зависимости от enum (ReportReviewed, Type)
     public ResponseEntity<PageDto<?>> getPostsPage(
             @RequestParam(value = "type") ReportType type,
             @RequestParam(value = "reviewed", defaultValue = "ALL") ReportReviewed reportReviewed,
             @RequestParam(value = "_page") Integer page,
             @RequestParam(value = "_limit", defaultValue = "10") Integer limit) {
-        Pageable pageable = PageRequest.of(page, limit);
+        Pageable pageable = PageRequest.of(page, limit, Sort.by("createTime"));
         PageDto<?> result = switch (type) {
-            case POST -> service.getPostReportsPage(pageable);
-            case COMMENT -> service.getCommentReportsPage(pageable);
+            case POST -> service.getPostReportsPage(reportReviewed, pageable);
+            case COMMENT -> service.getCommentReportsPage(reportReviewed, pageable);
         };
         return ResponseEntity.ok(result);
     }

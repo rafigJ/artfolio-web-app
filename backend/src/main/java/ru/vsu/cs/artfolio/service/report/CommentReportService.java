@@ -1,6 +1,7 @@
 package ru.vsu.cs.artfolio.service.report;
 
 import org.springframework.data.domain.Pageable;
+import ru.vsu.cs.artfolio.controller.enums.ReportReviewed;
 import ru.vsu.cs.artfolio.dto.PageDto;
 import ru.vsu.cs.artfolio.dto.report.CommentReportResponseDto;
 import ru.vsu.cs.artfolio.dto.report.ReportRequestDto;
@@ -14,6 +15,6 @@ public interface CommentReportService {
 
     CommentReportResponseDto setReviewed(UserEntity executor, Long commentReportId, ReportReviewRequestDto reviewDto);
 
-    PageDto<CommentReportResponseDto> getCommentReportsPage(Pageable page);
+    PageDto<CommentReportResponseDto> getCommentReportsPage(ReportReviewed reportReviewed, Pageable page);
 
 }
