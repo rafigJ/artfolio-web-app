@@ -12,6 +12,9 @@ public interface CommentService {
 
     CommentResponseDto createComment(UserEntity user, Long postId, CommentRequestDto requestDto);
 
+    /**
+     * Помечает пост удаленным
+     */
     void deleteCommentById(UserEntity user, Long postId, Long commentId);
 
 }

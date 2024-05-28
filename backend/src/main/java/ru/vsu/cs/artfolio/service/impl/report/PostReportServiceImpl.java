@@ -11,7 +11,7 @@ import ru.vsu.cs.artfolio.dto.report.PostReportResponseDto;
 import ru.vsu.cs.artfolio.dto.report.ReportRequestDto;
 import ru.vsu.cs.artfolio.dto.report.ReportReviewRequestDto;
 import ru.vsu.cs.artfolio.entity.PostEntity;
-import ru.vsu.cs.artfolio.entity.PostReportEntity;
+import ru.vsu.cs.artfolio.entity.report.PostReportEntity;
 import ru.vsu.cs.artfolio.entity.UserEntity;
 import ru.vsu.cs.artfolio.exception.NotFoundException;
 import ru.vsu.cs.artfolio.mapper.ReportMapper;

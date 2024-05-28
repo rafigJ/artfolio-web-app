@@ -6,9 +6,9 @@ import ru.vsu.cs.artfolio.dto.report.CommentReportResponseDto;
 import ru.vsu.cs.artfolio.dto.report.PostReportResponseDto;
 import ru.vsu.cs.artfolio.dto.report.ReportRequestDto;
 import ru.vsu.cs.artfolio.entity.CommentEntity;
-import ru.vsu.cs.artfolio.entity.CommentReportEntity;
+import ru.vsu.cs.artfolio.entity.report.CommentReportEntity;
 import ru.vsu.cs.artfolio.entity.PostEntity;
-import ru.vsu.cs.artfolio.entity.PostReportEntity;
+import ru.vsu.cs.artfolio.entity.report.PostReportEntity;
 import ru.vsu.cs.artfolio.entity.UserEntity;
 
 import java.time.LocalDateTime;

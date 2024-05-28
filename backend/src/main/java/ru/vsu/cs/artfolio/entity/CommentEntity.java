@@ -43,4 +43,6 @@ public class CommentEntity {
     @Column(name = "create_time")
     private LocalDateTime createTime;
 
+    @Column(name = "deleted")
+    private Boolean deleted;
 }

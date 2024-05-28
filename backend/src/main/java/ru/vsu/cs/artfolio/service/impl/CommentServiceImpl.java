@@ -27,7 +27,7 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public PageDto<CommentResponseDto> getAllByPostId(Long postId, Pageable page) {
-        Page<CommentEntity> comments = commentRepository.findAllByPostId(postId, page);
+        Page<CommentEntity> comments = commentRepository.findAllByPostIdAndDeletedIsFalse(postId, page);
         return CommentMapper.toPageDto(comments);
     }
 
@@ -51,7 +51,8 @@ public class CommentServiceImpl implements CommentService {
         }
 
         if (comment.getUser().getUuid().equals(user.getUuid()) || user.getRole().equals(Role.ADMIN)) {
-            commentRepository.delete(comment);
+            comment.setDeleted(true);
+            commentRepository.save(comment);
         } else {
             throw new RestException("Insufficient rights to delete comment", HttpStatus.UNAUTHORIZED);
         }

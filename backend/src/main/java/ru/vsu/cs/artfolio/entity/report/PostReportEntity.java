@@ -1,4 +1,4 @@
-package ru.vsu.cs.artfolio.entity;
+package ru.vsu.cs.artfolio.entity.report;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -14,6 +14,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import ru.vsu.cs.artfolio.entity.PostEntity;
+import ru.vsu.cs.artfolio.entity.UserEntity;
 
 import java.time.LocalDateTime;
 

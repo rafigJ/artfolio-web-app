@@ -7,6 +7,6 @@ import ru.vsu.cs.artfolio.entity.CommentEntity;
 
 public interface CommentRepository extends JpaRepository<CommentEntity, Long> {
 
-    Page<CommentEntity> findAllByPostId(Long postId, Pageable page);
+    Page<CommentEntity> findAllByPostIdAndDeletedIsFalse(Long postId, Pageable page);
 
 }

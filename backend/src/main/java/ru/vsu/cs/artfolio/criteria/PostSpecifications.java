@@ -11,41 +11,48 @@ import ru.vsu.cs.artfolio.entity.PostEntity;
 import ru.vsu.cs.artfolio.entity.UserEntity;
 
 public class PostSpecifications {
+
     public static Specification<PostEntity> nameContainsIgnoreCaseSortByCreateTime(String name) {
         if (!StringUtils.hasText(name)) {
             return null;
         }
         return (root, query, criteriaBuilder) -> {
             query.orderBy(criteriaBuilder.desc(root.get("createTime")));
-            return criteriaBuilder.like(criteriaBuilder.lower(root.get("name")), "%" + name.toLowerCase() + "%");
+            return criteriaBuilder.and(
+                    criteriaBuilder.like(criteriaBuilder.lower(root.get("name")), "%" + name.toLowerCase() + "%"),
+                    criteriaBuilder.isFalse(root.get("deleted"))
+            );
         };
     }
 
     public static Specification<PostEntity> sortByCreateTime() {
         return (root, query, criteriaBuilder) -> {
             query.orderBy(criteriaBuilder.desc(root.get("createTime")));
-            return null;
+            return criteriaBuilder.isFalse(root.get("deleted"));
         };
     }
 
     public static Specification<PostEntity> sortByLikeCount() {
         return (root, query, criteriaBuilder) -> {
-            // Join с таблицей лайков
+            // Join with the likes table
             Join<PostEntity, LikeEntity> likesJoin = root.join("likes", JoinType.LEFT);
 
-            // Группировка по постам
+            // Group by posts
             query.groupBy(root.get("id"));
 
-            // Подсчет количества лайков
+            // Count the number of likes
             Expression<Long> likeCount = criteriaBuilder.count(likesJoin.get("id"));
 
-            // Сортировка по количеству лайков (убывание) и времени создания (убывание)
+            // Order by the number of likes (descending) and creation time (descending)
             query.orderBy(
                     criteriaBuilder.desc(likeCount),
                     criteriaBuilder.desc(root.get("createTime"))
             );
 
-            return criteriaBuilder.conjunction();
+            return criteriaBuilder.and(
+                    criteriaBuilder.conjunction(),
+                    criteriaBuilder.isFalse(root.get("deleted"))
+            );
         };
     }
 
@@ -56,9 +63,10 @@ public class PostSpecifications {
 
             query.orderBy(criteriaBuilder.desc(root.get("createTime")));
 
-            return criteriaBuilder.equal(followJoin.get("subscriber"), subscriber);
+            return criteriaBuilder.and(
+                    criteriaBuilder.equal(followJoin.get("subscriber"), subscriber),
+                    criteriaBuilder.isFalse(root.get("deleted"))
+            );
         };
     }
-
-
 }

@@ -11,7 +11,7 @@ import ru.vsu.cs.artfolio.dto.report.CommentReportResponseDto;
 import ru.vsu.cs.artfolio.dto.report.ReportRequestDto;
 import ru.vsu.cs.artfolio.dto.report.ReportReviewRequestDto;
 import ru.vsu.cs.artfolio.entity.CommentEntity;
-import ru.vsu.cs.artfolio.entity.CommentReportEntity;
+import ru.vsu.cs.artfolio.entity.report.CommentReportEntity;
 import ru.vsu.cs.artfolio.entity.UserEntity;
 import ru.vsu.cs.artfolio.exception.NotFoundException;
 import ru.vsu.cs.artfolio.mapper.ReportMapper;
