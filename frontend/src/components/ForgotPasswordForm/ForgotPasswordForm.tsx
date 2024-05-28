@@ -42,7 +42,11 @@ const ForgotPasswordform = () => {
 				</Typography.Title>
 				<Form.Item
 					name='email'
-					rules={[{ required: true, message: 'Введите электронную почту!' }]}
+					rules={[
+						{ required: true, message: 'Введите электронную почту!' },
+						{ type: 'email', message: 'Введите корректный адрес электронной почты!' },
+						{ max: 150, message: 'Электронная почта должна содержать не более 150 символов' }
+					]}
 				>
 					<Input
 						prefix={<UserOutlined className='site-form-item-icon' />}
@@ -62,7 +66,17 @@ const ForgotPasswordform = () => {
 
 				<Form.Item
 					name='newPassword'
-					rules={[{ required: true, message: 'Введите новый пароль!' }]}
+					rules={[
+						{ required: true, message: 'Введите новый пароль!' },
+						{
+							pattern: /^(?=.*[A-Za-z])(?=.*\d).{8,}$/,
+							message: 'Пароль должен содержать минимум 8 символов, хотя бы одну букву и цифру'
+						},
+						{
+							pattern: /^[A-Za-z\d]+$/,
+							message: 'Пароль не должен содержать служебные символы!'
+						}
+					]}
 				>
 					<Input.Password
 						prefix={<LockOutlined className='site-form-item-icon' />}
