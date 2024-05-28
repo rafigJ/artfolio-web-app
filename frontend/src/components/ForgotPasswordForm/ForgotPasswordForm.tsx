@@ -1,10 +1,28 @@
 import { LockOutlined, UserOutlined } from '@ant-design/icons'
-import { Button, Form, Input, Typography } from 'antd'
+import { Button, Form, Input, Typography, message } from 'antd'
+import { useNavigate } from 'react-router-dom'
+import $api from '../../api'
 import '../LoginForm/LoginForm.css'
 
 const ForgotPasswordform = () => {
-	const onFinish = (values: any) => {
-		console.log('Received values of form: ', values)
+	const navigate = useNavigate()
+	const onFinish = async (values: any) => {
+		try {
+			const response = await $api.patch('auth/change-password', {
+				email: values.email,
+				secretWord: values.secretWord,
+				newPassword: values.newPassword,
+			})
+
+			if (response.status === 200) {
+				message.success('Пароль успешно изменен!')
+				navigate('/login')
+			} else {
+				message.error('Произошла ошибка при сбросе пароля')
+			}
+		} catch (error) {
+			message.error('Произошла ошибка при сбросе пароля')
+		}
 	}
 
 	return (
