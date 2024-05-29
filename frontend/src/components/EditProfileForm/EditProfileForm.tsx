@@ -1,6 +1,7 @@
 import { EnvironmentOutlined, MailOutlined, UserOutlined } from '@ant-design/icons'
 import { Button, Form, Input, Typography, UploadFile, message } from 'antd'
 import { useContext, useEffect, useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
 import UserService from '../../api/UserService'
 import { AuthContext } from '../../context'
 import { useFetching } from '../../hooks/useFetching'
@@ -12,6 +13,7 @@ import RegisterFormAvatarUpload from '../RegisterFormAvatarUpload/RegisterFormAv
 const EditProfileForm = () => {
 	const [avatar, setAvatar] = useState<UploadFile[]>([] as UploadFile[])
 	const [form] = Form.useForm()
+	const navigate = useNavigate()
 
 	const { authCredential } = useContext(AuthContext)
 	const [profile, setProfile] = useState<FullUserResponse>({} as FullUserResponse)
@@ -35,7 +37,14 @@ const EditProfileForm = () => {
 			return
 		}
 		const editProfileRequest: EditProfileRequest = values
-		UserService.editUserProfile(editProfileRequest, avatar.pop()?.originFileObj)
+		try {
+			UserService.editUserProfile(editProfileRequest, avatar.pop()?.originFileObj)
+			message.success("Профиль успешно обновлён")
+			navigate(`/profile/${profile.username}`)
+		}
+		catch (error) {
+			message.error("Произошла ошибка при редактировании профиля")
+		}
 	}
 
 	return (
@@ -135,8 +144,9 @@ const EditProfileForm = () => {
 						htmlType='submit'
 						className='login-form-button'
 					>
-						Обновить профиль
+						Сохранить изменения
 					</Button>
+					<Link to={`/profile/${profile.username}`}>Назад к профилю</Link>
 				</Form.Item>
 			</Form>
 		</div>
