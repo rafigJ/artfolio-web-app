@@ -2,32 +2,32 @@ import { DownOutlined } from '@ant-design/icons'
 import { Button, Dropdown, MenuProps, Space, Table, TableProps } from 'antd'
 import { FC, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { ReportResponce } from '../../types/ReportResponce'
+import { ReportResponse } from '../../types/ReportResponse'
 
 
 const ReportTablePost: FC = () => {
-
+	
 	const [reviewed, setReviewed] = useState(false)
-
+	
 	const items: MenuProps['items'] = [
 		{
 			key: '1',
 			label: 'Нерассмотренные',
-			onClick: () => setReviewed(false),
+			onClick: () => setReviewed(false)
 		},
 		{
 			key: '2',
 			label: 'Рассмотренные',
-			onClick: () => setReviewed(true),
-		},
+			onClick: () => setReviewed(true)
+		}
 	]
-
-	const columns: TableProps<ReportResponce>['columns'] = [
+	
+	const columns: TableProps<ReportResponse>['columns'] = [
 		{
 			title: 'ID',
 			dataIndex: 'id',
 			key: 'id',
-			render: (text) => <span>{text}</span>,
+			render: (text) => <span>{text}</span>
 		},
 		{
 			title: 'Отправитель жалобы',
@@ -38,7 +38,7 @@ const ReportTablePost: FC = () => {
 					<Link to={`/profile/${sender}`}>
 						{sender}
 					</Link>
-				</span>,
+				</span>
 		},
 		{
 			title: 'Публикация',
@@ -49,13 +49,13 @@ const ReportTablePost: FC = () => {
 					<Link to={`/posts/${post}`}>
 						{post}
 					</Link>
-				</span>,
+				</span>
 		},
 		{
 			title: 'Текст жалобы',
 			dataIndex: 'reason',
 			key: 'reason',
-			render: (text) => <span>{text}</span>,
+			render: (text) => <span>{text}</span>
 		},
 		{
 			title: 'Профиль автора поста',
@@ -66,12 +66,12 @@ const ReportTablePost: FC = () => {
 					<Link to={`/profile/${author}`}>
 						{author}
 					</Link>
-				</span>,
+				</span>
 		},
 		{
 			title: 'Время оставления жалобы',
 			dataIndex: 'time',
-			key: 'time',
+			key: 'time'
 		},
 		{
 			title: 'Статус',
@@ -80,107 +80,108 @@ const ReportTablePost: FC = () => {
 			render: (reviewed) =>
 				<span>
 					{reviewed ? (
-						<Button type="link">
+						<Button type='link'>
 							Отметить как нерассмотренную
 						</Button>
 					) : (
-						<Button type="link">
+						<Button type='link'>
 							Отметить как рассмотренную
 						</Button>
 					)}
-				</span>,
-		},
+				</span>
+		}
 	]
-
-	const data: ReportResponce[] = [
+	const data: ReportResponse[] = [
 		{
 			id: 1,
 			postId: 20,
-			reason: "Какой-то текст жалобы здесь",
+			reason: 'Какой-то текст жалобы здесь',
 			reviewed: true,
-			time: '2022-03-30 12:45',
+			time: '2022-03-30T12:45',
 			targetUser: {
-				fullName: "Джон Сноу",
-				username: 'commentator456',
+				fullName: 'Джон Сноу',
+				username: 'commentator456'
 			},
 			sender: {
-				fullName: "Джон Сноу",
-				username: 'user123',
+				fullName: 'Джон Сноу',
+				username: 'user123'
 			}
 		},
 		{
 			id: 2,
 			postId: 33,
-			reason: "Очень много крови!",
+			reason: 'Очень много крови!',
 			reviewed: false,
 			time: '2022-03-30 12:45',
 			targetUser: {
-				fullName: "Рамси Болтон",
+				fullName: 'Рамси Болтон',
 				username: 'boltonArts'
 			},
 			sender: {
-				fullName: "Рамси Болтон",
+				fullName: 'Рамси Болтон',
 				username: 'boltonArts'
 			}
 		},
 		{
 			id: 3,
 			postId: 45,
-			reason: "Слишком много рекламы",
+			reason: 'Слишком много рекламы',
 			reviewed: true,
 			time: '2022-03-30 12:45',
 			targetUser: {
-				fullName: "Джон Сноу",
+				fullName: 'Джон Сноу',
 				username: 'johnsnow22'
 			},
 			sender: {
-				fullName: "Санса Старк",
+				fullName: 'Санса Старк',
 				username: 'sansa_stark'
 			}
 		},
 		{
 			id: 4,
 			postId: 54,
-			reason: "Нецензурные выражения",
+			reason: 'Нецензурные выражения',
 			reviewed: false,
 			time: '2022-03-30 12:45',
 			targetUser: {
-				fullName: "Арья Старк",
+				fullName: 'Арья Старк',
 				username: 'aryastark11'
 			},
 			sender: {
-				fullName: "Тирион Ланнистер",
+				fullName: 'Тирион Ланнистер',
 				username: 'the_imp'
 			}
 		},
 		{
 			id: 5,
 			postId: 67,
-			reason: "Нарушение правил сообщества",
+			reason: 'Нарушение правил сообщества',
 			reviewed: true,
 			time: '2022-03-30 12:45',
 			targetUser: {
-				fullName: "Тирион Ланнистер",
+				fullName: 'Тирион Ланнистер',
 				username: 'the_imp'
 			},
 			sender: {
-				fullName: "Серсея Ланнистер",
+				fullName: 'Серсея Ланнистер',
 				username: 'cersei_queen'
 			}
-		},
+		}
 	]
-
-
+	
+	
 	const filteredData = data.filter(item => item.reviewed === reviewed)
-
+	
 	return (
-		<><Dropdown menu={{ items }} placement='bottomLeft'>
-			<Space style={{ marginBottom: 20 }}>
-				{reviewed ? 'Рассмотренные' : 'Нерассмотренные'}
-				<DownOutlined />
-			</Space>
-		</Dropdown>
-			<Table columns={columns} dataSource={filteredData} /></>
+		<>
+			<Dropdown menu={{ items }} placement='bottomLeft'>
+				<Space style={{ marginBottom: 20 }}>
+					{reviewed ? 'Рассмотренные' : 'Нерассмотренные'}
+					<DownOutlined />
+				</Space>
+			</Dropdown>
+			<Table columns={columns} dataSource={filteredData} />
+		</>
 	)
 }
 

@@ -1,7 +1,9 @@
 import { List, Result, Skeleton } from 'antd'
-import { useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import InfiniteScroll from 'react-infinite-scroll-component'
+import { useNavigate } from 'react-router-dom'
 import FeedService from '../../api/FeedService'
+import { AuthContext } from '../../context'
 import { useFetching } from '../../hooks/useFetching'
 import { FEED_VALUES, FeedSection } from '../../types/MockTypes/MockFeedRequest'
 import type { PostResponse } from '../../types/PostResponse'
@@ -9,19 +11,21 @@ import NewTabs from '../NewTabs/NewTabs'
 import PostCard from '../PostCard/PostCard'
 
 const PostGrid = () => {
+	const { isAuth } = useContext(AuthContext)
+	const navigate = useNavigate()
 	const [page, setPage] = useState(0)
 	const [data, setData] = useState<PostResponse[]>([])
 	const [totalElements, setTotalElements] = useState(0)
 	const [activeTabKey, setActiveTabKey] = useState<FeedSection | null>(FeedSection.NEW)
 	
-	const [fetchPosts, isLoading, isError, error] = useFetching(async _page => {
-		const response = await FeedService.getFeed(FeedSection.NEW, page, 20)
+	const [fetchPosts, isLoading, isError, error] = useFetching(async (section: FeedSection | null, _page) => {
+		const response = await FeedService.getFeed(section, page, 20)
 		setData([...data, ...response.data.content])
 		setTotalElements(response.data.totalElements)
 	})
 	
 	useEffect(() => {
-		fetchPosts(page)
+		fetchPosts(activeTabKey, page)
 	}, [page, activeTabKey])
 	
 	if (isError) {
@@ -40,6 +44,9 @@ const PostGrid = () => {
 					setData([])
 					setPage(0)
 					setTotalElements(0)
+					if (!isAuth && FEED_VALUES[Number(activeKey)] === FeedSection.SUBSCRIBE) {
+						navigate('/login')
+					}
 					setActiveTabKey(FEED_VALUES[Number(activeKey)])
 				}}
 				label={['Новые', 'Популярные', 'Для вас']}

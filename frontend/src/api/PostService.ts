@@ -19,7 +19,7 @@ export default class PostService {
 		})
 	}
 	
-	static async createPost(post: PostRequest, files: File[]): Promise<AxiosResponse<PostResponse>> {
+	static async createPost(post: PostRequest, files: Blob[]): Promise<AxiosResponse<PostResponse>> {
 		const bodyFormData = new FormData();
 		bodyFormData.append('post', new Blob([JSON.stringify(post)], { type: 'application/json' }))
 		files.forEach(file => {
