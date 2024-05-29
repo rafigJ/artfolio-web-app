@@ -1,14 +1,12 @@
 import { Input } from 'antd'
-import type { SearchProps } from 'antd/es/input/Search'
 import { type FC } from 'react'
 import './SearchInput.css'
+import { useNavigate } from 'react-router-dom'
 
 const { Search } = Input
 
-const onSearch: SearchProps['onSearch'] = (value, _e, info) =>
-	console.log(info?.source, value)
-
 const SearchInput: FC = () => {
+	const navigate = useNavigate()
 	return (
 		<div className='header__search-wrapper'>
 			<Search
@@ -16,7 +14,7 @@ const SearchInput: FC = () => {
 				size='large'
 				placeholder='Поиск...'
 				allowClear
-				onSearch={onSearch}
+				onSearch={(value) => navigate('/search?name=' + value)}
 			/>
 		</div>
 	)

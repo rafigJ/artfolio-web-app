@@ -10,6 +10,7 @@ import MainPage from '../pages/MainPage/MainPage'
 import PostPage from '../pages/PostPage/PostPage'
 import ProfilePage from '../pages/ProfilePage/ProfilePage'
 import RegisterPage from '../pages/RegisterPage/RegisterPage'
+import SearchPage from '../pages/SearchPage/SearchPage'
 
 const AppRouter = () => {
 	const { isAuth, authCredential } = useContext(AuthContext)
@@ -18,6 +19,7 @@ const AppRouter = () => {
 	return (
 		<Routes>
 			<Route index path='/' element={<MainPage />} />
+			<Route index path='/search' element={<SearchPage />} />
 			{!isAuth && <>
 				<Route path='/login' element={<LoginPage />} />
 				<Route path='/register' element={<RegisterPage />} />
@@ -27,15 +29,14 @@ const AppRouter = () => {
 			<Route path='/posts/:id' element={<PostPage />} />
 			<Route path='/profile/:username' element={<ProfilePage />} />
 			{isAuth ?
-				<>
-					<Route path='/posts/create' element={<CreatePostPage />} />
-					<Route path='/profile/edit' element={<EditProfilePage />} />
-				</>
+				<Route path='/posts/create' element={<CreatePostPage />} />
 				:
-				<>
-					<Route path='/posts/create' element={<Navigate replace to='/login' />} />
-					<Route path='/profile/edit' element={<Navigate replace to='/login' />} />
-				</>
+				<Route path='/posts/create' element={<Navigate replace to='/login' />} />
+			}
+			{isAuth ?
+				<Route path='/profile/edit' element={<EditProfilePage />} />
+				:
+				<Route path='/profile/edit' element={<Navigate replace to='/login' />} />
 			}
 			{/* {isAuth && authCredential.role === 'ADMIN' && */}
 			<Route path='/admin' element={<AdminPanelPage />} />

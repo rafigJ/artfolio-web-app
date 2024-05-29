@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react'
-import { Simulate } from 'react-dom/test-utils'
 import { BrowserRouter } from 'react-router-dom'
 import AuthService from './api/AuthService'
 import StandardLayout from './components/StandardLayout/StandardLayout'
@@ -14,9 +13,13 @@ const App: React.FC = () => {
 	const [isAuth, setIsAuth] = useState<boolean>(false)
 	
 	const [fetchUser, isError] = useFetching(async () => {
-		const response = await AuthService.userCredentials()
-		setAuthCredential({ ...response.data })
-		setIsAuth(true)
+		await AuthService.userCredentials().then((response) => {
+			setAuthCredential({ ...response.data })
+			setIsAuth(true)
+		}).catch((reason: any) => {
+				if (reason.response.status === 401) localStorage.removeItem('token')
+			}
+		)
 	})
 	
 	useEffect(() => {

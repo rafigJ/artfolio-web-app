@@ -18,4 +18,17 @@ export default class FeedService {
 		)
 	}
 	
+	static async searchFeed(name: string,
+	                        page: number = 0,
+	                        limit: number = 10): Promise<AxiosResponse<IPageResponse<PostResponse>>> {
+		return await $api.get('/feed/search', {
+				params: {
+					_page: page,
+					_limit: limit,
+					name: name
+				}
+			}
+		)
+	}
+	
 }

@@ -13,7 +13,7 @@ interface PostCardProps {
 
 const PostCard: FC<PostCardProps> = ({ post }) => {
 	const navigate = useNavigate()
-	
+
 	return (
 		<Card
 			hoverable
@@ -65,7 +65,7 @@ const PostCard: FC<PostCardProps> = ({ post }) => {
 					level={5}
 					style={{ fontSize: 24, margin: '0px 10px 30px 0px' }}
 				>
-					{post.id}
+					{post.likeCount}
 				</Typography.Title>
 				<HeartFilled
 					style={{ fontSize: '24px', color: 'red', marginTop: '7px' }}
