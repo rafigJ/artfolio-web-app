@@ -4,13 +4,15 @@ import {
 	EditOutlined,
 	EllipsisOutlined,
 	FlagFilled,
-	HeartFilled
+	HeartFilled,
+	HeartOutlined
 } from '@ant-design/icons'
-import { Avatar, Button, Divider, Dropdown, Flex, MenuProps, Skeleton, Typography } from 'antd'
-import { type CSSProperties, type FC, useEffect, useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
-import { API_URL } from '../../api'
+import { Avatar, Button, Divider, Dropdown, Flex, MenuProps, Skeleton, Typography, message } from 'antd'
+import { useContext, useEffect, useState, type CSSProperties, type FC } from 'react'
+import { Link, useNavigate, useParams } from 'react-router-dom'
+import $api, { API_URL } from '../../api'
 import PostService from '../../api/PostService'
+import { AuthContext } from '../../context'
 import { useFetching } from '../../hooks/useFetching'
 import type { FullPostResponse, Owner } from '../../types/FullPostResponse'
 import Error404Result from '../Error404Result/Error404Result'
@@ -33,14 +35,14 @@ const AuthorLinkCard: FC<AuthorLinkCardProps> = ({ owner, style }) => {
 					icon={<AntDesignOutlined />}
 				/>
 			</Link>
-			
+
 			<div style={{ display: 'flex', flexDirection: 'column' }}>
 				<Link to={`/profile/${owner?.username}`}>
 					<Typography.Title style={{ marginTop: '15px' }} level={4}>
 						{owner?.fullName}
 					</Typography.Title>
 				</Link>
-				
+
 				<Typography.Text>Воронеж, Россия</Typography.Text>
 			</div>
 		</div>
@@ -52,7 +54,44 @@ const PostContent = () => {
 	const showModal = () => {
 		setOpen(true)
 	}
-	
+	const [isLiked, setIsLiked] = useState(false)
+	const [likesCount, setLikesCount] = useState(0)
+	const { isAuth } = useContext(AuthContext)
+	const navigate = useNavigate()
+
+
+	const handleLike = async () => {
+		if (!isAuth) {
+			navigate('/login')
+			return
+		}
+		try {
+			const response = await $api.post(`posts/${post.id}/like`)
+			if (response.status === 200) {
+				setIsLiked(true)
+				setLikesCount((prevCount) => prevCount + 1)
+			}
+		} catch (error) {
+			message.error('Произошла ошибка при лайке поста')
+		}
+	}
+
+	const handleUnlike = async () => {
+		if (!isAuth) {
+			navigate('/login')
+			return
+		}
+		try {
+			const response = await $api.delete(`posts/${post.id}/like`)
+			if (response.status === 200) {
+				setIsLiked(false)
+				setLikesCount((prevCount) => prevCount - 1)
+			}
+		} catch (error) {
+			message.error('Произошла ошибка при лайке поста')
+		}
+	}
+
 	const items: MenuProps['items'] = [
 		{
 			key: '1',
@@ -72,29 +111,30 @@ const PostContent = () => {
 			danger: true
 		}
 	]
-	
+
 	const params = useParams()
 	const [post, setPost] = useState<FullPostResponse>({} as FullPostResponse)
-	
+
 	const [fetchPost, isLoading, isError, error] = useFetching(async (id) => {
 		const response = await PostService.getPostById(id)
 		setPost(response.data)
+		setLikesCount(response.data.likeCount)
 	})
-	
+
 	useEffect(() => {
 		fetchPost(params.id)
 	}, [params.id])
-	
+
 	if (isLoading) {
 		return <PostLoadingContent />
 	}
-	
+
 	if (isError) {
 		return (
 			<Error404Result />
 		)
 	}
-	
+
 	return (
 		<>
 			<ReportWindow open={open} setOpen={setOpen} />
@@ -127,9 +167,13 @@ const PostContent = () => {
 						level={3}
 						style={{ margin: '0 5px 0 0', padding: 0 }}
 					>
-						100
+						{likesCount}
 					</Typography.Title>
-					<HeartFilled style={{ fontSize: '28px', color: 'red' }} />
+					{isLiked ? (
+						<HeartFilled style={{ fontSize: '28px', color: 'red' }} onClick={handleUnlike} />
+					) : (
+						<HeartOutlined style={{ fontSize: '28px', color: 'red' }} onClick={handleLike} />
+					)}
 				</div>
 			</Flex>
 			<div>

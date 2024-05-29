@@ -1,10 +1,28 @@
 import { LockOutlined, UserOutlined } from '@ant-design/icons'
-import { Button, Form, Input, Typography } from 'antd'
+import { Button, Form, Input, Typography, message } from 'antd'
+import { useNavigate } from 'react-router-dom'
+import $api from '../../api'
 import '../LoginForm/LoginForm.css'
 
 const ForgotPasswordform = () => {
-	const onFinish = (values: any) => {
-		console.log('Received values of form: ', values)
+	const navigate = useNavigate()
+	const onFinish = async (values: any) => {
+		try {
+			const response = await $api.patch('auth/change-password', {
+				email: values.email,
+				secretWord: values.secretWord,
+				newPassword: values.newPassword,
+			})
+
+			if (response.status === 200) {
+				message.success('Пароль успешно изменен!')
+				navigate('/login')
+			} else {
+				message.error('Произошла ошибка при сбросе пароля')
+			}
+		} catch (error) {
+			message.error('Произошла ошибка при сбросе пароля')
+		}
 	}
 
 	return (
@@ -24,7 +42,11 @@ const ForgotPasswordform = () => {
 				</Typography.Title>
 				<Form.Item
 					name='email'
-					rules={[{ required: true, message: 'Введите электронную почту!' }]}
+					rules={[
+						{ required: true, message: 'Введите электронную почту!' },
+						{ type: 'email', message: 'Введите корректный адрес электронной почты!' },
+						{ max: 150, message: 'Электронная почта должна содержать не более 150 символов' }
+					]}
 				>
 					<Input
 						prefix={<UserOutlined className='site-form-item-icon' />}
@@ -44,7 +66,17 @@ const ForgotPasswordform = () => {
 
 				<Form.Item
 					name='newPassword'
-					rules={[{ required: true, message: 'Введите новый пароль!' }]}
+					rules={[
+						{ required: true, message: 'Введите новый пароль!' },
+						{
+							pattern: /^(?=.*[A-Za-z])(?=.*\d).{8,}$/,
+							message: 'Пароль должен содержать минимум 8 символов, хотя бы одну букву и цифру'
+						},
+						{
+							pattern: /^[A-Za-z\d]+$/,
+							message: 'Пароль не должен содержать служебные символы!'
+						}
+					]}
 				>
 					<Input.Password
 						prefix={<LockOutlined className='site-form-item-icon' />}

@@ -65,7 +65,7 @@ const ProfileHeader: FC<ProfileHeaderProps> = ({ profile }) => {
 				</Typography.Text>
 				{authCredential.username !== profile.username && (
 					<Button
-						style={{ margin: '5px 0' }}
+						style={{ margin: '5px 0', minWidth: '200px' }}
 						danger={userIsSubscribed}
 						type='primary'
 						onClick={userIsSubscribed ? handleUnsubscribe : handleSubscribe}
@@ -75,7 +75,7 @@ const ProfileHeader: FC<ProfileHeaderProps> = ({ profile }) => {
 				)}
 				<Button
 					href={`mailto://${profile?.email}`}
-					style={{ margin: '5px 0' }}>
+					style={{ margin: '5px 0', minWidth: '200px' }}>
 					Связаться
 				</Button>
 			</Flex>
