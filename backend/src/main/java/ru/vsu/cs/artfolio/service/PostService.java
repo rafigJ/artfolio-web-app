@@ -11,6 +11,7 @@ import ru.vsu.cs.artfolio.dto.post.PostResponseDto;
 import ru.vsu.cs.artfolio.entity.PostEntity;
 import ru.vsu.cs.artfolio.entity.UserEntity;
 
+import javax.annotation.Nullable;
 import java.util.List;
 import java.util.UUID;
 
@@ -19,7 +20,12 @@ public interface PostService {
     FullPostResponseDto createPost(UserEntity executor, PostRequestDto requestDto,
                                    List<MultipartFile> files);
 
-    FullPostResponseDto getPostById(Long id);
+    /**
+     * Получить пост по id.
+     * Для Администратора user возвращает пост, независимо от того, помечен он удаленным или нет.
+     * @param user - пользователь, который пытается получить доступ к ресурсу, null если он анонимный
+     */
+    FullPostResponseDto getPostById(@Nullable UserEntity user, Long id);
 
     /**
      * Помечает пост удаленным

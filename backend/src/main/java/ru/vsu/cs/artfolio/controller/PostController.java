@@ -56,10 +56,9 @@ public class PostController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<FullPostResponseDto> getPostById(@PathVariable("id") Long id) {
-        // todo: изменить сигнатуру метода. Если пользователь Администратор, то он может получить данные о посте
+    public ResponseEntity<FullPostResponseDto> getPostById(@PathVariable("id") Long id, @AuthenticationPrincipal User user) {
         LOGGER.info("Получение поста " + id);
-        return ResponseEntity.ok(service.getPostById(id));
+        return ResponseEntity.ok(service.getPostById(user.getUserEntity(), id));
     }
 
     @PutMapping("/{id}")
