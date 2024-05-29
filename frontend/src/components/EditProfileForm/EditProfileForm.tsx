@@ -51,6 +51,7 @@ const EditProfileForm = () => {
 		<div className='login-form-container'>
 			<Form
 				form={form}
+				style={{ marginTop: '60px' }}
 				name='edit_profile'
 				className='login-form'
 				onFinish={onFinish}
