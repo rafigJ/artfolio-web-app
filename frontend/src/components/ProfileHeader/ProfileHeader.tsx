@@ -85,6 +85,7 @@ const ProfileHeader: FC<ProfileHeaderProps> = ({ profile }) => {
 				)}
 				<Button
 					href={`mailto://${profile?.email}`}
+					onClick={() => window.ym(97163910, 'reachGoal', 'contactTo')}
 					style={{ margin: '5px 0', minWidth: '200px' }}>
 					Связаться
 				</Button>

@@ -26,6 +26,7 @@ const ProfileDescription: FC<ProfileDescriptionProps> = ({ profile }) => {
 	}
 
 	const handleExportDescription = () => {
+		window.ym(97163910, 'reachGoal', 'exportTo')
 		const docDefinition = {
 			content: [
 				{ text: 'Имя пользователя: ', bold: true },
