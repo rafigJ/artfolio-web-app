@@ -32,6 +32,7 @@ public class PostMapper {
                 .owner(owner)
                 .previewMediaName(previewMedia.name())
                 .previewType(previewMedia.contentType())
+                .deleted(false)
                 .build();
     }
 
