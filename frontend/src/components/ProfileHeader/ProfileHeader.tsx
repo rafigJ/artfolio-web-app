@@ -4,6 +4,7 @@ import { useContext, useEffect, useState, type FC } from 'react'
 import { API_URL } from '../../api'
 import $api from '../../api/index'
 
+import { useNavigate } from 'react-router-dom'
 import { AuthContext } from '../../context'
 import type { FullUserResponse } from '../../types/FullUserResponse'
 
@@ -13,8 +14,9 @@ interface ProfileHeaderProps {
 
 const ProfileHeader: FC<ProfileHeaderProps> = ({ profile }) => {
 	const [userIsSubscribed, setIsSubscribed] = useState(false)
+	const navigate = useNavigate()
 
-	const { authCredential } = useContext(AuthContext)
+	const { authCredential, isAuth } = useContext(AuthContext)
 
 	useEffect(() => {
 		// Проверка начального состояния подписки (можно добавить запрос к API для получения статуса подписки)
@@ -63,15 +65,23 @@ const ProfileHeader: FC<ProfileHeaderProps> = ({ profile }) => {
 					{`${profile?.city}, 
 					${profile?.country}`}
 				</Typography.Text>
-				{authCredential.username !== profile.username && (
+				{isAuth && authCredential.username == profile.username ? (
+					<Button
+						style={{ margin: '5px 0', minWidth: '200px' }}
+						onClick={() => navigate('/profile/edit')}
+					>
+						Редактировать профиль
+					</Button>
+				) : (
 					<Button
 						style={{ margin: '5px 0', minWidth: '200px' }}
 						danger={userIsSubscribed}
 						type='primary'
-						onClick={userIsSubscribed ? handleUnsubscribe : handleSubscribe}
+						onClick={isAuth ? (userIsSubscribed ? handleUnsubscribe : handleSubscribe) : (() => navigate('/login'))}
 					>
 						{userIsSubscribed ? 'Отписаться' : 'Подписаться'}
 					</Button>
+
 				)}
 				<Button
 					href={`mailto://${profile?.email}`}
