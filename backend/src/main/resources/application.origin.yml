@@ -2,14 +2,14 @@ spring:
   servlet:
     multipart:
       max-file-size: 11MB
-      max-request-size: 111MB
+      max-request-size: 123MB
   jpa:
     hibernate:
       ddl-auto: validate
     show-sql: false
     properties:
       hibernate:
-        format_sql: true
+        format_sql: false
   docker:
     compose:
       stop:
@@ -17,9 +17,9 @@ spring:
 application:
   security:
     jwt:
-      secret-key: 100000000000000000000000000000000000000000000a0000000000000000c1
+      secret-key: ${SPRING_APPLICATION_SECURITY_JWT_SECRETKEY}
   minio:
-    url: http://127.0.0.1:9000/
-    accessKey: minioadmin
-    secretKey: minioadmin
-    bucketName: images
+    url: ${SPRING_APPLICATION_MINIO_URL}
+    accessKey: ${SPRING_APPLICATION_MINIO_ACCESSKEY}
+    secretKey: ${SPRING_APPLICATION_MINIO_SECRETKEY}
+    bucketName: ${SPRING_APPLICATION_MINIO_BUCKETNAME}
