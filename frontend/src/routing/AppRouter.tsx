@@ -3,6 +3,7 @@ import { Navigate, Route, Routes } from 'react-router-dom'
 import { AuthContext } from '../context'
 import AdminPanelPage from '../pages/AdminPanelPage/AdminPanelPage'
 import CreatePostPage from '../pages/CreatePostPage/CreatePostPage'
+import EditProfilePage from '../pages/EditProfilePage/EditProfilePage'
 import ForgotPasswordPage from '../pages/ForgotPasswordPage/ForgotPasswordPage'
 import LoginPage from '../pages/LoginPage/LoginPage'
 import MainPage from '../pages/MainPage/MainPage'
@@ -12,8 +13,8 @@ import RegisterPage from '../pages/RegisterPage/RegisterPage'
 
 const AppRouter = () => {
 	const { isAuth, authCredential } = useContext(AuthContext)
-	
-	
+
+
 	return (
 		<Routes>
 			<Route index path='/' element={<MainPage />} />
@@ -26,9 +27,15 @@ const AppRouter = () => {
 			<Route path='/posts/:id' element={<PostPage />} />
 			<Route path='/profile/:username' element={<ProfilePage />} />
 			{isAuth ?
-				<Route path='/posts/create' element={<CreatePostPage />} />
+				<>
+					<Route path='/posts/create' element={<CreatePostPage />} />
+					<Route path='/profile/edit' element={<EditProfilePage />} />
+				</>
 				:
-				<Route path='/posts/create' element={<Navigate replace to='/login' />} />
+				<>
+					<Route path='/posts/create' element={<Navigate replace to='/login' />} />
+					<Route path='/profile/edit' element={<Navigate replace to='/login' />} />
+				</>
 			}
 			{/* {isAuth && authCredential.role === 'ADMIN' && */}
 			<Route path='/admin' element={<AdminPanelPage />} />

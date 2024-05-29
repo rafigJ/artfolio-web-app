@@ -1,9 +1,9 @@
 import type { DropdownProps, MenuProps } from 'antd'
 import { Dropdown } from 'antd'
-import './HeaderProfileMenu.css'
-import React, { type FC, useContext, useState } from 'react'
+import { useContext, useState, type FC } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { AuthContext } from '../../context'
+import './HeaderProfileMenu.css'
 
 interface HeaderProfileMenuProps {
 	src: string
@@ -13,13 +13,13 @@ const HeaderProfileMenu: FC<HeaderProfileMenuProps> = ({ src }) => {
 	const [open, setOpen] = useState(false)
 	const { setIsAuth, authCredential } = useContext(AuthContext)
 	const navigate = useNavigate()
-	
+
 	const handleMenuClick: MenuProps['onClick'] = (e) => {
 		if (e.key === '1') {
 			navigate(`/profile/${authCredential?.username}`)
 		}
 		if (e.key === '2') {
-		
+			navigate(`/profile/edit`)
 		}
 		if (e.key === '3') {
 			localStorage.removeItem('token')
@@ -28,13 +28,13 @@ const HeaderProfileMenu: FC<HeaderProfileMenuProps> = ({ src }) => {
 		}
 		setOpen(false)
 	}
-	
+
 	const handleOpenChange: DropdownProps['onOpenChange'] = (nextOpen, info) => {
 		if (info.source === 'trigger' || nextOpen) {
 			setOpen(nextOpen)
 		}
 	}
-	
+
 	const items: MenuProps['items'] = [
 		{
 			label: 'Профиль',
@@ -50,7 +50,7 @@ const HeaderProfileMenu: FC<HeaderProfileMenuProps> = ({ src }) => {
 			danger: true
 		}
 	]
-	
+
 	return (
 		<Dropdown
 			menu={{
