@@ -1,4 +1,4 @@
-export interface ReportResponce {
+export interface ReportResponse {
   id: number;
   postId: number;
   commentId?: number;

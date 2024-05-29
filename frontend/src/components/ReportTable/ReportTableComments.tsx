@@ -2,7 +2,7 @@ import { DownOutlined } from '@ant-design/icons'
 import { Button, Dropdown, MenuProps, Space, Table, TableProps } from 'antd'
 import { FC, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { ReportResponce } from '../../types/ReportResponce'
+import { ReportResponse } from '../../types/ReportResponse'
 
 
 
@@ -23,7 +23,7 @@ const ReportTableComments: FC = () => {
 		},
 	]
 
-	const columns: TableProps<ReportResponce>['columns'] = [
+	const columns: TableProps<ReportResponse>['columns'] = [
 		{
 			title: 'ID',
 			dataIndex: 'id',
@@ -99,7 +99,7 @@ const ReportTableComments: FC = () => {
 		},
 	]
 
-	const data: ReportResponce[] = [
+	const data: ReportResponse[] = [
 		{
 			id: 159,
 			postId: 33,

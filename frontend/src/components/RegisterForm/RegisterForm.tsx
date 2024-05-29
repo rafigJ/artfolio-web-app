@@ -84,7 +84,7 @@ const RegisterForm: React.FC = () => {
 			)
 		}
 	]
-	
+	// todo перенести в fetch
 	if (!isLoading && isError) {
 		message.error(`Ошибка регистрации ${error}`)
 	}
