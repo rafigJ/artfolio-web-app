@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -46,9 +47,12 @@ public class AuthenticationController {
     @GetMapping()
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<AuthResponseDto> getUserCredentials(
-            @RequestHeader String authorization,
+            @RequestHeader(required = false) String authorization,
             @AuthenticationPrincipal User user
     ) {
+        if (authorization == null) {
+            throw new AccessDeniedException("Access Denied");
+        }
         String token = authorization.substring(7);
         var userEntity = user.getUserEntity();
         return ResponseEntity.ok(

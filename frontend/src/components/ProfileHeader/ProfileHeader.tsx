@@ -1,7 +1,11 @@
 import { AntDesignOutlined } from '@ant-design/icons'
-import { Avatar, Button, Flex, Typography } from 'antd'
-import { type FC, useState } from 'react'
+import { Avatar, Button, Flex, Typography, message } from 'antd'
+import { useContext, useEffect, useState, type FC } from 'react'
 import { API_URL } from '../../api'
+import $api from '../../api/index'
+
+import { useNavigate } from 'react-router-dom'
+import { AuthContext } from '../../context'
 import type { FullUserResponse } from '../../types/FullUserResponse'
 
 interface ProfileHeaderProps {
@@ -10,7 +14,36 @@ interface ProfileHeaderProps {
 
 const ProfileHeader: FC<ProfileHeaderProps> = ({ profile }) => {
 	const [userIsSubscribed, setIsSubscribed] = useState(false)
-	
+	const navigate = useNavigate()
+
+	const { authCredential, isAuth } = useContext(AuthContext)
+
+	useEffect(() => {
+		// Проверка начального состояния подписки (можно добавить запрос к API для получения статуса подписки)
+	}, [])
+
+	const handleSubscribe = async () => {
+		try {
+			const response = await $api.post(`/user/${profile.username}/subscribes`)
+			if (response.status === 200) {
+				setIsSubscribed(true)
+			}
+		} catch (error) {
+			message.error('Произошла ошибка при подписке')
+		}
+	}
+
+	const handleUnsubscribe = async () => {
+		try {
+			const response = await $api.delete(`/user/${profile.username}/subscribes`)
+			if (response.status === 200) {
+				setIsSubscribed(false)
+			}
+		} catch (error) {
+			message.error('Произошла ошибка при отписке')
+		}
+	}
+
 	return (
 		<Flex
 			style={{
@@ -28,16 +61,34 @@ const ProfileHeader: FC<ProfileHeaderProps> = ({ profile }) => {
 			/>
 			<Flex vertical style={{ marginLeft: '15px' }}>
 				<Typography.Title level={3}>{profile?.fullName}</Typography.Title>
-				<Typography.Text>{`${profile?.city}, ${profile?.country}`}</Typography.Text>
+				<Typography.Text style={{ marginBottom: '5px' }}>
+					{`${profile?.city}, 
+					${profile?.country}`}
+				</Typography.Text>
+				{isAuth && authCredential.username == profile.username ? (
+					<Button
+						style={{ margin: '5px 0', minWidth: '200px' }}
+						onClick={() => navigate('/profile/edit')}
+					>
+						Редактировать профиль
+					</Button>
+				) : (
+					<Button
+						style={{ margin: '5px 0', minWidth: '200px' }}
+						danger={userIsSubscribed}
+						type='primary'
+						onClick={isAuth ? (userIsSubscribed ? handleUnsubscribe : handleSubscribe) : (() => navigate('/login'))}
+					>
+						{userIsSubscribed ? 'Отписаться' : 'Подписаться'}
+					</Button>
+
+				)}
 				<Button
-					style={{ margin: '10px 0' }}
-					danger={userIsSubscribed}
-					type='primary'
-					onClick={() => setIsSubscribed(!userIsSubscribed)}
-				>
-					{userIsSubscribed ? 'Отписаться' : 'Подписаться'}
+					href={`mailto://${profile?.email}`}
+					onClick={() => window.ym(97163910, 'reachGoal', 'contactTo')}
+					style={{ margin: '5px 0', minWidth: '200px' }}>
+					Связаться
 				</Button>
-				<Button href={`mailto://${profile?.email}`}>Связаться</Button>
 			</Flex>
 		</Flex>
 	)

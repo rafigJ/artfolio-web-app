@@ -16,6 +16,7 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import ru.vsu.cs.artfolio.auth.JwtService;
+import ru.vsu.cs.artfolio.exception.NotExistUserException;
 
 import java.io.IOException;
 
@@ -58,7 +59,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     SecurityContextHolder.getContext().setAuthentication(authToken);
                 }
             }
-        } catch (SignatureException | ExpiredJwtException e) {
+        } catch (SignatureException | ExpiredJwtException | NotExistUserException e) {
             request.setAttribute(JWT_EXPIRED, e.getMessage());
         } catch (RuntimeException re) {
             SecurityContextHolder.clearContext();

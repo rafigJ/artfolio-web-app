@@ -1,5 +1,44 @@
 version: '3.8'
 services:
+  backend:
+    image: artfolio-app-backend:latest # mvn -DskipTests spring-boot:build-image в помощь
+    ports:
+      - 8080:8080
+    depends_on:
+          - postgres_db
+          - minio
+    environment:
+      SERVER_PORT: 8080
+      SPRING_DATASOURCE_URL: ${DATASOURCE_URL}
+      SPRING_DATASOURCE_USERNAME: ${DATASOURCE_USERNAME}
+      SPRING_DATASOURCE_PASSWORD: ${DATASOURCE_PASSWORD}
+      SPRING_APPLICATION_SECURITY_JWT_SECRETKEY: ${JWT_SECRET_KEY}
+      SPRING_APPLICATION_MINIO_URL: http://minio:9000/
+      SPRING_APPLICATION_MINIO_ACCESSKEY: ${MINIO_ROOT_USER}
+      SPRING_APPLICATION_MINIO_SECRETKEY: ${MINIO_ROOT_PASSWORD}
+      SPRING_APPLICATION_MINIO_BUCKETNAME: ${MINIO_BUCKET_NAME}
+    restart: always
+  
+  frontend:
+    image: artfolio-app-frontend:latest
+    build:
+      context: ./frontend
+    ports: 
+      - 80:80
+    environment:
+      REACT_APP_API_URL: http://backend:8080
+      
+  postgres_db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: ${DATASOURCE_USERNAME}
+      POSTGRES_PASSWORD: ${DATASOURCE_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: always   
+    ports:
+      - 5432:5432
+  
   minio:
     image: minio/minio:RELEASE.2024-04-18T19-09-19Z.fips
     ports:
@@ -11,7 +50,7 @@ services:
       MINIO_ROOT_USER: ${MINIO_ROOT_USER}
       MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
     command: server --console-address ":9001" /data
-  
+    restart: always
   createbuckets:
     image: minio/mc:RELEASE.2023-10-24T21-42-22Z.hotfix.75d18600
     depends_on:
@@ -23,3 +62,5 @@ services:
       /usr/bin/mc anonymous set public myminio/images;
       exit 0;
       "
+volumes:
+  postgres_data:      

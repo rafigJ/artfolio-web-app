@@ -7,51 +7,58 @@ import ru.vsu.cs.artfolio.dto.post.PostRequestDto;
 import ru.vsu.cs.artfolio.dto.post.PostResponseDto;
 import ru.vsu.cs.artfolio.entity.PostEntity;
 import ru.vsu.cs.artfolio.entity.UserEntity;
+import ru.vsu.cs.artfolio.mapper.wrappers.MinioResult;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 public class PostMapper {
-    public static FullPostResponseDto toFullDto(PostEntity postEntity, List<Long> mediaIds) {
+    public static FullPostResponseDto toFullDto(PostEntity postEntity, List<Long> mediaIds, Long likeCount) {
         return FullPostResponseDto.builder()
                 .id(postEntity.getId())
                 .mediaIds(mediaIds)
                 .name(postEntity.getName())
                 .owner(UserMapper.toDto(postEntity.getOwner()))
                 .description(postEntity.getDescription())
+                .likeCount(likeCount)
                 .build();
     }
 
-    public static PostEntity toEntity(PostRequestDto post, UserEntity owner) {
+    public static PostEntity toEntity(PostRequestDto post, UserEntity owner, MinioResult previewMedia) {
         return PostEntity.builder()
                 .name(post.getName())
                 .description(post.getDescription())
                 .createTime(LocalDateTime.now())
                 .owner(owner)
+                .previewMediaName(previewMedia.name())
+                .previewType(previewMedia.contentType())
+                .deleted(false)
                 .build();
     }
 
-    public static PostResponseDto toDto(PostEntity postEntity, Long previewMediaId) {
+    /**
+     * Используется для краткой информации о публикации
+     * Количество лайков пустое, вставляется в toPageDto
+     */
+    private static PostResponseDto toDto(PostEntity postEntity) {
         return PostResponseDto.builder()
                 .id(postEntity.getId())
                 .name(postEntity.getName())
-                .previewMediaId(previewMediaId)
                 .owner(UserMapper.toDto(postEntity.getOwner()))
                 .likeCount(null)
                 .build();
     }
 
 
-    public static PageDto<PostResponseDto> toPageDto(Page<PostEntity> postEntityPage, List<Long> previewMediaIds) {
-        if (previewMediaIds.size() != postEntityPage.getContent().size()) {
-            throw new IllegalArgumentException("previewMediaIds size must be equal postEntityPage size");
+    public static PageDto<PostResponseDto> toPageDto(Page<PostEntity> postEntityPage, List<Long> likeCounts) {
+        if (postEntityPage.getContent().size() != likeCounts.size()) {
+            throw new IllegalArgumentException("postEntityPage.content size is not equal likeCount size");
         }
-        List<PostEntity> postEntityList = postEntityPage.getContent();
-        List<PostResponseDto> mappedPosts = new ArrayList<>();
-        for (int i = 0; i < postEntityList.size(); i++) {
-            mappedPosts.add(toDto(postEntityList.get(i), previewMediaIds.get(i)));
+        List<PostResponseDto> postResponseDto = postEntityPage.getContent().stream().map(PostMapper::toDto).toList();
+        for (int i = 0; i < likeCounts.size(); i++) {
+            Long likeCount = likeCounts.get(i);
+            postResponseDto.get(i).setLikeCount(likeCount == null ? 0L : likeCount);
         }
-        return new PageDto<>(mappedPosts, postEntityPage.getTotalElements(), postEntityPage.getTotalPages());
+        return new PageDto<>(postResponseDto, postEntityPage.getTotalElements(), postEntityPage.getTotalPages());
     }
 }

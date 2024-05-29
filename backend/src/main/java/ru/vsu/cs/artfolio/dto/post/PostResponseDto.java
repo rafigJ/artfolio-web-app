@@ -21,9 +21,6 @@ public final class PostResponseDto {
     @NonNull
     private String name;
 
-    @NonNull
-    private Long previewMediaId;
-
     private Long likeCount;
 
     @NonNull

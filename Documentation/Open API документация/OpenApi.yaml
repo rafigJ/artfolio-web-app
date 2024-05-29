@@ -6,7 +6,7 @@ info:
     url: https://www.apache.org/licenses/LICENSE-2.0.html
   version: 0.0.1
 servers:
-  - url: http://localhost/
+  - url: http://localhost:8080
 tags:
   - name: auth
     description: Регистрация, Авторизация, Сброс пароля
@@ -37,6 +37,9 @@ paths:
           multipart/form-data:
             schema:
               $ref: '#/components/schemas/PostRequest'
+            encoding:
+              post:
+                contentType: application/json
         required: true
       responses:
         '200':
@@ -96,6 +99,9 @@ paths:
           multipart/form-data:
             schema:
               $ref: '#/components/schemas/PostRequest'
+            encoding:
+              post:
+                contentType: application/json
         required: true
       responses:
         '200':
@@ -135,6 +141,7 @@ paths:
                 $ref: '#/components/schemas/Error'
       security:
         - bearerAuth: [ ]
+
   # like post
   /api/v1/posts/{postId}/like:
     post:
@@ -152,6 +159,10 @@ paths:
       responses:
         '200':
           description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostLikeResponse'
         default:
           description: Error
           content:
@@ -175,6 +186,10 @@ paths:
       responses:
         '200':
           description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostLikeResponse'
         default:
           description: Error
           content:
@@ -183,6 +198,40 @@ paths:
                 $ref: '#/components/schemas/Error'
       security:
         - bearerAuth: [ ]
+  # get preview post
+  /api/v1/posts/{postId}/preview:
+    get:
+      tags:
+        - posts
+      summary: Получить превью поста
+      description: Позволяет получить сжатое превью публикации
+      parameters:
+        - name: postId
+          in: path
+          required: true
+          schema:
+            type: integer
+      operationId: getPreviewMediaByPostId
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            image/jpg:
+              schema:
+                type: string
+                format: binary
+            image/png:
+              schema:
+                type: string
+                format: binary
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  # get full media by id
   /api/v1/posts/medias/{mediaId}:
     get:
       tags:
@@ -213,6 +262,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+
   # comment post
   /api/v1/posts/{postId}/comments:
     get:
@@ -411,6 +461,9 @@ paths:
           multipart/form-data:
             schema:
               $ref: '#/components/schemas/UserUpdateRequest'
+            encoding:
+              userInfo:
+                contentType: application/json
         required: true
       responses:
         '200':
@@ -662,8 +715,8 @@ paths:
           schema:
             type: string
             enum:
-              - post
-              - comment
+              - POST
+              - COMMENT
         - name: _page
           description: Номер страницы (отчет от 0)
           in: query
@@ -683,9 +736,9 @@ paths:
           schema:
             type: string
             enum:
-              - all
-              - 'true'
-              - 'false'
+              - ALL
+              - 'TRUE'
+              - 'FALSE'
       responses:
         '200':
           description: Successful operation
@@ -705,13 +758,13 @@ paths:
                 $ref: '#/components/schemas/Error'
       security:
         - bearerAuth: [ ]
-  /api/v1/reports/{reportId}:
+  /api/v1/reports/posts/{reportId}:
     patch:
       tags:
         - reports
       summary: Отметить жалобу рассмотренной или не рассмотренной (Доступно только администраторам)
       description: Позволяет администратору отметить жалобу рассмотренной или не рассмотренной
-      operationId: setReviewedReport
+      operationId: setPostReviewedReport
       parameters:
         - name: reportId
           in: path
@@ -735,11 +788,9 @@ paths:
             application/json:
               schema:
                 type: array
-                description: Страница из жалоб на посты или на комментарии
+                description: Страница из жалоб на посты
                 items:
-                  oneOf:
-                    - $ref: '#/components/schemas/PostReportResponse'
-                    - $ref: '#/components/schemas/CommentReportResponse'
+                  $ref: '#/components/schemas/PostReportResponse'
         default:
           description: Error
           content:
@@ -748,7 +799,47 @@ paths:
                 $ref: '#/components/schemas/Error'
       security:
         - bearerAuth: [ ]
-  /api/v1/posts/{postId}/reports:
+  /api/v1/reports/comments/{reportId}:
+    patch:
+      tags:
+        - reports
+      summary: Отметить жалобу рассмотренной или не рассмотренной (Доступно только администраторам)
+      description: Позволяет администратору отметить жалобу рассмотренной или не рассмотренной
+      operationId: setCommentReviewedReport
+      parameters:
+        - name: reportId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                reviewed:
+                  type: boolean
+                  example: true
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommentReportResponse'
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      security:
+        - bearerAuth: [ ]
+
+
+  /api/v1/reports/posts/{postId}:
     post:
       tags:
         - reports
@@ -782,7 +873,7 @@ paths:
                 $ref: '#/components/schemas/Error'
       security:
         - bearerAuth: [ ]
-  /api/v1/comments/{commentId}/reports:
+  /api/v1/reports/comments/{commentId}:
     post:
       tags:
         - reports
@@ -816,8 +907,8 @@ paths:
                 $ref: '#/components/schemas/Error'
       security:
         - bearerAuth: [ ]
-  
-  
+
+
   # auth
   /api/v1/auth:
     get:
@@ -882,6 +973,9 @@ paths:
           multipart/form-data:
             schema:
               $ref: '#/components/schemas/RegisterRequest'
+            encoding:
+              userInfo:
+                contentType: application/json
         required: true
       responses:
         '200':
@@ -1037,9 +1131,17 @@ components:
           type: integer
           example: 39
         previewMedia:
+          deprecated: true
           type: integer
           example: 949
-          description: id на превьюшку изображения
+          description: id на превьюшку изображения (DEPRECATED) использовать отдельный endpoint {postId}/preview
+        mediaIds:
+          type: array
+          maxItems: 10
+          items:
+            type: integer
+          example: [1, 3, 23, 29, 34]
+          description: идентификаторы медиа, которые доступны в medias
         owner:
           $ref: '#/components/schemas/UserResponse'
     PostResponse:
@@ -1055,9 +1157,10 @@ components:
           type: integer
           example: 39
         previewMedia:
+          deprecated: true
           type: integer
           example: 949
-          description: id на превьюшку изображения
+          description: id на превьюшку изображения (DEPRECATED) использовать отдельный endpoint {postId}/preview
         owner:
           $ref: '#/components/schemas/UserResponse'
     PostsPage:
@@ -1226,6 +1329,10 @@ components:
         reviewed:
           type: boolean
           example: false
+        createTime:
+          type: string
+          example: 2024-03-23 12:00
+          format: yyyy-MM-dd HH:mm
         targetUser:
           $ref: '#/components/schemas/UserResponse'
         sender:
@@ -1243,6 +1350,16 @@ components:
         totalPages:
           type: integer
           example: 10
+    PostLikeResponse:
+      type: object
+      properties:
+        postId:
+          type: integer
+          example: 1
+        likeCount:
+          type: integer
+          example: 10
+          description: Обновленное количество лайков после операции
     # comment report
     CommentReportRequest:
       type: object
@@ -1271,9 +1388,13 @@ components:
         reviewed:
           type: boolean
           example: false
+        createTime:
+          type: string
+          example: 2024-03-23 12:00
+          format: yyyy-MM-dd HH:mm
         targetUser:
           $ref: '#/components/schemas/UserResponse'
-        sendler:
+        sender:
           $ref: '#/components/schemas/UserResponse'
     CommentReportPage:
       type: object
