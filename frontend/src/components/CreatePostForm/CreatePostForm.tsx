@@ -28,9 +28,9 @@ const CreatePostForm = () => {
 			'Погрузитесь в уникальные проекты, эксперименты с цветом, текстурой и формой, ' +
 			'и вдохновляйтесь новыми идеями, которые заставят вас увидеть мир в ином свете.'
 	})
-	
+
 	const [fileList, setFileList] = useState<UploadFile[]>([])
-	
+
 	const [createPost, isLoading] = useFetching(async (post: PostRequest, files: File[]) => {
 		await PostService.createPost(post, files)
 			.then(r => {
@@ -40,24 +40,25 @@ const CreatePostForm = () => {
 				message.error(`Ошибка создания публикации ${e}`)
 			})
 	})
-	
-	
+
+
 	const onFinish = (values: PostRequest) => {
+		window.ym(97163910, 'reachGoal', 'createSuccess')
 		if (fileList.length === 0) {
 			message.error('Должна быть загружена хотя бы одна фотография')
 			return
 		}
 		createPost(values, fileList.map(e => e?.originFileObj as File))
 	}
-	
+
 	const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setPost({ ...post, title: e.target.value })
 	}
-	
+
 	const handleDescriptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
 		setPost({ ...post, description: e.target.value })
 	}
-	
+
 	return (
 		<Flex justify='space-around' align='flex-start'>
 			<div style={{ width: '50%' }}>

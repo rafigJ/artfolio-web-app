@@ -1,5 +1,5 @@
-import { useContext } from 'react'
-import { Navigate, Route, Routes } from 'react-router-dom'
+import { useContext, useEffect } from 'react'
+import { Navigate, Route, Routes, useLocation } from 'react-router-dom'
 import { AuthContext } from '../context'
 import AdminPanelPage from '../pages/AdminPanelPage/AdminPanelPage'
 import CreatePostPage from '../pages/CreatePostPage/CreatePostPage'
@@ -14,6 +14,14 @@ import SearchPage from '../pages/SearchPage/SearchPage'
 
 const AppRouter = () => {
 	const { isAuth, authCredential } = useContext(AuthContext)
+
+	const location = useLocation()
+
+	useEffect(() => {
+		if (typeof window.ym === 'function') {
+			window.ym(97163910, 'hit', location.pathname)
+		}
+	}, [location])
 
 
 	return (
