@@ -1,13 +1,33 @@
 import { EnvironmentOutlined, MailOutlined, UserOutlined } from '@ant-design/icons'
 import { Button, Form, Input, Typography, UploadFile, message } from 'antd'
-import { useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import UserService from '../../api/UserService'
+import { AuthContext } from '../../context'
+import { useFetching } from '../../hooks/useFetching'
 import { EditProfileRequest } from '../../types/EditProfileRequest'
+import { FullUserResponse } from '../../types/FullUserResponse'
 import '../LoginForm/LoginForm.css'
 import RegisterFormAvatarUpload from '../RegisterFormAvatarUpload/RegisterFormAvatarUpload'
 
 const EditProfileForm = () => {
 	const [avatar, setAvatar] = useState<UploadFile[]>([] as UploadFile[])
+	const [form] = Form.useForm()
+
+	const { authCredential } = useContext(AuthContext)
+	const [profile, setProfile] = useState<FullUserResponse>({} as FullUserResponse)
+
+	const [fetchUser, isLoading, isError, error] = useFetching(async (username) => {
+		const response = await UserService.getUserByUsername(username)
+		setProfile(response.data)
+	})
+
+	useEffect(() => {
+		fetchUser(authCredential.username)
+	}, [authCredential.username])
+
+	useEffect(() => {
+		form.setFieldsValue(profile)
+	}, [profile, form])
 
 	const onFinish = async (values: any) => {
 		if (!avatar.length) {
@@ -18,16 +38,12 @@ const EditProfileForm = () => {
 		UserService.editUserProfile(editProfileRequest, avatar.pop()?.originFileObj)
 	}
 
-	const handleAvatarChange = (info: any) => {
-		setAvatar(info)
-	}
-
 	return (
 		<div className='login-form-container'>
 			<Form
+				form={form}
 				name='edit_profile'
 				className='login-form'
-				initialValues={{ remember: true }}
 				onFinish={onFinish}
 			>
 				<Typography.Title
@@ -58,7 +74,8 @@ const EditProfileForm = () => {
 						{ required: true, message: 'Введите имя!' },
 						{ min: 3, message: 'Имя должно быть не меньше 3 символов!' },
 						{ max: 40, message: 'Имя должно содержать не более 40 символов' }
-					]}>
+					]}
+				>
 					<Input
 						prefix={<UserOutlined className='site-form-item-icon' />}
 						placeholder='Полное имя'
@@ -82,7 +99,8 @@ const EditProfileForm = () => {
 				<Form.Item name='country'
 					rules={[
 						{ max: 40, message: 'Название страны должно содержать не более 40 символов' }
-					]}>
+					]}
+				>
 					<Input
 						prefix={<EnvironmentOutlined className='site-form-item-icon' />}
 						placeholder='Страна'
@@ -92,7 +110,8 @@ const EditProfileForm = () => {
 				<Form.Item name='city'
 					rules={[
 						{ max: 40, message: 'Название города должно содержать не более 40 символов' }
-					]}>
+					]}
+				>
 					<Input
 						prefix={<EnvironmentOutlined className='site-form-item-icon' />}
 						placeholder='Город'
@@ -102,7 +121,8 @@ const EditProfileForm = () => {
 				<Form.Item name='description'
 					rules={[
 						{ max: 400, message: 'Описание профиля должно содержать не более 400 символов' }
-					]}>
+					]}
+				>
 					<Input.TextArea placeholder='Описание профиля' rows={4} />
 				</Form.Item>
 
