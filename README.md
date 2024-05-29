@@ -2,9 +2,9 @@
 **Проект "Онлайн-платформа для создания и управления портфолио для художников, дизайнеров и фотографов. Artfolio"**
 
 Выполняют студенты группы:
-- [Джаббаров Рафиг](https://github.com/rafigJ)
-- [Балык Иван](https://github.com/ivan01239)
-- [Сторожук Михаил](https://github.com/Night-Beetle)
+- [Джаббаров Рафиг](https://github.com/rafigJ) - Тимлид команды, backend разработчик
+- [Балык Иван](https://github.com/ivan01239) - Бизнес-аналитик, frontend разработчик
+- [Сторожук Михаил](https://github.com/Night-Beetle) - Дизайнер, технический писатель
 
 ## Сервисы
 
@@ -19,9 +19,25 @@
 
 [Оформительские задачи](https://github.com/rafigJ/artfolio-web-app/blob/master/Documentation/%D0%9E%D1%84%D0%BE%D1%80%D0%BC%D0%B8%D1%82%D0%B5%D0%BB%D1%8C%D1%81%D0%BA%D0%B8%D0%B5%20%D0%B7%D0%B0%D0%B4%D0%B0%D1%87%D0%B8/%D0%9E%D1%84%D0%BE%D1%80%D0%BC%D0%B8%D1%82%D0%B5%D0%BB%D1%8C%D1%81%D0%BA%D0%B8%D0%B5%20%D0%B7%D0%B0%D0%B4%D0%B0%D1%87%D0%B8%20(%D1%86).jpg)
 
+[Курсовой проект](https://github.com/rafigJ/artfolio-web-app/blob/master/Documentation/%D0%9A%D1%83%D1%80%D1%81%D0%BE%D0%B2%D0%BE%D0%B9%20%D0%BF%D1%80%D0%BE%D0%B5%D0%BA%D1%82/%D0%9A%D1%83%D1%80%D1%81%D0%BE%D0%B2%D0%BE%D0%B9%20%D0%BF%D1%80%D0%BE%D0%B5%D0%BA%D1%82.pdf)
+
 ## Видео
 [Видеопрезентация 1 аттестация](https://drive.google.com/drive/folders/1AvF7BeIEMuA4yHOka8-E2L98p2-NjuXV?usp=sharing)  
 
 [Видеопрезентация 2 аттестация](https://drive.google.com/drive/folders/1DuKxSM86_SpR4zm6mDNsHY-F-5rVUJjQ?usp=sharing)
 
 [Видеодемонстрация экранов 2 аттестация](https://drive.google.com/file/d/1XPzvDkrKQy9Lxy4fbOVKVUbzqQrX0jv9/view?usp=sharing)
+
+[Видеопрезентация Защита](https://drive.google.com/drive/folders/1588rl638kQ7oWBYgDIIZ9sM31hZNdnHD)
+
+
+## Данные для демонстрации работы
+Необходимо перейти по ссылке [ARTFOLIO](http://79.174.93.30/) и авторизоваться
+Учетные данные:
+
+- Пользователь:
+	Логин (email): gosling@gmail.com
+	Пароль: somePassword1C
+	Секретное слово: someSecret
+
+- Администратор: Позже добавим
