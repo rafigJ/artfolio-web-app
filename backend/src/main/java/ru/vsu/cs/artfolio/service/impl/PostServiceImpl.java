@@ -28,7 +28,6 @@ import ru.vsu.cs.artfolio.mapper.PostMapper;
 import ru.vsu.cs.artfolio.mapper.wrappers.MinioResult;
 import ru.vsu.cs.artfolio.repository.MediaRepository;
 import ru.vsu.cs.artfolio.repository.PostRepository;
-import ru.vsu.cs.artfolio.repository.UserRepository;
 import ru.vsu.cs.artfolio.service.LikeService;
 import ru.vsu.cs.artfolio.service.PostService;
 
@@ -46,22 +45,20 @@ public class PostServiceImpl implements PostService {
     private final LikeService likeService;
 
     private final PostRepository postRepository;
-    private final UserRepository userRepository;
     private final MediaRepository mediaRepository;
 
     @Override
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public FullPostResponseDto createPost(UUID userId,
+    public FullPostResponseDto createPost(UserEntity executor,
                                           PostRequestDto requestDto,
                                           List<MultipartFile> files) {
-        LOGGER.info("Получение следующих данных {}, {} для сохранения", userId, requestDto);
-        UserEntity ownerEntity = userRepository.getReferenceById(userId);
+        LOGGER.info("Получение следующих данных {}, {} для сохранения", executor.getUuid(), requestDto);
         if (files.isEmpty()) {
             throw new BadRequestException("Multipart files must have min one file");
         }
 
         MultipartFile file = files.get(0);
-        PostEntity post = PostMapper.toEntity(requestDto, ownerEntity, minioService.uploadPreviewFile(file));
+        PostEntity post = PostMapper.toEntity(requestDto, executor, minioService.uploadPreviewFile(file));
 
         LOGGER.info("Сохранение поста");
         PostEntity createdPost = postRepository.save(post);
@@ -75,22 +72,21 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public FullPostResponseDto getPostById(Long id) {
+    public FullPostResponseDto getPostById(UserEntity user, Long id) {
         PostEntity postEntity = postRepository.findById(id)
+                .filter(post -> user.getRole() == Role.ADMIN || !post.getDeleted())
                 .orElseThrow(() -> new NotFoundException("Post by id: " + id + " not found"));
         List<Long> mediaIds = postEntity.getMedias().stream().sorted(Comparator.comparingInt(MediaFileEntity::getPosition)).map(MediaFileEntity::getId).toList();
         return PostMapper.toFullDto(postEntity, mediaIds, likeService.getLikeCount(id));
     }
 
     @Override
-    public void deletePost(UUID userId, Long id) {
-        UserEntity executor = userRepository.getReferenceById(userId);
+    public void deletePost(UserEntity executor, Long id) {
         PostEntity post = postRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Post by id: " + id + " not found"));
-        if (post.getOwner().getUuid().equals(userId) || executor.getRole() == Role.ADMIN) {
-            List<String> fileNames = post.getMedias().stream().map(MediaFileEntity::getFileName).toList();
-            minioService.deleteFiles(fileNames);
-            postRepository.delete(post);
+        if (post.getOwner().getUuid().equals(executor.getUuid()) || executor.getRole() == Role.ADMIN) {
+            post.setDeleted(true);
+            postRepository.save(post);
         } else {
             throw new RestException("Insufficient rights to delete", HttpStatus.UNAUTHORIZED);
         }
@@ -98,20 +94,19 @@ public class PostServiceImpl implements PostService {
 
     @Override
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public FullPostResponseDto updatePost(UUID userId, Long id, PostRequestDto requestDto, List<MultipartFile> files) {
-        LOGGER.info("Получение следующих данных {}, {}, {} для обновления", userId, id, requestDto);
+    public FullPostResponseDto updatePost(UserEntity executor, Long id, PostRequestDto requestDto, List<MultipartFile> files) {
+        LOGGER.info("Получение следующих данных {}, {}, {} для обновления", executor.getUuid(), id, requestDto);
 
         PostEntity postToUpdate = postRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Post by id: " + id + " not found"));
 
-        if (!postToUpdate.getOwner().getUuid().equals(userId)) {
+        if (!postToUpdate.getOwner().getUuid().equals(executor.getUuid())) {
             LOGGER.warn("Insufficient rights to update post");
             throw new RestException("Insufficient rights to update post", HttpStatus.UNAUTHORIZED);
         }
 
-        UserEntity ownerEntity = userRepository.getReferenceById(userId);
         MultipartFile file = files.get(0);
-        PostEntity newPost = PostMapper.toEntity(requestDto, ownerEntity, minioService.uploadPreviewFile(file));
+        PostEntity newPost = PostMapper.toEntity(requestDto, executor, minioService.uploadPreviewFile(file));
         newPost.setId(id);
 
         List<String> fileNames = postToUpdate.getMedias().stream().map(MediaFileEntity::getFileName).toList();
@@ -143,7 +138,7 @@ public class PostServiceImpl implements PostService {
     @Override
     public Long likePost(UUID userId, Long postId) {
         if (!postRepository.existsById(postId)) {
-            throw new NotFoundException("post by id: " + postId + " not found");
+            throw new NotFoundException("Post by id: " + postId + " not found");
         }
         likeService.createLike(userId, postId);
         return likeService.getLikeCount(postId);
@@ -152,17 +147,12 @@ public class PostServiceImpl implements PostService {
     @Override
     public Long deleteLikeFromPost(UUID userId, Long postId) {
         if (!postRepository.existsById(postId)) {
-            throw new NotFoundException("post by id: " + postId + " not found");
+            throw new NotFoundException("Post by id: " + postId + " not found");
         }
         likeService.deleteLike(userId, postId);
         return likeService.getLikeCount(postId);
     }
 
-    @Override
-    public void sendReportToPost(UUID userId, Long postId, String reasonText) {
-        // TODO implement
-        throw new UnsupportedOperationException();
-    }
 
     @Override
     public MediaDto getMediaById(Long mediaId) {

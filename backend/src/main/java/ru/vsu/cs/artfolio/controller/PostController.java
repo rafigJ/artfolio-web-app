@@ -50,16 +50,15 @@ public class PostController {
             @AuthenticationPrincipal User user,
             @RequestPart("post") @Valid PostRequestDto post,
             @RequestPart("file") List<MultipartFile> listFiles) {
-
         LOGGER.info("Пользователь {} сохраняет пост {}", user.getUsername(), post);
-        var createdPost = service.createPost(user.getUserEntity().getUuid(), post, listFiles);
+        var createdPost = service.createPost(user.getUserEntity(), post, listFiles);
         return ResponseEntity.ok(createdPost);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<FullPostResponseDto> getPostById(@PathVariable("id") Long id) {
+    public ResponseEntity<FullPostResponseDto> getPostById(@PathVariable("id") Long id, @AuthenticationPrincipal User user) {
         LOGGER.info("Получение поста " + id);
-        return ResponseEntity.ok(service.getPostById(id));
+        return ResponseEntity.ok(service.getPostById(user.getUserEntity(), id));
     }
 
     @PutMapping("/{id}")
@@ -71,7 +70,7 @@ public class PostController {
             @RequestPart("file") List<MultipartFile> listFiles) {
 
         LOGGER.info("Пользователь {} обновляет пост {}", user.getUsername(), post);
-        var updatedPost = service.updatePost(user.getUserEntity().getUuid(), id, post, listFiles);
+        var updatedPost = service.updatePost(user.getUserEntity(), id, post, listFiles);
         return ResponseEntity.ok(updatedPost);
     }
 
@@ -81,7 +80,7 @@ public class PostController {
             @PathVariable("id") Long id,
             @AuthenticationPrincipal User user) {
         LOGGER.info("Пользователь {} удаляет пост с идентификатором {}", user.getUsername(), id);
-        service.deletePost(user.getUserEntity().getUuid(), id);
+        service.deletePost(user.getUserEntity(), id);
         return ResponseEntity.ok("post " + id + " is deleted");
     }
 

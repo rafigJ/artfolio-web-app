@@ -1,4 +1,4 @@
-package ru.vsu.cs.artfolio.entity;
+package ru.vsu.cs.artfolio.entity.report;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -14,6 +14,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import ru.vsu.cs.artfolio.entity.PostEntity;
+import ru.vsu.cs.artfolio.entity.UserEntity;
 
 import java.time.LocalDateTime;
 
@@ -23,26 +25,28 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "comment", schema = "artfolio")
-public class CommentEntity {
+@Table(name = "post_report", schema = "artfolio")
+public class PostReportEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "user_uuid")
-    private UserEntity user;
+    @JoinColumn(name = "sender_uuid", nullable = false)
+    private UserEntity sender;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "post_id")
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "post_id", nullable = false)
     private PostEntity post;
 
-    private String comment;
+    @Column(name = "reason", nullable = false)
+    private String reason;
+
+    @Column(name = "reviewed")
+    private Boolean reviewed;
 
     @Column(name = "create_time")
     private LocalDateTime createTime;
 
-    @Column(name = "deleted")
-    private Boolean deleted;
 }
