@@ -30,6 +30,7 @@
 
 [Видеопрезентация Защита](https://drive.google.com/drive/folders/1588rl638kQ7oWBYgDIIZ9sM31hZNdnHD)
 
+[Видео про backend и деплой](https://drive.google.com/drive/folders/1-Jy6gHRVGVeQtqDWyh5TVf8tAm-mRTiH)
 
 ## Данные для демонстрации работы
 Необходимо перейти по ссылке [ARTFOLIO](http://79.174.93.30/) и авторизоваться
