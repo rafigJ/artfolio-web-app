@@ -32,6 +32,8 @@
 
 [Видео про backend и деплой](https://drive.google.com/drive/folders/1-Jy6gHRVGVeQtqDWyh5TVf8tAm-mRTiH)
 
+[Видео про frontend](https://drive.google.com/file/d/155br7Oeayg19s9O6u7_A62-I1gpAoaMb/view?usp=sharing)
+
 ## Данные для демонстрации работы
 Необходимо перейти по ссылке [ARTFOLIO](http://79.174.93.30/) и авторизоваться
 
