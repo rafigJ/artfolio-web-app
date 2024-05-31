@@ -73,9 +73,15 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public FullPostResponseDto getPostById(UserEntity user, Long id) {
-        PostEntity postEntity = postRepository.findById(id)
-                .filter(post -> user.getRole() == Role.ADMIN || !post.getDeleted())
-                .orElseThrow(() -> new NotFoundException("Post by id: " + id + " not found"));
+        PostEntity postEntity;
+        if (user != null && user.getRole().equals(Role.ADMIN)) {
+            postEntity = postRepository.findById(id)
+                    .orElseThrow(() -> new NotFoundException("Post by id: " + id + " not found"));
+        } else {
+            postEntity = postRepository.findById(id)
+                    .filter(p -> !p.getDeleted())
+                    .orElseThrow(() -> new NotFoundException("Post by id: " + id + " not found"));
+        }
         List<Long> mediaIds = postEntity.getMedias().stream().sorted(Comparator.comparingInt(MediaFileEntity::getPosition)).map(MediaFileEntity::getId).toList();
         return PostMapper.toFullDto(postEntity, mediaIds, likeService.getLikeCount(id));
     }

@@ -29,6 +29,7 @@ import ru.vsu.cs.artfolio.dto.comment.CommentRequestDto;
 import ru.vsu.cs.artfolio.dto.comment.CommentResponseDto;
 import ru.vsu.cs.artfolio.dto.post.FullPostResponseDto;
 import ru.vsu.cs.artfolio.dto.post.PostRequestDto;
+import ru.vsu.cs.artfolio.entity.UserEntity;
 import ru.vsu.cs.artfolio.service.CommentService;
 import ru.vsu.cs.artfolio.service.PostService;
 
@@ -58,7 +59,8 @@ public class PostController {
     @GetMapping("/{id}")
     public ResponseEntity<FullPostResponseDto> getPostById(@PathVariable("id") Long id, @AuthenticationPrincipal User user) {
         LOGGER.info("Получение поста " + id);
-        return ResponseEntity.ok(service.getPostById(user.getUserEntity(), id));
+        UserEntity userEntity = user != null ? user.getUserEntity() : null;
+        return ResponseEntity.ok(service.getPostById(userEntity, id));
     }
 
     @PutMapping("/{id}")
