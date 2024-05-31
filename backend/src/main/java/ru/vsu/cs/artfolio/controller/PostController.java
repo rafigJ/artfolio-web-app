@@ -83,7 +83,7 @@ public class PostController {
             @AuthenticationPrincipal User user) {
         LOGGER.info("Пользователь {} удаляет пост с идентификатором {}", user.getUsername(), id);
         service.deletePost(user.getUserEntity(), id);
-        return ResponseEntity.ok("post " + id + " is deleted");
+        return ResponseEntity.ok("{\"message\": \"post " + id + " is deleted\"}");
     }
 
     @PostMapping("/{id}/like")

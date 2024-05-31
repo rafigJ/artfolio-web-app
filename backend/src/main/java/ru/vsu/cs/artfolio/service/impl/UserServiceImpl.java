@@ -45,6 +45,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void deleteUser(UUID executorId, String username) {
+        // todo soft delete
         if (userRepository.getReferenceById(executorId).getRole() == Role.ADMIN) {
             userRepository.removeByUsername(username);
         } else {

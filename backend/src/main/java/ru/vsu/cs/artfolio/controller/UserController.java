@@ -57,7 +57,7 @@ public class UserController {
                                                   @PathVariable("username") String username) {
         LOGGER.info("Удаление пользователя {}", username);
         service.deleteUser(user.getUserEntity().getUuid(), username);
-        return ResponseEntity.ok("Пользователь " + username + " удален");
+        return ResponseEntity.ok("{\"message\": \"user " + username + " is deleted\"}");
     }
 
     @GetMapping("/{username}/avatar")
