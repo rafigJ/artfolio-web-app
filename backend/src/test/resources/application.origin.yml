@@ -1,0 +1,25 @@
+spring:
+  datasource:
+    url: jdbc:tc:postgresql:16:///artfolio?TC_DAEMON=true
+    username: artfolio
+    password: artfolio
+  servlet:
+    multipart:
+      max-file-size: 11MB
+      max-request-size: 123MB
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: false
+application:
+  security:
+    jwt:
+      secret-key: 100000000000000000000000000000000000000000000a0000000000000000c1
+  minio:
+    url: http://localhost:9000/
+    accessKey: minioadmin
+    secretKey: minioadmin
+    bucketName: images

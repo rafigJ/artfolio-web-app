@@ -23,7 +23,7 @@ public interface PostService {
     /**
      * Получить пост по id.
      * Для Администратора user возвращает пост, независимо от того, помечен он удаленным или нет.
-     * @param user - пользователь, который пытается получить доступ к ресурсу, null если он анонимный
+     * @param user пользователь, который пытается получить доступ к ресурсу, null если он анонимный
      */
     FullPostResponseDto getPostById(@Nullable UserEntity user, Long id);
 

@@ -24,7 +24,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 
-@Sql("/sql/some_controller/test_data.sql")
+@Sql("/sql/post_service/test_data.sql")
 @Testcontainers
 @SpringBootTest
 @AutoConfigureMockMvc(printOnlyOnFailure = false)
