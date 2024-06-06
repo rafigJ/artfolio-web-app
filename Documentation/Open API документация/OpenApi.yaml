@@ -1130,11 +1130,10 @@ components:
         likeCount:
           type: integer
           example: 39
-        previewMedia:
-          deprecated: true
-          type: integer
-          example: 949
-          description: id на превьюшку изображения (DEPRECATED) использовать отдельный endpoint {postId}/preview
+        hasLike:
+          type: boolean
+          example: false
+          description: Поставлен ли лайк, пользователя, который получает пост (null, если неавторизован)
         mediaIds:
           type: array
           maxItems: 10
@@ -1227,23 +1226,20 @@ components:
           properties:
             fullName:
               type: string
-              example: Рамси Болтон
+              example: Обновленный Ramsey
             description:
               type: string
               example: Родился я бастардом на Севере России города Уфа. С раннего детства отец приучал меня к Искусству. Пока я новичок в этом деле. Надеюсь вам понравятся мои работы.
             country:
               type: string
-              example: Россия
+              example: Вестерос
             city:
               type: string
-              example: Уфа
+              example: Север
             username:
               type: string
-              example: boltonArts
-            email:
-              type: string
-              example: bolton@vesteros.com
-          description: Данные пользователя в формате JSON
+              example: newBoltonArts
+          description: Данные пользователя для обновления в формате JSON
         avatarFile:
           type: string
           format: binary
@@ -1275,10 +1271,18 @@ components:
         subscribersCount:
           type: integer
           example: 3
-          description: Количество подписчиков
+          description: Количество подписчиков (тех, кто подписан на него)
+        followingCount:
+          type: integer
+          example: 5
+          description: Количество собственных подписок пользователя
         likeCount:
           type: integer
           example: 499
+        isFollowed:
+          type: boolean
+          example: false
+          description: Подписан ли пользователь (null если не авторизован)
     UserResponse:
       type: object
       properties:
