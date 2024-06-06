@@ -76,7 +76,8 @@ public class UserController {
     public ResponseEntity<PageDto<PostResponseDto>> getPostsByUsername(@RequestParam(value = "_page", defaultValue = "0") Integer page,
                                                                        @RequestParam(value = "_limit", defaultValue = "10") Integer limit,
                                                                        @PathVariable("username") String username) {
-        throw new UnsupportedOperationException();
+        var posts = service.getPostsPageByUsername(username, PageRequest.of(page, limit));
+        return ResponseEntity.ok(posts);
     }
 
     @GetMapping("/{username}/subscribes")
@@ -96,7 +97,7 @@ public class UserController {
     @DeleteMapping("/{username}/subscribes")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<String> deleteSubscribe(@PathVariable("username") String username, @AuthenticationPrincipal User user) {
-        service.deleteSubscribe(user.getUserEntity().getUuid(), username);
+        service.deleteSubscribe(user.getUserEntity(), username);
         return ResponseEntity.ok("{\"message\": \"delete subscribe from " + username + "\"}");
     }
 

@@ -5,7 +5,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import ru.vsu.cs.artfolio.auth.user.Role;
 import ru.vsu.cs.artfolio.dto.PageDto;
 import ru.vsu.cs.artfolio.dto.comment.CommentRequestDto;
 import ru.vsu.cs.artfolio.dto.comment.CommentResponseDto;
@@ -50,7 +49,7 @@ public class CommentServiceImpl implements CommentService {
             throw new RestException("Comment by " + commentId + " doesn't belong to post by " + postId, HttpStatus.BAD_REQUEST);
         }
 
-        if (comment.getUser().getUuid().equals(user.getUuid()) || user.getRole().equals(Role.ADMIN)) {
+        if (comment.getUser().equals(user) || user.isAdmin()) {
             comment.setDeleted(true);
             commentRepository.save(comment);
         } else {

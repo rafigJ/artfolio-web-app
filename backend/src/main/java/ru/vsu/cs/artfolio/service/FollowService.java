@@ -11,7 +11,7 @@ public interface FollowService {
 
     void subscribe(UserEntity subscriber, UserEntity followed);
 
-    void deleteSubscribe(UUID subscriberUuid, UUID followedUuid);
+    void deleteSubscribe(UserEntity subscriber, UserEntity followed);
 
     /**
      * @param userId - uuid пользователя

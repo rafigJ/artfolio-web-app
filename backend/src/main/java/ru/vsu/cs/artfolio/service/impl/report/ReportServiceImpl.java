@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import ru.vsu.cs.artfolio.auth.user.Role;
 import ru.vsu.cs.artfolio.controller.enums.ReportReviewed;
 import ru.vsu.cs.artfolio.dto.PageDto;
 import ru.vsu.cs.artfolio.dto.report.CommentReportResponseDto;
@@ -41,7 +40,7 @@ public class ReportServiceImpl implements ReportService {
 
     @Override
     public CommentReportResponseDto setCommentReportReviewed(UserEntity executor, Long commentReportId, ReportReviewRequestDto reviewDto) {
-        if (!executor.getRole().equals(Role.ADMIN)) {
+        if (!executor.isAdmin()) {
             throw new RestException("Insufficient rights to update report", HttpStatus.UNAUTHORIZED);
         }
         return commentReportService.setReviewed(executor, commentReportId, reviewDto);
@@ -61,7 +60,7 @@ public class ReportServiceImpl implements ReportService {
 
     @Override
     public PostReportResponseDto setPostReportReviewed(UserEntity executor, Long postReportId, ReportReviewRequestDto reviewDto) {
-        if (!executor.getRole().equals(Role.ADMIN)) {
+        if (!executor.isAdmin()) {
             throw new RestException("Insufficient rights to update report", HttpStatus.UNAUTHORIZED);
         }
         return postReportService.setReviewed(executor, postReportId, reviewDto);

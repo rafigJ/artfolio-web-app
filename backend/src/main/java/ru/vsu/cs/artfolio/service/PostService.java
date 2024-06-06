@@ -34,8 +34,6 @@ public interface PostService {
 
     FullPostResponseDto updatePost(UserEntity executor, Long id, PostRequestDto requestDto, List<MultipartFile> images);
 
-    PageDto<PostResponseDto> getPostsPageByUserId(UUID userId, Pageable page);
-
     PageDto<PostResponseDto> getPostsPageBySpecifications(Specification<PostEntity> specification, Pageable page);
 
     Long likePost(UUID userId, Long postId);

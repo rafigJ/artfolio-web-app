@@ -12,12 +12,7 @@ import ru.vsu.cs.artfolio.repository.UserRepository;
 import ru.vsu.cs.artfolio.service.FeedService;
 import ru.vsu.cs.artfolio.service.PostService;
 
-import java.util.UUID;
-
-import static ru.vsu.cs.artfolio.criteria.PostSpecifications.nameContainsIgnoreCaseSortByCreateTime;
-import static ru.vsu.cs.artfolio.criteria.PostSpecifications.postsByFollowedUsers;
-import static ru.vsu.cs.artfolio.criteria.PostSpecifications.sortByCreateTime;
-import static ru.vsu.cs.artfolio.criteria.PostSpecifications.sortByLikeCount;
+import static ru.vsu.cs.artfolio.criteria.PostSpecifications.*;
 
 @Service
 @RequiredArgsConstructor

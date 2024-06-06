@@ -14,7 +14,7 @@ public interface PostRepository extends JpaRepository<PostEntity, Long>, JpaSpec
 
     Optional<PostEntity> findByName(String postName);
 
-    Page<PostEntity> findAllByOwnerUuid(UUID uuid, Pageable pageable);
+    Page<PostEntity> findAllByOwnerUuidAndDeletedIsFalse(UUID uuid, Pageable pageable);
 
     List<PostEntity> findAllByOwnerUuid(UUID uuid);
 }

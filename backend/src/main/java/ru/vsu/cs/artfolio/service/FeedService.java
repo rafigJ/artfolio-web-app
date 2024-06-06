@@ -7,8 +7,6 @@ import ru.vsu.cs.artfolio.dto.post.PostResponseDto;
 import ru.vsu.cs.artfolio.entity.PostEntity;
 import ru.vsu.cs.artfolio.entity.UserEntity;
 
-import java.util.UUID;
-
 public interface FeedService {
 
     PageDto<PostResponseDto> getPostsPageOrderedByTime(Pageable page);

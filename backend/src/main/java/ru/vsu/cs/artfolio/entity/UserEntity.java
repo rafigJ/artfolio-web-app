@@ -20,6 +20,7 @@ import ru.vsu.cs.artfolio.auth.user.Role;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 @Entity
@@ -91,6 +92,16 @@ public class UserEntity {
         return deleted;
     }
 
+    @Override
+    public boolean equals(Object object) {
+        if (this == object) return true;
+        if (object == null || getClass() != object.getClass()) return false;
+        UserEntity that = (UserEntity) object;
+        return Objects.equals(uuid, that.uuid);
+    }
 
-
+    @Override
+    public int hashCode() {
+        return Objects.hash(uuid);
+    }
 }

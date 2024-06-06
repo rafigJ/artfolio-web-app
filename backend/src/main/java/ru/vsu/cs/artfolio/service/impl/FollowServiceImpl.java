@@ -31,8 +31,8 @@ public class FollowServiceImpl implements FollowService {
     }
 
     @Override
-    public void deleteSubscribe(UUID subscriberUuid, UUID followedUuid) {
-        Optional<FollowEntity> followEntity = repository.findBySubscriber_UuidAndFollowed_Uuid(subscriberUuid, followedUuid);
+    public void deleteSubscribe(UserEntity subscriber, UserEntity followed) {
+        Optional<FollowEntity> followEntity = repository.findBySubscriber_UuidAndFollowed_Uuid(subscriber.getUuid(), followed.getUuid());
         if (followEntity.isEmpty()) {
             return;
         }

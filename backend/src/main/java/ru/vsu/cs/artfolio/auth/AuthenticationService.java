@@ -110,6 +110,7 @@ public class AuthenticationService {
                 .avatarName(avatarData.name())
                 .avatarType(avatarData.contentType())
                 .role(Role.USER)
+                .deleted(false)
                 .createTime(LocalDateTime.now())
                 .updateTime(LocalDateTime.now())
                 .build();
