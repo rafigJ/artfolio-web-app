@@ -10,6 +10,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -75,6 +76,21 @@ public class UserEntity {
     @Column(nullable = false, name = "update_time")
     private LocalDateTime updateTime;
 
+    @Getter(AccessLevel.PRIVATE)
+    @Column(nullable = false, name = "deleted")
+    private Boolean deleted;
+
     @OneToMany(mappedBy = "followed", fetch = FetchType.LAZY)
     private List<FollowEntity> followers;
+
+    public boolean isAdmin() {
+        return this.role.equals(Role.ADMIN);
+    }
+
+    public boolean isDeleted() {
+        return deleted;
+    }
+
+
+
 }

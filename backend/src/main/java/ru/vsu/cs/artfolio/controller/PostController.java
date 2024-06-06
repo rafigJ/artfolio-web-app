@@ -33,6 +33,7 @@ import ru.vsu.cs.artfolio.entity.UserEntity;
 import ru.vsu.cs.artfolio.service.CommentService;
 import ru.vsu.cs.artfolio.service.PostService;
 
+import javax.annotation.Nullable;
 import java.util.List;
 
 @RestController
@@ -57,7 +58,7 @@ public class PostController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<FullPostResponseDto> getPostById(@PathVariable("id") Long id, @AuthenticationPrincipal User user) {
+    public ResponseEntity<FullPostResponseDto> getPostById(@PathVariable("id") Long id, @Nullable @AuthenticationPrincipal User user) {
         LOGGER.info("Получение поста " + id);
         UserEntity userEntity = user != null ? user.getUserEntity() : null;
         return ResponseEntity.ok(service.getPostById(userEntity, id));

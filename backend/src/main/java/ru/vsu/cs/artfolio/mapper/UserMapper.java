@@ -43,7 +43,6 @@ public class UserMapper {
         oldEntity.setCountry(updatedUser.country());
         oldEntity.setCity(updatedUser.city());
         oldEntity.setUsername(updatedUser.username());
-        oldEntity.setEmail(updatedUser.email());
         oldEntity.setAvatarName(avatarData.name());
         oldEntity.setAvatarType(avatarData.contentType());
         oldEntity.setUpdateTime(LocalDateTime.now());

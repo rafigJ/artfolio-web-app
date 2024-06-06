@@ -1,6 +1,5 @@
 package ru.vsu.cs.artfolio.service;
 
-
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -65,7 +64,6 @@ public class PostServiceIT {
     void clearMinio() {
         var mediaFiles = mediaRepository.findAll().stream().map(MediaFileEntity::getFileName).toList();
         minioService.deleteFiles(mediaFiles);
-        mediaRepository.deleteAll();
     }
 
     @Test

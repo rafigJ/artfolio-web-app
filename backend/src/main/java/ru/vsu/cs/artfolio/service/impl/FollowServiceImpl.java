@@ -22,12 +22,10 @@ public class FollowServiceImpl implements FollowService {
     private final FollowRepository repository;
 
     @Override
-    public void subscribe(UUID subscriberUuid, UUID followedUuid) {
-        if (repository.existsBySubscriber_UuidAndFollowed_Uuid(subscriberUuid, followedUuid)) {
+    public void subscribe(UserEntity subscriber, UserEntity followed) {
+        if (repository.existsBySubscriber_UuidAndFollowed_Uuid(subscriber.getUuid(), followed.getUuid())) {
             return;
         }
-        var subscriber = UserEntity.builder().uuid(subscriberUuid).build();
-        var followed = UserEntity.builder().uuid(followedUuid).build();
         var followEntity = new FollowEntity(null, subscriber, followed);
         repository.save(followEntity);
     }

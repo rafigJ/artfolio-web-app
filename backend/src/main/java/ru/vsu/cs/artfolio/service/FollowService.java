@@ -3,12 +3,13 @@ package ru.vsu.cs.artfolio.service;
 import org.springframework.data.domain.Pageable;
 import ru.vsu.cs.artfolio.dto.PageDto;
 import ru.vsu.cs.artfolio.dto.user.UserResponseDto;
+import ru.vsu.cs.artfolio.entity.UserEntity;
 
 import java.util.UUID;
 
 public interface FollowService {
 
-    void subscribe(UUID subscriberUuid, UUID followedUuid);
+    void subscribe(UserEntity subscriber, UserEntity followed);
 
     void deleteSubscribe(UUID subscriberUuid, UUID followedUuid);
 

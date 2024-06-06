@@ -43,8 +43,7 @@ public class FeedServiceImpl implements FeedService {
     }
 
     @Override
-    public PageDto<PostResponseDto> getPostsPageOrderedByFollowerSubscribe(UUID userId, Pageable page) {
-        UserEntity user = userRepository.getReferenceById(userId);
+    public PageDto<PostResponseDto> getPostsPageOrderedByFollowerSubscribe(UserEntity user, Pageable page) {
         return postService.getPostsPageBySpecifications(postsByFollowedUsers(user), page);
     }
 

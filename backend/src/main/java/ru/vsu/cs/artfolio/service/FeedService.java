@@ -5,6 +5,7 @@ import org.springframework.data.jpa.domain.Specification;
 import ru.vsu.cs.artfolio.dto.PageDto;
 import ru.vsu.cs.artfolio.dto.post.PostResponseDto;
 import ru.vsu.cs.artfolio.entity.PostEntity;
+import ru.vsu.cs.artfolio.entity.UserEntity;
 
 import java.util.UUID;
 
@@ -16,7 +17,7 @@ public interface FeedService {
 
     PageDto<PostResponseDto> getPostsPageOrderedByPopularity(Pageable page);
 
-    PageDto<PostResponseDto> getPostsPageOrderedByFollowerSubscribe(UUID userId, Pageable page);
+    PageDto<PostResponseDto> getPostsPageOrderedByFollowerSubscribe(UserEntity user, Pageable page);
 
     PageDto<PostResponseDto> getPostsPageBySpecifications(Specification<PostEntity> specification, Pageable page);
 

@@ -21,5 +21,7 @@ public final class FullUserResponseDto {
     public String email;
     public Long postCount;
     public Long subscribersCount;
+    public Long followingCount;
     public Long likeCount;
+    public Boolean isFollowed;
 }

@@ -15,10 +15,7 @@ public final class FullPostResponseDto {
     public String name;
     public String description;
     public Long likeCount;
-
-    @Deprecated
-    public Long previewMedia;
-
+    public Boolean hasLike;
     public List<Long> mediaIds;
     public UserResponseDto owner;
 }

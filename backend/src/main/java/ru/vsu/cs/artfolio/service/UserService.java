@@ -7,20 +7,22 @@ import ru.vsu.cs.artfolio.dto.PageDto;
 import ru.vsu.cs.artfolio.dto.user.FullUserResponseDto;
 import ru.vsu.cs.artfolio.dto.user.UserResponseDto;
 import ru.vsu.cs.artfolio.dto.user.request.UserUpdateRequestDto;
+import ru.vsu.cs.artfolio.entity.UserEntity;
 
+import javax.annotation.Nullable;
 import java.util.UUID;
 
 public interface UserService {
 
     FullUserResponseDto updateUserInformation(UUID userId, UserUpdateRequestDto updatedUser, MultipartFile avatar);
 
-    FullUserResponseDto getUserByUsername(String username);
+    FullUserResponseDto getUserByUsername(@Nullable UserEntity executor, String username);
 
-    void deleteUser(UUID executorId, String username);
+    void deleteUser(UserEntity executor, String username);
 
     MediaDto downloadAvatar(String username);
 
-    void subscribe(UUID subscriberUuid, String followedUsername);
+    void subscribe(UserEntity subscriber, String followedUsername);
 
     void deleteSubscribe(UUID subscriberUuid, String followedUsername);
 
