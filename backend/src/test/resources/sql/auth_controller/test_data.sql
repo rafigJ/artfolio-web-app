@@ -8,3 +8,4 @@ VALUES ('7c826e51-b416-475d-97b1-e01b2835db52', 'bolton@vesteros.com', 'boltonAr
 
 -- login: bolton@vesteros.com
 -- password: somePassword19
+-- secretWord: winterIsComing
