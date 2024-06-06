@@ -15,8 +15,10 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.vsu.cs.artfolio.dto.post.FullPostResponseDto;
 import ru.vsu.cs.artfolio.dto.post.PostRequestDto;
 import ru.vsu.cs.artfolio.entity.MediaFileEntity;
+import ru.vsu.cs.artfolio.entity.PostEntity;
 import ru.vsu.cs.artfolio.exception.NotFoundException;
 import ru.vsu.cs.artfolio.repository.MediaRepository;
+import ru.vsu.cs.artfolio.repository.PostRepository;
 import ru.vsu.cs.artfolio.repository.UserRepository;
 import ru.vsu.cs.artfolio.service.impl.MinioService;
 
@@ -54,6 +56,9 @@ public class PostServiceIT {
     MediaRepository mediaRepository;
 
     @Autowired
+    PostRepository postRepository;
+
+    @Autowired
     PostService postService;
 
 
@@ -64,8 +69,10 @@ public class PostServiceIT {
      */
     @AfterEach
     void clearMinio() {
-        var mediaFiles = mediaRepository.findAll().stream().map(MediaFileEntity::getFileName).toList();
+        var mediaFiles = mediaRepository.findAll().parallelStream().map(MediaFileEntity::getFileName).toList();
+        var postPreviewFiles = postRepository.findAll().parallelStream().map(PostEntity::getPreviewMediaName).toList();
         minioService.deleteFiles(mediaFiles);
+        minioService.deleteFiles(postPreviewFiles);
     }
 
     @Test

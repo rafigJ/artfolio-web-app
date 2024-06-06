@@ -2,7 +2,6 @@ package ru.vsu.cs.artfolio.controller;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -19,8 +18,8 @@ import ru.vsu.cs.artfolio.auth.user.Role;
 import ru.vsu.cs.artfolio.dto.auth.AuthRequestDto;
 import ru.vsu.cs.artfolio.dto.auth.ChangePasswordRequestDto;
 import ru.vsu.cs.artfolio.dto.auth.RegisterRequestDto;
-import ru.vsu.cs.artfolio.entity.MediaFileEntity;
-import ru.vsu.cs.artfolio.repository.MediaRepository;
+import ru.vsu.cs.artfolio.entity.UserEntity;
+import ru.vsu.cs.artfolio.repository.UserRepository;
 import ru.vsu.cs.artfolio.service.PostServiceIT;
 import ru.vsu.cs.artfolio.service.impl.MinioService;
 
@@ -46,25 +45,19 @@ public class AuthenticationControllerTest {
     }
 
     static final Logger LOG = LoggerFactory.getLogger(AuthenticationControllerTest.class);
-
-    MediaRepository mediaRepository;
+    UserRepository userRepository;
     MinioService minioService;
     MockMvc mockMvc;
     ObjectMapper objectMapper;
 
     @Autowired
-    public AuthenticationControllerTest(MediaRepository mediaRepository, MinioService minioService, MockMvc mockMvc, ObjectMapper objectMapper) {
-        this.mediaRepository = mediaRepository;
+    public AuthenticationControllerTest(UserRepository userRepository, MinioService minioService, MockMvc mockMvc, ObjectMapper objectMapper) {
+        this.userRepository = userRepository;
         this.minioService = minioService;
         this.mockMvc = mockMvc;
         this.objectMapper = objectMapper;
     }
 
-    @AfterEach
-    void clearMinio() {
-        var mediaFiles = mediaRepository.findAll().stream().map(MediaFileEntity::getFileName).toList();
-        minioService.deleteFiles(mediaFiles);
-    }
 
     @Test
     void login_ValidLoginRequest_ReturnAuthResponse() throws Exception {
@@ -128,6 +121,8 @@ public class AuthenticationControllerTest {
                         jsonPath("$.role").value(Role.USER.name()),
                         jsonPath("$.token").hasJsonPath()
                 );
+        // after remove trash
+        clearMinio();
     }
 
     @Test
@@ -177,4 +172,10 @@ public class AuthenticationControllerTest {
                         jsonPath("$.token").hasJsonPath()
                 );
     }
+
+    private void clearMinio() {
+        var mediaFiles = userRepository.findAll().parallelStream().map(UserEntity::getAvatarName).toList();
+        minioService.deleteFiles(mediaFiles);
+    }
+
 }
