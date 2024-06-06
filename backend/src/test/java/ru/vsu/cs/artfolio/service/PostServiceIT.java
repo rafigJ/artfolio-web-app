@@ -30,6 +30,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @Transactional
 @ExtendWith(MockitoExtension.class)
 @Sql(value = "/sql/post_service/test_data.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_CLASS)
+@Sql(value = "/sql/post_service/test_data_update.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
 public class PostServiceIT {
 
     // test_data.sql
@@ -149,9 +150,7 @@ public class PostServiceIT {
         // given not saved post with 1000L id
 
         // when & then
-        assertThrows(NotFoundException.class, () -> {
-            postService.getPostById(null, 1000L);
-        });
+        assertThrows(NotFoundException.class, () -> postService.getPostById(null, 1000L));
     }
 
 }
