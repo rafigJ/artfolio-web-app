@@ -26,8 +26,18 @@ const RegisterFormSecondStep: FC<RegisterFormSecondStep> = ({ onFinishStep2, ava
 				<Form.Item name='fullName'
 					rules={[
 						{ required: true, message: 'Введите имя!' },
-						{ min: 3, message: 'Имя должно быть не меньше 3 символов!' },
-						{ max: 40, message: 'Имя должно содержать не более 40 символов' }
+						{ max: 40, message: 'Имя должно содержать не более 40 символов' },
+						{
+							validator: (_, value) => {
+								if (value.trim().replace(/\s/g, '').length < 3) {
+									return Promise.reject('Имя должно быть не меньше 3 символов')
+								}
+								if (value.trim().split(/\s+/).length > 2) {
+									return Promise.reject('Имя не может содержать более двух слов!')
+								}
+								return Promise.resolve()
+							}
+						}
 					]}>
 					<Input
 						prefix={<UserOutlined className='site-form-item-icon' />}
@@ -36,7 +46,15 @@ const RegisterFormSecondStep: FC<RegisterFormSecondStep> = ({ onFinishStep2, ava
 				</Form.Item>
 				<Form.Item name='country'
 					rules={[
-						{ max: 40, message: 'Название страны должно содержать не более 40 символов' }
+						{ max: 40, message: 'Название страны должно содержать не более 40 символов' },
+						{
+							validator: (_, value) => {
+								if (value.trim().split(/\s+/).length > 3) {
+									return Promise.reject('Название страны не может содержать более трёх слов!')
+								}
+								return Promise.resolve()
+							}
+						}
 					]}>
 					<Input
 						prefix={<EnvironmentOutlined className='site-form-item-icon' />}
@@ -45,7 +63,15 @@ const RegisterFormSecondStep: FC<RegisterFormSecondStep> = ({ onFinishStep2, ava
 				</Form.Item>
 				<Form.Item name='city'
 					rules={[
-						{ max: 40, message: 'Название города должно содержать не более 40 символов' }
+						{ max: 40, message: 'Название города должно содержать не более 40 символов' },
+						{
+							validator: (_, value) => {
+								if (value.trim().split(/\s+/).length > 3) {
+									return Promise.reject('Название города не может содержать более трёх слов!')
+								}
+								return Promise.resolve()
+							}
+						}
 					]}>
 					<Input
 						prefix={<EnvironmentOutlined className='site-form-item-icon' />}
