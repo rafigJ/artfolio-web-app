@@ -67,15 +67,19 @@ const ForgotPasswordform = () => {
 				<Form.Item
 					name='newPassword'
 					rules={[
-						{ required: true, message: 'Введите новый пароль!' },
+						{ required: true, message: 'Введите пароль!' },
 						{
 							pattern: /^(?=.*[A-Za-z])(?=.*\d).{8,}$/,
 							message: 'Пароль должен содержать минимум 8 символов, хотя бы одну букву и цифру'
 						},
 						{
-							pattern: /^[A-Za-z\d]+$/,
+							pattern: /^[a-zA-Zа-яА-ЯёЁ0-9]+$/,
 							message: 'Пароль не должен содержать служебные символы!'
-						}
+						},
+						{
+							pattern: /^[^\u0400-\u04FFёЁ]+$/,
+							message: 'Пароль не должен содержать кириллицу!'
+						},
 					]}
 				>
 					<Input.Password

@@ -49,8 +49,10 @@ const RegisterFormSecondStep: FC<RegisterFormSecondStep> = ({ onFinishStep2, ava
 						{ max: 40, message: 'Название страны должно содержать не более 40 символов' },
 						{
 							validator: (_, value) => {
-								if (value.trim().split(/\s+/).length > 3) {
-									return Promise.reject('Название страны не может содержать более трёх слов!')
+								if (value) {
+									if (value.trim().split(/\s+/).length > 3) {
+										return Promise.reject('Название страны не может содержать более трёх слов!')
+									}
 								}
 								return Promise.resolve()
 							}
@@ -66,9 +68,12 @@ const RegisterFormSecondStep: FC<RegisterFormSecondStep> = ({ onFinishStep2, ava
 						{ max: 40, message: 'Название города должно содержать не более 40 символов' },
 						{
 							validator: (_, value) => {
-								if (value.trim().split(/\s+/).length > 3) {
-									return Promise.reject('Название города не может содержать более трёх слов!')
+								if (value) {
+									if (value.trim().split(/\s+/).length > 3) {
+										return Promise.reject('Название города не может содержать более трёх слов!')
+									}
 								}
+
 								return Promise.resolve()
 							}
 						}

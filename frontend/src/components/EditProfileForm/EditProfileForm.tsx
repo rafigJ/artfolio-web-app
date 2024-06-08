@@ -37,11 +37,12 @@ const EditProfileForm = () => {
 			return
 		}
 		const editProfileRequest: EditProfileRequest = {
-			...values,
+			username: values.username,
+			email: values.email,
 			fullName: values.fullName.trim(),
-			country: values.country.trim(),
-			city: values.city.trim(),
-			description: values.description.trim()
+			country: values.country ? values.country.trim() : '',
+			city: values.city ? values.city.trim() : '',
+			description: values.description ? values.description.trim() : '',
 		}
 		try {
 			UserService.editUserProfile(editProfileRequest, avatar.pop()?.originFileObj)

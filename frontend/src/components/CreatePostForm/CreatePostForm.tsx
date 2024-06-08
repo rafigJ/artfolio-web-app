@@ -43,12 +43,16 @@ const CreatePostForm = () => {
 
 
 	const onFinish = (values: PostRequest) => {
-		window.ym(97163910, 'reachGoal', 'createSuccess')
+		const trimmedValues = {
+			name: values.name.trim(),
+			description: values.description.trim()
+		}
 		if (fileList.length === 0) {
 			message.error('Должна быть загружена хотя бы одна фотография')
 			return
 		}
-		createPost(values, fileList.map(e => e?.originFileObj as File))
+		window.ym(97163910, 'reachGoal', 'createSuccess')
+		createPost(trimmedValues, fileList.map(e => e?.originFileObj as File))
 	}
 
 	const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -71,14 +75,27 @@ const CreatePostForm = () => {
 						<Form.Item
 							name='name'
 							label='Заголовок публикации'
-							rules={[{ required: true }]}
+							rules={[
+								{ required: true, message: 'Введите название публикации!' },
+								{ max: 35, message: 'Название должно содержать не более 35 символов' },
+								{
+									validator: (_, value) => {
+										if (value.trim().replace(/\s/g, '').length < 3) {
+											return Promise.reject('Заголовок должен быть не меньше 3 символов')
+										}
+										return Promise.resolve()
+									}
+								}
+							]}
 						>
-							<Input onChange={handleTitleChange} maxLength={35} />
+							<Input onChange={handleTitleChange} maxLength={36} />
 						</Form.Item>
 						<Form.Item
 							name='description'
 							label='Описание публикации'
-							rules={[{ required: true }]}
+							rules={[{ required: true, message: 'Введите описание публикации!' },
+							{ max: 400, message: 'Описание публикации должно содержать не более 400 символов' }
+							]}
 						>
 							<Input.TextArea
 								onChange={handleDescriptionChange}
