@@ -36,7 +36,13 @@ const EditProfileForm = () => {
 			message.error('Выберите аватар')
 			return
 		}
-		const editProfileRequest: EditProfileRequest = values
+		const editProfileRequest: EditProfileRequest = {
+			...values,
+			fullName: values.fullName.trim(),
+			country: values.country.trim(),
+			city: values.city.trim(),
+			description: values.description.trim()
+		}
 		try {
 			UserService.editUserProfile(editProfileRequest, avatar.pop()?.originFileObj)
 			message.success("Профиль успешно обновлён")
@@ -68,8 +74,16 @@ const EditProfileForm = () => {
 					name='username'
 					rules={[
 						{ required: true, message: 'Введите логин!' },
-						{ min: 5, message: 'Логин должен быть не меньше 5 символов!' },
-						{ max: 150, message: 'Логин должен содержать не более 150 символов' }
+						{ max: 150, message: 'Логин должен содержать не более 150 символов' },
+						{ min: 5, message: 'Логин должен содержать не менее 5 символов' },
+						{
+							pattern: /^[a-zA-Zа-яА-ЯёЁ0-9_]+$/,
+							message: 'Логин не должен содержать служебные символы!'
+						},
+						{
+							pattern: /^[^\u0400-\u04FFёЁ]+$/,
+							message: 'Логин не должен содержать кириллицу!'
+						},
 					]}
 				>
 					<Input
@@ -82,8 +96,18 @@ const EditProfileForm = () => {
 				<Form.Item name='fullName'
 					rules={[
 						{ required: true, message: 'Введите имя!' },
-						{ min: 3, message: 'Имя должно быть не меньше 3 символов!' },
-						{ max: 40, message: 'Имя должно содержать не более 40 символов' }
+						{ max: 40, message: 'Имя должно содержать не более 40 символов' },
+						{
+							validator: (_, value) => {
+								if (value.trim().replace(/\s/g, '').length < 3) {
+									return Promise.reject('Имя должно быть не меньше 3 символов')
+								}
+								if (value.trim().split(/\s+/).length > 2) {
+									return Promise.reject('Имя не может содержать более двух слов!')
+								}
+								return Promise.resolve()
+							}
+						}
 					]}
 				>
 					<Input
@@ -108,7 +132,15 @@ const EditProfileForm = () => {
 
 				<Form.Item name='country'
 					rules={[
-						{ max: 40, message: 'Название страны должно содержать не более 40 символов' }
+						{ max: 40, message: 'Название страны должно содержать не более 40 символов' },
+						{
+							validator: (_, value) => {
+								if (value.trim().split(/\s+/).length > 3) {
+									return Promise.reject('Название страны не может содержать более трёх слов!')
+								}
+								return Promise.resolve()
+							}
+						}
 					]}
 				>
 					<Input
@@ -119,7 +151,15 @@ const EditProfileForm = () => {
 
 				<Form.Item name='city'
 					rules={[
-						{ max: 40, message: 'Название города должно содержать не более 40 символов' }
+						{ max: 40, message: 'Название города должно содержать не более 40 символов' },
+						{
+							validator: (_, value) => {
+								if (value.trim().split(/\s+/).length > 3) {
+									return Promise.reject('Название города не может содержать более трёх слов!')
+								}
+								return Promise.resolve()
+							}
+						}
 					]}
 				>
 					<Input
