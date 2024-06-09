@@ -1,6 +1,5 @@
 package ru.vsu.cs.artfolio.service;
 
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -14,8 +13,10 @@ import org.springframework.test.context.jdbc.Sql;
 import org.springframework.transaction.annotation.Transactional;
 import ru.vsu.cs.artfolio.dto.post.FullPostResponseDto;
 import ru.vsu.cs.artfolio.dto.post.PostRequestDto;
+import ru.vsu.cs.artfolio.dto.user.UserResponseDto;
 import ru.vsu.cs.artfolio.entity.MediaFileEntity;
 import ru.vsu.cs.artfolio.entity.PostEntity;
+import ru.vsu.cs.artfolio.entity.UserEntity;
 import ru.vsu.cs.artfolio.exception.NotFoundException;
 import ru.vsu.cs.artfolio.repository.MediaRepository;
 import ru.vsu.cs.artfolio.repository.PostRepository;
@@ -26,18 +27,22 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest
 @Transactional
 @ExtendWith(MockitoExtension.class)
 @Sql(value = "/sql/post_service/test_data.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_CLASS)
 @Sql(value = "/sql/post_service/test_data_update.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
+@Sql(value = "/sql/after_all/test_data_clear.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_CLASS)
 public class PostServiceIT {
 
     // test_data.sql
     private static final String DUMMY_FILE_NAME_DB = "dummy_file"; // 'saved' file in media_file table
-    private static final UUID mockUserUuid = UUID.fromString("7c826e51-b416-475d-97b1-e01b2835db52"); // 'saved' user in _user table
+    private static final UUID USER_UUID = UUID.fromString("7c826e51-b416-475d-97b1-e01b2835db52"); // 'saved' user in _user table
+    private static final UUID ADMIN_UUID = UUID.fromString("7c826e51-b416-475d-97b1-e01b2835db53"); // 'saved' user in _user table
     private static final InputStream mockFile = PostServiceIT.class.getClassLoader().getResourceAsStream("dummy-image.jpg");
     private static MockMultipartFile mockMultipartFile;
 
@@ -67,7 +72,6 @@ public class PostServiceIT {
      * s3 хранилищем. Следовательно, нам нужно очищать созданные файлы.
      * (Можно также мокать, но так больше случаев можно покрыть)
      */
-    @AfterEach
     void clearMinio() {
         var mediaFiles = mediaRepository.findAll().parallelStream().map(MediaFileEntity::getFileName).toList();
         var postPreviewFiles = postRepository.findAll().parallelStream().map(PostEntity::getPreviewMediaName).toList();
@@ -78,7 +82,7 @@ public class PostServiceIT {
     @Test
     void createPost_ValidRequest_ReturnFullPostResponseDto() throws Exception {
         // given
-        var executor = userRepository.findById(mockUserUuid).orElseThrow();
+        UserEntity executor = userRepository.findById(USER_UUID).orElseThrow();
         PostRequestDto postRequestDto = new PostRequestDto("post1", "description");
 
         // when
@@ -91,18 +95,15 @@ public class PostServiceIT {
         assertEquals(0, savedPost.getLikeCount());
         assertEquals(2, savedPost.getMediaIds().size());
 
-        var owner = savedPost.getOwner();
-        assertEquals(owner.uuid, executor.getUuid());
-        assertEquals(owner.fullName, executor.getFullName());
-        assertEquals(owner.email, executor.getEmail());
-        assertEquals(owner.username, executor.getUsername());
-
+        UserResponseDto owner = savedPost.getOwner();
+        assertUserEquals(owner, executor);
+        clearMinio();
     }
 
     @Test
     void getPostById_ByUnknown_ValidId_ReturnFullPostResponseDto() {
         // given savedPost with 1L id
-        var postOwner = userRepository.findById(mockUserUuid).orElseThrow();
+        var realOwner = userRepository.findById(USER_UUID).orElseThrow();
 
         // when
         FullPostResponseDto post = postService.getPostById(null, 1L);
@@ -113,17 +114,14 @@ public class PostServiceIT {
         assertEquals(0, post.getLikeCount());
         assertEquals(2, post.getMediaIds().size());
 
-        var owner = post.getOwner();
-        assertEquals(owner.uuid, postOwner.getUuid());
-        assertEquals(owner.fullName, postOwner.getFullName());
-        assertEquals(owner.email, postOwner.getEmail());
-        assertEquals(owner.username, postOwner.getUsername());
+        UserResponseDto owner = post.getOwner();
+        assertUserEquals(owner, realOwner);
     }
 
     @Test
     void getPostById_ByUser_ValidId_ReturnFullPostResponseDto() {
         // given
-        var executor = userRepository.findById(mockUserUuid).orElseThrow();
+        var executor = userRepository.findById(ADMIN_UUID).orElseThrow();
 
         // when
         FullPostResponseDto post = postService.getPostById(executor, 1L);
@@ -134,22 +132,31 @@ public class PostServiceIT {
         assertEquals("description", post.getDescription());
         assertEquals(0, post.getLikeCount());
         assertEquals(2, post.getMediaIds().size());
+        assertEquals(false, post.getHasLike());
 
-        var owner = post.getOwner();
-        assertEquals(owner.uuid, executor.getUuid());
-        assertEquals(owner.fullName, executor.getFullName());
-        assertEquals(owner.email, executor.getEmail());
-        assertEquals(owner.username, executor.getUsername());
+        UserResponseDto owner = post.getOwner();
+        assertUserEquals(owner, executor);
     }
 
     @Test
-    @Disabled
     void getPostById_ByAdmin_ValidId_ReturnFullPostResponseDto() throws Exception {
         // given
+        var realOwner = userRepository.findById(USER_UUID).orElseThrow();
+        var executor = userRepository.findById(ADMIN_UUID).orElseThrow();
 
         // when
+        FullPostResponseDto post = postService.getPostById(executor, 1L);
 
         // then
+        assertNotNull(post.getId());
+        assertEquals("post1", post.getName());
+        assertEquals("description", post.getDescription());
+        assertEquals(0, post.getLikeCount());
+        assertEquals(2, post.getMediaIds().size());
+        assertEquals(false, post.getHasLike());
+
+        UserResponseDto owner = post.getOwner();
+        assertUserEquals(owner, realOwner);
     }
 
     @Test
@@ -160,4 +167,10 @@ public class PostServiceIT {
         assertThrows(NotFoundException.class, () -> postService.getPostById(null, 1000L));
     }
 
+    private void assertUserEquals(UserResponseDto responseDto, UserEntity userEntity) {
+        assertEquals(responseDto.uuid, userEntity.getUuid());
+        assertEquals(responseDto.fullName, userEntity.getFullName());
+        assertEquals(responseDto.email, userEntity.getEmail());
+        assertEquals(responseDto.username, userEntity.getUsername());
+    }
 }

@@ -2,9 +2,11 @@
 DELETE FROM artfolio.media_file;
 DELETE FROM artfolio.post;
 DELETE FROM artfolio._user;
+DELETE FROM artfolio._like;
 
 SELECT setval('artfolio.media_file_id_seq', 1, false);
 SELECT setval('artfolio.post_id_seq', 1, false);
+SELECT setval('artfolio._like_id_seq', 1, false);
 
 INSERT INTO artfolio._user(uuid, email, username, password, secret_word, full_name, country, city, additional_info,
                            avatar_name, avatar_type, role, create_time, update_time, deleted)
@@ -40,3 +42,4 @@ VALUES (1, 'image/jpeg', 'dummy_file', 0),
 
 SELECT setval('artfolio.media_file_id_seq', (SELECT MAX(id) FROM artfolio.media_file), true);
 SELECT setval('artfolio.post_id_seq', (SELECT MAX(id) FROM artfolio.post), true);
+SELECT setval('artfolio._like_id_seq', (SELECT MAX(id) FROM artfolio._like), true);

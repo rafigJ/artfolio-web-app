@@ -1,6 +1,5 @@
 package ru.vsu.cs.artfolio.controller;
 
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -26,11 +25,15 @@ import ru.vsu.cs.artfolio.service.impl.MinioService;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@Sql(value = "/sql/auth_controller/test_data.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_CLASS)
-@Sql(value = "/sql/auth_controller/test_data_update.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
+@Sql(value = "/sql/auth_controller/test_data.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+@Sql(value = "/sql/after_all/test_data_clear.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
 @SpringBootTest
 @AutoConfigureMockMvc(printOnlyOnFailure = false)
 public class AuthenticationControllerTest {
@@ -44,11 +47,11 @@ public class AuthenticationControllerTest {
         mockMultipartFile = new MockMultipartFile("dummy-image.jpg", "dummy-image.jpg", "image/jpeg", mockFile);
     }
 
-    static final Logger LOG = LoggerFactory.getLogger(AuthenticationControllerTest.class);
-    UserRepository userRepository;
-    MinioService minioService;
-    MockMvc mockMvc;
-    ObjectMapper objectMapper;
+    private static final Logger LOG = LoggerFactory.getLogger(AuthenticationControllerTest.class);
+    private final UserRepository userRepository;
+    private final MinioService minioService;
+    private final MockMvc mockMvc;
+    private final ObjectMapper objectMapper;
 
     @Autowired
     public AuthenticationControllerTest(UserRepository userRepository, MinioService minioService, MockMvc mockMvc, ObjectMapper objectMapper) {
@@ -74,6 +77,7 @@ public class AuthenticationControllerTest {
                 .andExpectAll(
                         status().isOk(),
                         content().contentType(MediaType.APPLICATION_JSON),
+                        jsonPath("$.username").value("boltonArt"),
                         jsonPath("$.name").value("Рамси Болтон"),
                         jsonPath("$.email").value("bolton@vesteros.com"),
                         jsonPath("$.role").value(Role.USER.name()),
@@ -166,6 +170,7 @@ public class AuthenticationControllerTest {
                 .andExpectAll(
                         status().isOk(),
                         content().contentType(MediaType.APPLICATION_JSON),
+                        jsonPath("$.username").value("boltonArt"),
                         jsonPath("$.name").value("Рамси Болтон"),
                         jsonPath("$.email").value("bolton@vesteros.com"),
                         jsonPath("$.role").value(Role.USER.name()),
