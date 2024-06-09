@@ -4,7 +4,6 @@ backend/.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
 backend/src/main/resources/application.yml
-application.yml
 
 .env
 minio/storage/
@@ -63,10 +62,8 @@ frontend/yarn-error.log*
 .pnp.js
 
 # testing
-frontend/coverage
 
 # production
-frontend/build
 
 # misc
 .DS_Store
