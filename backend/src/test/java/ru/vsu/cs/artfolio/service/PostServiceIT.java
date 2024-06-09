@@ -42,7 +42,7 @@ public class PostServiceIT {
     // test_data.sql
     private static final String DUMMY_FILE_NAME_DB = "dummy_file"; // 'saved' file in media_file table
     private static final UUID USER_UUID = UUID.fromString("7c826e51-b416-475d-97b1-e01b2835db52"); // 'saved' user in _user table
-    private static final UUID ADMIN_UUID = UUID.fromString("7c826e51-b416-475d-97b1-e01b2835db53"); // 'saved' user in _user table
+    private static final UUID ADMIN_UUID = UUID.fromString("7c826e51-b416-475d-97b1-e01b2835db53"); // 'saved' admin in _user table
     private static final InputStream mockFile = PostServiceIT.class.getClassLoader().getResourceAsStream("dummy-image.jpg");
     private static MockMultipartFile mockMultipartFile;
 
@@ -121,7 +121,7 @@ public class PostServiceIT {
     @Test
     void getPostById_ByUser_ValidId_ReturnFullPostResponseDto() {
         // given
-        var executor = userRepository.findById(ADMIN_UUID).orElseThrow();
+        var executor = userRepository.findById(USER_UUID).orElseThrow();
 
         // when
         FullPostResponseDto post = postService.getPostById(executor, 1L);

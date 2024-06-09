@@ -30,6 +30,7 @@ import ru.vsu.cs.artfolio.repository.PostRepository;
 import ru.vsu.cs.artfolio.service.LikeService;
 import ru.vsu.cs.artfolio.service.PostService;
 
+import javax.annotation.Nullable;
 import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
@@ -67,11 +68,11 @@ public class PostServiceImpl implements PostService {
 
         LOGGER.info("Возврат ответа");
         List<Long> mediaIds = medias.stream().map(MediaFileEntity::getId).toList();
-        return PostMapper.toFullDto(createdPost, mediaIds, 0L);
+        return PostMapper.toFullDto(createdPost, mediaIds, 0L, false);
     }
 
     @Override
-    public FullPostResponseDto getPostById(UserEntity user, Long id) {
+    public FullPostResponseDto getPostById(@Nullable UserEntity user, Long id) {
         PostEntity postEntity;
         if (user != null && user.isAdmin()) {
             postEntity = findPostById(id);
@@ -80,8 +81,12 @@ public class PostServiceImpl implements PostService {
                     .filter(p -> !p.getDeleted())
                     .orElseThrow(() -> new NotFoundException("Post by id: " + id + " not found"));
         }
-        List<Long> mediaIds = postEntity.getMedias().stream().sorted(Comparator.comparingInt(MediaFileEntity::getPosition)).map(MediaFileEntity::getId).toList();
-        return PostMapper.toFullDto(postEntity, mediaIds, likeService.getLikeCount(id));
+        List<Long> mediaIds = postEntity.getMedias().stream()
+                .sorted(Comparator.comparingInt(MediaFileEntity::getPosition))
+                .map(MediaFileEntity::getId).toList();
+
+        Boolean hasLike = user != null ? likeService.hasLike(user.getUuid(), id) : null;
+        return PostMapper.toFullDto(postEntity, mediaIds, likeService.getLikeCount(id), hasLike);
     }
 
     @Override
@@ -120,7 +125,8 @@ public class PostServiceImpl implements PostService {
 
         List<MediaFileEntity> medias = mediaRepository.saveAll(MediaMapper.toEntityList(mediaFiles, updatedPost));
         List<Long> mediaIds = medias.stream().map(MediaFileEntity::getId).toList();
-        return PostMapper.toFullDto(updatedPost, mediaIds, likeService.getLikeCount(id));
+        Boolean hasLike = likeService.hasLike(executor.getUuid(), id);
+        return PostMapper.toFullDto(updatedPost, mediaIds, likeService.getLikeCount(id), hasLike);
     }
 
     @Override
