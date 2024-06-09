@@ -13,6 +13,7 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.mock.web.MockPart;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
 import ru.vsu.cs.artfolio.auth.user.Role;
 import ru.vsu.cs.artfolio.dto.auth.AuthRequestDto;
 import ru.vsu.cs.artfolio.dto.auth.ChangePasswordRequestDto;
@@ -61,7 +62,6 @@ public class AuthenticationControllerTest {
         this.objectMapper = objectMapper;
     }
 
-
     @Test
     void login_ValidLoginRequest_ReturnAuthResponse() throws Exception {
         // given
@@ -87,6 +87,7 @@ public class AuthenticationControllerTest {
 
 
     @Test
+    @Transactional
     void register_ValidDto_ReturnAuthResponse() throws Exception {
         // given
         RegisterRequestDto requestDto = new RegisterRequestDto(
