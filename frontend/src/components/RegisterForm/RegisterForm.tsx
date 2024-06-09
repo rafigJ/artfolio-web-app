@@ -65,9 +65,17 @@ const RegisterForm: React.FC = () => {
 			message.error('Выберите аватар')
 			return
 		}
-		console.log('Step 2 values:', values)
-		setSecondStepData(values)
-		const registerRequest: RegistrationRequest = { ...firstStepData, ...values }
+		const trimmedValues: SecondStepSlice = {
+			fullName: values.fullName.trim(),
+			country: values.country ? values.country.trim() : '',
+			city: values.city ? values.city.trim() : '',
+			description: values.description ? values.description.trim() : '',
+			avatarFile: values.avatarFile
+		}
+		console.log('Step 2 values:', trimmedValues)
+		setSecondStepData(trimmedValues)
+		const registerRequest: RegistrationRequest = { ...firstStepData, ...trimmedValues }
+		console.log(registerRequest)
 		register(registerRequest, avatar.pop()?.originFileObj)
 		window.ym(97163910, 'reachGoal', 'step2Success')
 	}

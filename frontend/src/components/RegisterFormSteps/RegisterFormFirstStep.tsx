@@ -29,8 +29,16 @@ const RegisterFormFirstStep: FC<RegisterFormFirstStep> = ({ onFinishStep1 }) => 
 					name='username'
 					rules={[
 						{ required: true, message: 'Введите логин!' },
-						{ min: 5, message: 'Логин должен быть не меньше 5 символов!' },
-						{ max: 150, message: 'Логин должен содержать не более 150 символов' }
+						{ max: 150, message: 'Логин должен содержать не более 150 символов' },
+						{ min: 5, message: 'Логин должен содержать не менее 5 символов' },
+						{
+							pattern: /^[a-zA-Zа-яА-ЯёЁ0-9_]+$/,
+							message: 'Логин не должен содержать служебные символы!'
+						},
+						{
+							pattern: /^[^\u0400-\u04FFёЁ]+$/,
+							message: 'Логин не должен содержать кириллицу!'
+						},
 					]}
 				>
 					<Input
@@ -61,9 +69,13 @@ const RegisterFormFirstStep: FC<RegisterFormFirstStep> = ({ onFinishStep1 }) => 
 							message: 'Пароль должен содержать минимум 8 символов, хотя бы одну букву и цифру'
 						},
 						{
-							pattern: /^[A-Za-z\d]+$/,
+							pattern: /^[a-zA-Zа-яА-ЯёЁ0-9]+$/,
 							message: 'Пароль не должен содержать служебные символы!'
-						}
+						},
+						{
+							pattern: /^[^\u0400-\u04FFёЁ]+$/,
+							message: 'Пароль не должен содержать кириллицу!'
+						},
 					]}
 				>
 					<Input.Password
@@ -86,8 +98,10 @@ const RegisterFormFirstStep: FC<RegisterFormFirstStep> = ({ onFinishStep1 }) => 
 				</Form.Item>
 				<Form.Item
 					name='secretWord'
-					rules={[{ required: true, message: 'Введите секретное слово!' },
-					{ min: 5, message: 'Секретное слово должно быть не меньше 5 символов!' }
+					rules={[
+						{ required: true, message: 'Введите секретное слово!' },
+						{ min: 5, message: 'Секретное слово должно содержать не менее 5 символов' },
+						{ pattern: /^[a-zA-Zа-яА-ЯёЁ0-9]+$/, message: 'Секретное слово не должно содержать служебные символы' }
 					]}
 				>
 					<Input
