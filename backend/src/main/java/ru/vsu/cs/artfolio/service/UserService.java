@@ -15,7 +15,7 @@ import java.util.UUID;
 
 public interface UserService {
 
-    FullUserResponseDto updateUserInformation(UUID userId, UserUpdateRequestDto updatedUser, MultipartFile avatar);
+    FullUserResponseDto updateUserInformation(UserEntity executor, UserUpdateRequestDto updatedUser, MultipartFile avatar);
 
     FullUserResponseDto getUserByUsername(@Nullable UserEntity executor, String username);
 

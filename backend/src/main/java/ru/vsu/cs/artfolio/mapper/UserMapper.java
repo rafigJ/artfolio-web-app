@@ -7,6 +7,7 @@ import ru.vsu.cs.artfolio.dto.user.UserResponseDto;
 import ru.vsu.cs.artfolio.dto.user.request.UserUpdateRequestDto;
 import ru.vsu.cs.artfolio.entity.UserEntity;
 import ru.vsu.cs.artfolio.mapper.wrappers.MinioResult;
+import ru.vsu.cs.artfolio.mapper.wrappers.UserAdditionalInfo;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -22,7 +23,7 @@ public class UserMapper {
                 .build();
     }
 
-    public static FullUserResponseDto toFullDto(UserEntity user) {
+    public static FullUserResponseDto toFullDto(UserEntity user, UserAdditionalInfo additionalInfo) {
         return FullUserResponseDto.builder()
                 .uuid(user.getUuid())
                 .fullName(user.getFullName())
@@ -31,9 +32,11 @@ public class UserMapper {
                 .city(user.getCity())
                 .username(user.getUsername())
                 .email(user.getEmail())
-                .likeCount(null)
-                .subscribersCount(null)
-                .likeCount(null)
+                .postCount(additionalInfo.postCount())
+                .subscribersCount(additionalInfo.subscribersCount())
+                .followingCount(additionalInfo.followingCount())
+                .likeCount(additionalInfo.likeCount())
+                .isFollowed(additionalInfo.isFollowed())
                 .build();
     }
 

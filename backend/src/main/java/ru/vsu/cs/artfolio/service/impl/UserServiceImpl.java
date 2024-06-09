@@ -1,6 +1,7 @@
 package ru.vsu.cs.artfolio.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -21,6 +22,7 @@ import ru.vsu.cs.artfolio.exception.NotExistUserException;
 import ru.vsu.cs.artfolio.exception.NotFoundException;
 import ru.vsu.cs.artfolio.mapper.PostMapper;
 import ru.vsu.cs.artfolio.mapper.UserMapper;
+import ru.vsu.cs.artfolio.mapper.wrappers.UserAdditionalInfo;
 import ru.vsu.cs.artfolio.repository.CommentRepository;
 import ru.vsu.cs.artfolio.repository.PostRepository;
 import ru.vsu.cs.artfolio.repository.UserRepository;
@@ -30,7 +32,6 @@ import ru.vsu.cs.artfolio.service.UserService;
 
 import javax.annotation.Nullable;
 import java.util.List;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -46,22 +47,20 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public FullUserResponseDto updateUserInformation(UUID userId, UserUpdateRequestDto updatedUser, MultipartFile avatar) {
-        UserEntity oldUser = userRepository.getReferenceById(userId);
-        minioService.deleteFile(oldUser.getAvatarName());
-        UserEntity updatedEntity = UserMapper.updateEntity(oldUser, updatedUser, minioService.uploadFile(avatar));
-        return UserMapper.toFullDto(userRepository.save(updatedEntity));
+    public FullUserResponseDto updateUserInformation(UserEntity user, UserUpdateRequestDto updatedUser, MultipartFile avatar) {
+        minioService.deleteFile(user.getAvatarName());
+        UserEntity updatedEntity = UserMapper.updateEntity(user, updatedUser, minioService.uploadFile(avatar));
+        UserAdditionalInfo additionalInfo = getUserAdditionalInfo(user, user);
+        return UserMapper.toFullDto(userRepository.save(updatedEntity), additionalInfo);
     }
 
     @Override
     public FullUserResponseDto getUserByUsername(@Nullable UserEntity executor, String username) {
         UserEntity fetchUser = findUserByUsername(username);
-        if (!fetchUser.isDeleted()) {
-            return UserMapper.toFullDto(fetchUser);
-        }
-        if (executor != null && (executor.isAdmin() || executor.equals(fetchUser))) {
-            // В случае если executor админ или получает свои данные
-            return UserMapper.toFullDto(fetchUser);
+        UserAdditionalInfo additionalInfo = getUserAdditionalInfo(executor, fetchUser);
+
+        if (!fetchUser.isDeleted() || (executor != null && (executor.isAdmin() || executor.equals(fetchUser)))) {
+            return UserMapper.toFullDto(fetchUser, additionalInfo);
         } else {
             throw new NotExistUserException();
         }
@@ -70,24 +69,22 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void deleteUser(UserEntity executor, String username) {
-        if (executor.isAdmin()) {
-            UserEntity userEntity = findUserByUsername(username);
-            // "Каскадное удаление"
-            userEntity.setDeleted(true);
-            List<PostEntity> ownerPosts = postRepository.findAllByOwnerUuid(userEntity.getUuid());
-            for (PostEntity ownerPost : ownerPosts) {
-                ownerPost.setDeleted(true);
-            }
-            List<CommentEntity> ownerComments = commentRepository.findAllByUserUuid(userEntity.getUuid());
-            for (CommentEntity ownerComment : ownerComments) {
-                ownerComment.setDeleted(true);
-            }
-            commentRepository.saveAll(ownerComments);
-            postRepository.saveAll(ownerPosts);
-            userRepository.save(userEntity);
-        } else {
+        if (!executor.isAdmin()) {
             throw new BadRequestException("Need permits for that");
         }
+        // каскадное удаление
+        UserEntity userEntity = findUserByUsername(username);
+        userEntity.setDeleted(true);
+
+        List<PostEntity> ownerPosts = postRepository.findAllByOwnerUuid(userEntity.getUuid());
+        ownerPosts.forEach(post -> post.setDeleted(true));
+
+        List<CommentEntity> ownerComments = commentRepository.findAllByUserUuid(userEntity.getUuid());
+        ownerComments.forEach(comment -> comment.setDeleted(true));
+
+        commentRepository.saveAll(ownerComments);
+        postRepository.saveAll(ownerPosts);
+        userRepository.save(userEntity);
     }
 
     @Override
@@ -99,21 +96,25 @@ public class UserServiceImpl implements UserService {
     @Override
     public void subscribe(UserEntity subscriber, String followedUsername) {
         UserEntity followedUser = findUserByUsername(followedUsername);
+
         if (followedUser.isDeleted()) {
             throw new BadRequestException("Can't subscribe to deleted user");
         }
         if (followedUser.equals(subscriber)) {
             throw new BadRequestException("User can't subscribe to himself");
         }
+
         followService.subscribe(subscriber, followedUser);
     }
 
     @Override
     public void deleteSubscribe(UserEntity subscriber, String followedUsername) {
         UserEntity followedUser = findUserByUsername(followedUsername);
+
         if (followedUser.equals(subscriber)) {
             throw new BadRequestException("User can't delete/subscribe to himself");
         }
+
         followService.deleteSubscribe(subscriber, followedUser);
     }
 
@@ -133,7 +134,8 @@ public class UserServiceImpl implements UserService {
     public PageDto<PostResponseDto> getPostsPageByUsername(String username, Pageable page) {
         UserEntity user = findUserByUsername(username);
         Page<PostEntity> posts = postRepository.findAllByOwnerUuidAndDeletedIsFalse(user.getUuid(), page);
-        List<Long> likeCountsEachPostInList = likeService.getLikeCountsEachPostInList(posts.getContent().stream().map(PostEntity::getId).toList());
+        List<Long> postIds = posts.getContent().stream().map(PostEntity::getId).toList();
+        List<Long> likeCountsEachPostInList = likeService.getLikeCountsEachPostInList(postIds);
         return PostMapper.toPageDto(posts, likeCountsEachPostInList);
     }
 
@@ -141,4 +143,21 @@ public class UserServiceImpl implements UserService {
         return userRepository.findByUsername(username)
                 .orElseThrow(() -> new NotFoundException("User by " + username + " username not found"));
     }
+
+    @NotNull
+    private UserAdditionalInfo getUserAdditionalInfo(@Nullable UserEntity executor, UserEntity fetchUser) {
+        List<Long> userPosts = postRepository.findAllByOwnerUuid(fetchUser.getUuid())
+                .parallelStream()
+                .map(PostEntity::getId)
+                .toList();
+
+        Long postCount = (long) userPosts.size();
+        Long subscribersCount = followService.countUserFollowers(fetchUser.getUuid());
+        Long followingCount = followService.countUserSubscribes(fetchUser.getUuid());
+        Long likeCount = likeService.getLikeCount(userPosts);
+        Boolean isFollowed = executor != null ? followService.isFollowing(executor.getUuid(), fetchUser.getUuid()) : null;
+
+        return new UserAdditionalInfo(postCount, subscribersCount, followingCount, likeCount, isFollowed);
+    }
 }
+

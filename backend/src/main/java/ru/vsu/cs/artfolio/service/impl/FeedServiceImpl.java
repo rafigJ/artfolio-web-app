@@ -19,7 +19,6 @@ import static ru.vsu.cs.artfolio.criteria.PostSpecifications.*;
 public class FeedServiceImpl implements FeedService {
 
     private final PostService postService;
-    private final UserRepository userRepository;
 
     @Override
     public PageDto<PostResponseDto> getPostsPageOrderedByTime(Pageable page) {

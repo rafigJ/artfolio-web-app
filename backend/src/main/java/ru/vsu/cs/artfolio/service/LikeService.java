@@ -8,7 +8,6 @@ public interface LikeService {
     void createLike(UUID executorId, Long postId);
 
     /**
-     * Возвращает флаг о том подписан ли пользователь на пост
      * @return true если пользователь поставил лайк на postId, false если лайка нет
      */
     boolean hasLike(UUID userId, Long postId);

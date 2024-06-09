@@ -43,30 +43,26 @@ public class PostServiceImpl implements PostService {
 
     private final MinioService minioService;
     private final LikeService likeService;
-
     private final PostRepository postRepository;
     private final MediaRepository mediaRepository;
 
     @Override
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public FullPostResponseDto createPost(UserEntity executor,
-                                          PostRequestDto requestDto,
-                                          List<MultipartFile> files) {
-        LOGGER.info("Получение следующих данных {}, {} для сохранения", executor.getUuid(), requestDto);
+    public FullPostResponseDto createPost(UserEntity executor, PostRequestDto requestDto, List<MultipartFile> files) {
+        LOGGER.info("Creating post with data: {}, {}", executor.getUuid(), requestDto);
         if (files.isEmpty()) {
-            throw new BadRequestException("Multipart files must have min one file");
+            throw new BadRequestException("Multipart files must have at least one file");
         }
 
         MultipartFile file = files.get(0);
         PostEntity post = PostMapper.toEntity(requestDto, executor, minioService.uploadPreviewFile(file));
 
-        LOGGER.info("Сохранение поста");
+        LOGGER.info("Saving post");
         PostEntity createdPost = postRepository.save(post);
         List<MinioResult> mediaFiles = files.stream().map(minioService::uploadFile).toList();
-
         List<MediaFileEntity> medias = mediaRepository.saveAll(MediaMapper.toEntityList(mediaFiles, createdPost));
 
-        LOGGER.info("Возврат ответа");
+        LOGGER.info("Returning response");
         List<Long> mediaIds = medias.stream().map(MediaFileEntity::getId).toList();
         return PostMapper.toFullDto(createdPost, mediaIds, 0L, false);
     }
@@ -81,11 +77,12 @@ public class PostServiceImpl implements PostService {
                     .filter(p -> !p.getDeleted())
                     .orElseThrow(() -> new NotFoundException("Post by id: " + id + " not found"));
         }
+
         List<Long> mediaIds = postEntity.getMedias().stream()
                 .sorted(Comparator.comparingInt(MediaFileEntity::getPosition))
                 .map(MediaFileEntity::getId).toList();
 
-        Boolean hasLike = user != null ? likeService.hasLike(user.getUuid(), id) : null;
+        Boolean hasLike = (user != null) ? likeService.hasLike(user.getUuid(), id) : null;
         return PostMapper.toFullDto(postEntity, mediaIds, likeService.getLikeCount(id), hasLike);
     }
 
@@ -103,10 +100,9 @@ public class PostServiceImpl implements PostService {
     @Override
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public FullPostResponseDto updatePost(UserEntity executor, Long id, PostRequestDto requestDto, List<MultipartFile> files) {
-        LOGGER.info("Получение следующих данных {}, {}, {} для обновления", executor.getUuid(), id, requestDto);
+        LOGGER.info("Updating post with data: {}, {}, {}", executor.getUuid(), id, requestDto);
 
         PostEntity postToUpdate = findPostById(id);
-
         if (!postToUpdate.getOwner().equals(executor)) {
             LOGGER.warn("Insufficient rights to update post");
             throw new RestException("Insufficient rights to update post", HttpStatus.UNAUTHORIZED);
@@ -122,8 +118,8 @@ public class PostServiceImpl implements PostService {
 
         PostEntity updatedPost = postRepository.save(newPost);
         List<MinioResult> mediaFiles = files.stream().map(minioService::uploadFile).toList();
-
         List<MediaFileEntity> medias = mediaRepository.saveAll(MediaMapper.toEntityList(mediaFiles, updatedPost));
+
         List<Long> mediaIds = medias.stream().map(MediaFileEntity::getId).toList();
         Boolean hasLike = likeService.hasLike(executor.getUuid(), id);
         return PostMapper.toFullDto(updatedPost, mediaIds, likeService.getLikeCount(id), hasLike);
@@ -132,7 +128,8 @@ public class PostServiceImpl implements PostService {
     @Override
     public PageDto<PostResponseDto> getPostsPageBySpecifications(Specification<PostEntity> specification, Pageable page) {
         Page<PostEntity> posts = postRepository.findAll(specification, page);
-        List<Long> likeCountsEachPostInList = likeService.getLikeCountsEachPostInList(posts.getContent().stream().map(PostEntity::getId).toList());
+        List<Long> postIds = posts.getContent().stream().map(PostEntity::getId).toList();
+        List<Long> likeCountsEachPostInList = likeService.getLikeCountsEachPostInList(postIds);
         return PostMapper.toPageDto(posts, likeCountsEachPostInList);
     }
 
@@ -153,7 +150,6 @@ public class PostServiceImpl implements PostService {
         likeService.deleteLike(userId, postId);
         return likeService.getLikeCount(postId);
     }
-
 
     @Override
     public MediaDto getMediaById(Long mediaId) {

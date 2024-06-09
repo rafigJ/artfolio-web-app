@@ -52,7 +52,7 @@ public class UserController {
                                                           @RequestPart("userInfo") @Valid UserUpdateRequestDto request,
                                                           @RequestPart("avatarFile") MultipartFile avatarFile) {
         LOGGER.info("Обновление данных о {}", user.getUsername());
-        return ResponseEntity.ok(service.updateUserInformation(user.getUserEntity().getUuid(), request, avatarFile));
+        return ResponseEntity.ok(service.updateUserInformation(user.getUserEntity(), request, avatarFile));
     }
 
     @DeleteMapping("/{username}")

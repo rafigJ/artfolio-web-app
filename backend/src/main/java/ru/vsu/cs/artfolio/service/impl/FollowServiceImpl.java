@@ -46,8 +46,23 @@ public class FollowServiceImpl implements FollowService {
     }
 
     @Override
+    public Long countUserSubscribes(UUID userId) {
+        return repository.countBySubscriberUuid(userId);
+    }
+
+    @Override
     public PageDto<UserResponseDto> getAllUserFollowers(UUID userId, Pageable page) {
         Page<UserEntity> followers = repository.findAllByFollowedUuid(userId, page).map(FollowEntity::getSubscriber);
         return UserMapper.toPageDto(followers);
+    }
+
+    @Override
+    public Long countUserFollowers(UUID userId) {
+        return repository.countByFollowedUuid(userId);
+    }
+
+    @Override
+    public boolean isFollowing(UUID subscriberId, UUID followedId) {
+        return repository.existsBySubscriber_UuidAndFollowed_Uuid(subscriberId, followedId);
     }
 }

@@ -123,7 +123,7 @@ public class MinioService {
             }
             Thumbnails.of(originalImage)
                     .size(406, 204)
-                    .outputFormat("jpg")
+                    .outputFormat(file.getContentType().substring("image/".length()))
                     .toOutputStream(byteArrayOutputStream);
             return byteArrayOutputStream;
         } catch (IOException e) {
