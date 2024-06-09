@@ -5,6 +5,8 @@ import io.minio.MinioClient;
 import io.minio.PutObjectArgs;
 import io.minio.RemoveObjectArgs;
 import io.minio.RemoveObjectsArgs;
+import io.minio.Result;
+import io.minio.messages.DeleteError;
 import io.minio.messages.DeleteObject;
 import lombok.RequiredArgsConstructor;
 import net.coobird.thumbnailator.Thumbnails;
@@ -83,12 +85,20 @@ public class MinioService {
 
     public void deleteFiles(List<String> fileNames) {
         var deleteObjects = fileNames.stream().map(DeleteObject::new).toList();
-        minioClient.removeObjects(
+        Iterable<Result<DeleteError>> results = minioClient.removeObjects(
                 RemoveObjectsArgs.builder()
                         .bucket(bucketName)
                         .objects(deleteObjects)
                         .build()
         );
+        for (Result<DeleteError> result : results) {
+            try {
+                DeleteError error = result.get();
+                System.out.println("Error in deleting object " + error.objectName() + "; " + error.message());
+            } catch (Exception e) {
+                throw new RestException(e.getMessage(), HttpStatus.BAD_GATEWAY);
+            }
+        }
     }
 
     public void deleteFile(String fileName) {
@@ -113,7 +123,7 @@ public class MinioService {
             }
             Thumbnails.of(originalImage)
                     .size(406, 204)
-                    .outputFormat("jpg")
+                    .outputFormat(file.getContentType().substring("image/".length()))
                     .toOutputStream(byteArrayOutputStream);
             return byteArrayOutputStream;
         } catch (IOException e) {

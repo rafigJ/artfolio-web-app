@@ -10,6 +10,8 @@ import ru.vsu.cs.artfolio.entity.LikeEntity;
 import ru.vsu.cs.artfolio.entity.PostEntity;
 import ru.vsu.cs.artfolio.entity.UserEntity;
 
+import java.util.UUID;
+
 public class PostSpecifications {
 
     public static Specification<PostEntity> nameContainsIgnoreCaseSortByCreateTime(String name) {
@@ -20,6 +22,16 @@ public class PostSpecifications {
             query.orderBy(criteriaBuilder.desc(root.get("createTime")));
             return criteriaBuilder.and(
                     criteriaBuilder.like(criteriaBuilder.lower(root.get("name")), "%" + name.toLowerCase() + "%"),
+                    criteriaBuilder.isFalse(root.get("deleted"))
+            );
+        };
+    }
+
+    public static Specification<PostEntity> byOwnerId(UUID ownerID) {
+        return (root, query, criteriaBuilder) -> {
+            query.orderBy(criteriaBuilder.desc(root.get("createTime")));
+            return criteriaBuilder.and(
+                    criteriaBuilder.equal(root.get("ownerId"), ownerID.toString()),
                     criteriaBuilder.isFalse(root.get("deleted"))
             );
         };

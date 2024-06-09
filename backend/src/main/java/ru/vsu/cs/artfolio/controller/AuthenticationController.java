@@ -28,13 +28,13 @@ import ru.vsu.cs.artfolio.dto.auth.RegisterRequestDto;
 @RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
 public class AuthenticationController {
-    private static final Logger LOGGER = LoggerFactory.getLogger(PostController.class);
+    private static final Logger LOG = LoggerFactory.getLogger(PostController.class);
     private final AuthenticationService service;
 
     @PostMapping("/register")
     public ResponseEntity<AuthResponseDto> register(@RequestPart("userInfo") @Valid RegisterRequestDto request,
                                                     @RequestPart("avatarFile") MultipartFile avatarFile) {
-        LOGGER.info("{}", avatarFile);
+        LOG.info("{}", avatarFile);
         var register = service.register(request, avatarFile);
         return ResponseEntity.ok(register);
     }

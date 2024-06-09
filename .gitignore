@@ -4,6 +4,7 @@ backend/.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
 backend/src/main/resources/application.yml
+application.yml
 
 .env
 minio/storage/

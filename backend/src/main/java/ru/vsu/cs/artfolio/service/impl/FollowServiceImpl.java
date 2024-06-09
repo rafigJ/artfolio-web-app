@@ -22,19 +22,17 @@ public class FollowServiceImpl implements FollowService {
     private final FollowRepository repository;
 
     @Override
-    public void subscribe(UUID subscriberUuid, UUID followedUuid) {
-        if (repository.existsBySubscriber_UuidAndFollowed_Uuid(subscriberUuid, followedUuid)) {
+    public void subscribe(UserEntity subscriber, UserEntity followed) {
+        if (repository.existsBySubscriber_UuidAndFollowed_Uuid(subscriber.getUuid(), followed.getUuid())) {
             return;
         }
-        var subscriber = UserEntity.builder().uuid(subscriberUuid).build();
-        var followed = UserEntity.builder().uuid(followedUuid).build();
         var followEntity = new FollowEntity(null, subscriber, followed);
         repository.save(followEntity);
     }
 
     @Override
-    public void deleteSubscribe(UUID subscriberUuid, UUID followedUuid) {
-        Optional<FollowEntity> followEntity = repository.findBySubscriber_UuidAndFollowed_Uuid(subscriberUuid, followedUuid);
+    public void deleteSubscribe(UserEntity subscriber, UserEntity followed) {
+        Optional<FollowEntity> followEntity = repository.findBySubscriber_UuidAndFollowed_Uuid(subscriber.getUuid(), followed.getUuid());
         if (followEntity.isEmpty()) {
             return;
         }
@@ -48,8 +46,23 @@ public class FollowServiceImpl implements FollowService {
     }
 
     @Override
+    public Long countUserSubscribes(UUID userId) {
+        return repository.countBySubscriberUuid(userId);
+    }
+
+    @Override
     public PageDto<UserResponseDto> getAllUserFollowers(UUID userId, Pageable page) {
         Page<UserEntity> followers = repository.findAllByFollowedUuid(userId, page).map(FollowEntity::getSubscriber);
         return UserMapper.toPageDto(followers);
+    }
+
+    @Override
+    public Long countUserFollowers(UUID userId) {
+        return repository.countByFollowedUuid(userId);
+    }
+
+    @Override
+    public boolean isFollowing(UUID subscriberId, UUID followedId) {
+        return repository.existsBySubscriber_UuidAndFollowed_Uuid(subscriberId, followedId);
     }
 }

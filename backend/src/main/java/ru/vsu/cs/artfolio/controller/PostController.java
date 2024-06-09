@@ -29,9 +29,11 @@ import ru.vsu.cs.artfolio.dto.comment.CommentRequestDto;
 import ru.vsu.cs.artfolio.dto.comment.CommentResponseDto;
 import ru.vsu.cs.artfolio.dto.post.FullPostResponseDto;
 import ru.vsu.cs.artfolio.dto.post.PostRequestDto;
+import ru.vsu.cs.artfolio.entity.UserEntity;
 import ru.vsu.cs.artfolio.service.CommentService;
 import ru.vsu.cs.artfolio.service.PostService;
 
+import javax.annotation.Nullable;
 import java.util.List;
 
 @RestController
@@ -56,9 +58,10 @@ public class PostController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<FullPostResponseDto> getPostById(@PathVariable("id") Long id, @AuthenticationPrincipal User user) {
+    public ResponseEntity<FullPostResponseDto> getPostById(@PathVariable("id") Long id, @Nullable @AuthenticationPrincipal User user) {
         LOGGER.info("Получение поста " + id);
-        return ResponseEntity.ok(service.getPostById(user.getUserEntity(), id));
+        UserEntity userEntity = user != null ? user.getUserEntity() : null;
+        return ResponseEntity.ok(service.getPostById(userEntity, id));
     }
 
     @PutMapping("/{id}")
@@ -81,7 +84,7 @@ public class PostController {
             @AuthenticationPrincipal User user) {
         LOGGER.info("Пользователь {} удаляет пост с идентификатором {}", user.getUsername(), id);
         service.deletePost(user.getUserEntity(), id);
-        return ResponseEntity.ok("post " + id + " is deleted");
+        return ResponseEntity.ok("{\"message\": \"post " + id + " is deleted\"}");
     }
 
     @PostMapping("/{id}/like")

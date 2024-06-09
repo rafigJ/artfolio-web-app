@@ -18,6 +18,8 @@ import ru.vsu.cs.artfolio.dto.post.PostResponseDto;
 import ru.vsu.cs.artfolio.exception.BadRequestException;
 import ru.vsu.cs.artfolio.service.FeedService;
 
+import javax.annotation.Nullable;
+
 @RestController
 @RequestMapping("/api/v1/feed")
 @RequiredArgsConstructor
@@ -29,7 +31,8 @@ public class FeedController {
     @GetMapping()
     public ResponseEntity<PageDto<PostResponseDto>> getPostsPage(@RequestParam(value = "_page", defaultValue = "0") Integer page,
                                                                  @RequestParam(value = "_limit", defaultValue = "10") Integer limit,
-                                                                 @RequestParam(value = "section", defaultValue = "NEW") FeedSection section, @AuthenticationPrincipal User user) {
+                                                                 @RequestParam(value = "section", defaultValue = "NEW") FeedSection section,
+                                                                 @Nullable @AuthenticationPrincipal User user) {
         Pageable pageable = PageRequest.of(page, limit);
         PageDto<PostResponseDto> posts = switch (section) {
             case NEW -> {
@@ -41,11 +44,11 @@ public class FeedController {
                 yield feedService.getPostsPageOrderedByPopularity(pageable);
             }
             case SUBSCRIBE -> {
-                LOGGER.info("Пользователь {} получает посты SUBSCRIBE page = {}, limit = {}", user.getUserEntity().getUsername(), page, limit);
                 if (user == null) {
                     throw new BadRequestException("user must be logged in for SUBSCRIBE query");
                 }
-                yield feedService.getPostsPageOrderedByFollowerSubscribe(user.getUserEntity().getUuid(), pageable);
+                LOGGER.info("Пользователь {} получает посты SUBSCRIBE page = {}, limit = {}", user.getUserEntity().getUsername(), page, limit);
+                yield feedService.getPostsPageOrderedByFollowerSubscribe(user.getUserEntity(), pageable);
             }
         };
         return ResponseEntity.ok(posts);

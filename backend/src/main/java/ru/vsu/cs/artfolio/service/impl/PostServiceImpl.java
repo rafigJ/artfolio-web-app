@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-import ru.vsu.cs.artfolio.auth.user.Role;
 import ru.vsu.cs.artfolio.dto.MediaDto;
 import ru.vsu.cs.artfolio.dto.PageDto;
 import ru.vsu.cs.artfolio.dto.post.FullPostResponseDto;
@@ -31,6 +30,7 @@ import ru.vsu.cs.artfolio.repository.PostRepository;
 import ru.vsu.cs.artfolio.service.LikeService;
 import ru.vsu.cs.artfolio.service.PostService;
 
+import javax.annotation.Nullable;
 import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
@@ -43,48 +43,53 @@ public class PostServiceImpl implements PostService {
 
     private final MinioService minioService;
     private final LikeService likeService;
-
     private final PostRepository postRepository;
     private final MediaRepository mediaRepository;
 
     @Override
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public FullPostResponseDto createPost(UserEntity executor,
-                                          PostRequestDto requestDto,
-                                          List<MultipartFile> files) {
-        LOGGER.info("Получение следующих данных {}, {} для сохранения", executor.getUuid(), requestDto);
+    public FullPostResponseDto createPost(UserEntity executor, PostRequestDto requestDto, List<MultipartFile> files) {
+        LOGGER.info("Creating post with data: {}, {}", executor.getUuid(), requestDto);
         if (files.isEmpty()) {
-            throw new BadRequestException("Multipart files must have min one file");
+            throw new BadRequestException("Multipart files must have at least one file");
         }
 
         MultipartFile file = files.get(0);
         PostEntity post = PostMapper.toEntity(requestDto, executor, minioService.uploadPreviewFile(file));
 
-        LOGGER.info("Сохранение поста");
+        LOGGER.info("Saving post");
         PostEntity createdPost = postRepository.save(post);
         List<MinioResult> mediaFiles = files.stream().map(minioService::uploadFile).toList();
-
         List<MediaFileEntity> medias = mediaRepository.saveAll(MediaMapper.toEntityList(mediaFiles, createdPost));
 
-        LOGGER.info("Возврат ответа");
+        LOGGER.info("Returning response");
         List<Long> mediaIds = medias.stream().map(MediaFileEntity::getId).toList();
-        return PostMapper.toFullDto(createdPost, mediaIds, 0L);
+        return PostMapper.toFullDto(createdPost, mediaIds, 0L, false);
     }
 
     @Override
-    public FullPostResponseDto getPostById(UserEntity user, Long id) {
-        PostEntity postEntity = postRepository.findById(id)
-                .filter(post -> user.getRole() == Role.ADMIN || !post.getDeleted())
-                .orElseThrow(() -> new NotFoundException("Post by id: " + id + " not found"));
-        List<Long> mediaIds = postEntity.getMedias().stream().sorted(Comparator.comparingInt(MediaFileEntity::getPosition)).map(MediaFileEntity::getId).toList();
-        return PostMapper.toFullDto(postEntity, mediaIds, likeService.getLikeCount(id));
+    public FullPostResponseDto getPostById(@Nullable UserEntity user, Long id) {
+        PostEntity postEntity;
+        if (user != null && user.isAdmin()) {
+            postEntity = findPostById(id);
+        } else {
+            postEntity = postRepository.findById(id)
+                    .filter(p -> !p.getDeleted())
+                    .orElseThrow(() -> new NotFoundException("Post by id: " + id + " not found"));
+        }
+
+        List<Long> mediaIds = postEntity.getMedias().stream()
+                .sorted(Comparator.comparingInt(MediaFileEntity::getPosition))
+                .map(MediaFileEntity::getId).toList();
+
+        Boolean hasLike = (user != null) ? likeService.hasLike(user.getUuid(), id) : null;
+        return PostMapper.toFullDto(postEntity, mediaIds, likeService.getLikeCount(id), hasLike);
     }
 
     @Override
     public void deletePost(UserEntity executor, Long id) {
-        PostEntity post = postRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Post by id: " + id + " not found"));
-        if (post.getOwner().getUuid().equals(executor.getUuid()) || executor.getRole() == Role.ADMIN) {
+        PostEntity post = findPostById(id);
+        if (post.getOwner().equals(executor) || executor.isAdmin()) {
             post.setDeleted(true);
             postRepository.save(post);
         } else {
@@ -95,12 +100,10 @@ public class PostServiceImpl implements PostService {
     @Override
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public FullPostResponseDto updatePost(UserEntity executor, Long id, PostRequestDto requestDto, List<MultipartFile> files) {
-        LOGGER.info("Получение следующих данных {}, {}, {} для обновления", executor.getUuid(), id, requestDto);
+        LOGGER.info("Updating post with data: {}, {}, {}", executor.getUuid(), id, requestDto);
 
-        PostEntity postToUpdate = postRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Post by id: " + id + " not found"));
-
-        if (!postToUpdate.getOwner().getUuid().equals(executor.getUuid())) {
+        PostEntity postToUpdate = findPostById(id);
+        if (!postToUpdate.getOwner().equals(executor)) {
             LOGGER.warn("Insufficient rights to update post");
             throw new RestException("Insufficient rights to update post", HttpStatus.UNAUTHORIZED);
         }
@@ -115,23 +118,18 @@ public class PostServiceImpl implements PostService {
 
         PostEntity updatedPost = postRepository.save(newPost);
         List<MinioResult> mediaFiles = files.stream().map(minioService::uploadFile).toList();
-
         List<MediaFileEntity> medias = mediaRepository.saveAll(MediaMapper.toEntityList(mediaFiles, updatedPost));
-        List<Long> mediaIds = medias.stream().map(MediaFileEntity::getId).toList();
-        return PostMapper.toFullDto(updatedPost, mediaIds, likeService.getLikeCount(id));
-    }
 
-    @Override
-    public PageDto<PostResponseDto> getPostsPageByUserId(UUID userId, Pageable page) {
-        Page<PostEntity> posts = postRepository.findAllByOwnerUuid(userId, page);
-        List<Long> likeCountsEachPostInList = likeService.getLikeCountsEachPostInList(posts.getContent().stream().map(PostEntity::getId).toList());
-        return PostMapper.toPageDto(posts, likeCountsEachPostInList);
+        List<Long> mediaIds = medias.stream().map(MediaFileEntity::getId).toList();
+        Boolean hasLike = likeService.hasLike(executor.getUuid(), id);
+        return PostMapper.toFullDto(updatedPost, mediaIds, likeService.getLikeCount(id), hasLike);
     }
 
     @Override
     public PageDto<PostResponseDto> getPostsPageBySpecifications(Specification<PostEntity> specification, Pageable page) {
         Page<PostEntity> posts = postRepository.findAll(specification, page);
-        List<Long> likeCountsEachPostInList = likeService.getLikeCountsEachPostInList(posts.getContent().stream().map(PostEntity::getId).toList());
+        List<Long> postIds = posts.getContent().stream().map(PostEntity::getId).toList();
+        List<Long> likeCountsEachPostInList = likeService.getLikeCountsEachPostInList(postIds);
         return PostMapper.toPageDto(posts, likeCountsEachPostInList);
     }
 
@@ -153,18 +151,25 @@ public class PostServiceImpl implements PostService {
         return likeService.getLikeCount(postId);
     }
 
-
     @Override
     public MediaDto getMediaById(Long mediaId) {
-        MediaFileEntity media = mediaRepository.findById(mediaId)
-                .orElseThrow(() -> new NotFoundException("Media by id: " + mediaId + " not found"));
+        MediaFileEntity media = findMediaById(mediaId);
         return new MediaDto(minioService.downloadFile(media.getFileName()), media.getType());
     }
 
     @Override
     public MediaDto getPreviewByPostId(Long postId) {
-        PostEntity post = postRepository.findById(postId)
-                .orElseThrow(() -> new NotFoundException("Post by id: " + postId + " not found"));
+        PostEntity post = findPostById(postId);
         return new MediaDto(minioService.downloadFile(post.getPreviewMediaName()), post.getPreviewType());
+    }
+
+    private MediaFileEntity findMediaById(Long mediaId) {
+        return mediaRepository.findById(mediaId)
+                .orElseThrow(() -> new NotFoundException("Media by id: " + mediaId + " not found"));
+    }
+
+    private PostEntity findPostById(Long postId) {
+        return postRepository.findById(postId)
+                .orElseThrow(() -> new NotFoundException("Post by id: " + postId + " not found"));
     }
 }

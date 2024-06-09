@@ -26,7 +26,10 @@ import ru.vsu.cs.artfolio.dto.post.PostResponseDto;
 import ru.vsu.cs.artfolio.dto.user.FullUserResponseDto;
 import ru.vsu.cs.artfolio.dto.user.UserResponseDto;
 import ru.vsu.cs.artfolio.dto.user.request.UserUpdateRequestDto;
+import ru.vsu.cs.artfolio.entity.UserEntity;
 import ru.vsu.cs.artfolio.service.UserService;
+
+import javax.annotation.Nullable;
 
 @RestController
 @RequestMapping("/api/v1/user")
@@ -37,9 +40,10 @@ public class UserController {
     private final UserService service;
 
     @GetMapping("/{username}")
-    public ResponseEntity<FullUserResponseDto> getUserByUsername(@PathVariable("username") String username) {
+    public ResponseEntity<FullUserResponseDto> getUserByUsername(@Nullable @AuthenticationPrincipal User user, @PathVariable("username") String username) {
         LOGGER.info("Получение данных о {}", username);
-        return ResponseEntity.ok(service.getUserByUsername(username));
+        UserEntity executor = user != null ? user.getUserEntity() : null;
+        return ResponseEntity.ok(service.getUserByUsername(executor, username));
     }
 
     @PutMapping()
@@ -48,7 +52,7 @@ public class UserController {
                                                           @RequestPart("userInfo") @Valid UserUpdateRequestDto request,
                                                           @RequestPart("avatarFile") MultipartFile avatarFile) {
         LOGGER.info("Обновление данных о {}", user.getUsername());
-        return ResponseEntity.ok(service.updateUserInformation(user.getUserEntity().getUuid(), request, avatarFile));
+        return ResponseEntity.ok(service.updateUserInformation(user.getUserEntity(), request, avatarFile));
     }
 
     @DeleteMapping("/{username}")
@@ -56,8 +60,8 @@ public class UserController {
     public ResponseEntity<?> deleteUserByUsername(@AuthenticationPrincipal User user,
                                                   @PathVariable("username") String username) {
         LOGGER.info("Удаление пользователя {}", username);
-        service.deleteUser(user.getUserEntity().getUuid(), username);
-        return ResponseEntity.ok("Пользователь " + username + " удален");
+        service.deleteUser(user.getUserEntity(), username);
+        return ResponseEntity.ok("{\"message\": \"user " + username + " is deleted\"}");
     }
 
     @GetMapping("/{username}/avatar")
@@ -72,7 +76,8 @@ public class UserController {
     public ResponseEntity<PageDto<PostResponseDto>> getPostsByUsername(@RequestParam(value = "_page", defaultValue = "0") Integer page,
                                                                        @RequestParam(value = "_limit", defaultValue = "10") Integer limit,
                                                                        @PathVariable("username") String username) {
-        throw new UnsupportedOperationException();
+        var posts = service.getPostsPageByUsername(username, PageRequest.of(page, limit));
+        return ResponseEntity.ok(posts);
     }
 
     @GetMapping("/{username}/subscribes")
@@ -84,15 +89,15 @@ public class UserController {
 
     @PostMapping("/{username}/subscribes")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<?> subscribe(@PathVariable("username") String username, @AuthenticationPrincipal User user) {
-        service.subscribe(user.getUserEntity().getUuid(), username);
+    public ResponseEntity<String> subscribe(@PathVariable("username") String username, @AuthenticationPrincipal User user) {
+        service.subscribe(user.getUserEntity(), username);
         return ResponseEntity.ok("{\"message\": \"subscribed to " + username + "\"}");
     }
 
     @DeleteMapping("/{username}/subscribes")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<?> deleteSubscribe(@PathVariable("username") String username, @AuthenticationPrincipal User user) {
-        service.deleteSubscribe(user.getUserEntity().getUuid(), username);
+    public ResponseEntity<String> deleteSubscribe(@PathVariable("username") String username, @AuthenticationPrincipal User user) {
+        service.deleteSubscribe(user.getUserEntity(), username);
         return ResponseEntity.ok("{\"message\": \"delete subscribe from " + username + "\"}");
     }
 
