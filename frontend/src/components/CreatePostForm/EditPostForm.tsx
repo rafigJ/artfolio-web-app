@@ -56,7 +56,6 @@ const getCroppedImage = async (imageDataUrl: string): Promise<string> => {
 const EditPostForm: React.FC = () => {
 	const navigate = useNavigate()
 	const params = useParams()
-	const { authCredential } = useContext(AuthContext)
 	const [post, setPost] = useState<PostRequest>({} as PostRequest)
 	const [fileList, setFileList] = useState<UploadFile[]>([])
 	const [fileBlobMap, setMap] = useState<Map<string, Blob>>(new Map())
@@ -78,7 +77,12 @@ const EditPostForm: React.FC = () => {
 	const [fetchPost, isPostLoading] = useFetching(async (id: number) => {
 		try {
 			const response = await PostService.getPostById(id)
-			if (authCredential.username !== response.data.owner.username) {
+			if (!localStorage.getItem('username')) {
+				navigate(`/posts/${id}`)
+				message.warning('Для редактирования публикации необходимо авторизоваться')
+				return
+			}
+			if (localStorage.getItem('username') !== response.data.owner.username) {
 				navigate(`/posts/${id}`)
 				message.warning(`Вы не автор данной публикации и не можете её редактировать`)
 			} else {

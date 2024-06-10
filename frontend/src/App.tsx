@@ -16,8 +16,12 @@ const App: React.FC = () => {
 		await AuthService.userCredentials().then((response) => {
 			setAuthCredential({ ...response.data })
 			setIsAuth(true)
+			localStorage.setItem('username', response.data.username)
 		}).catch((reason: any) => {
-				if (reason.response.status === 401) localStorage.removeItem('token')
+				if (reason.response.status === 401) {
+					localStorage.removeItem('token')
+					localStorage.removeItem('username')
+				}
 			}
 		)
 	})

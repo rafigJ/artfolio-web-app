@@ -41,6 +41,7 @@ const RegisterForm: React.FC = () => {
 		const response = await AuthService.register(registerRequest, avatar)
 		setAuthCredential(response.data)
 		localStorage.setItem('token', response.data.token)
+		localStorage.setItem('username', response.data.username)
 		setIsAuth(true)
 		message.success((`Вы успешно зарегистрировались ${response.status}`))
 	})

@@ -23,6 +23,7 @@ const HeaderProfileMenu: FC<HeaderProfileMenuProps> = ({ src }) => {
 		}
 		if (e.key === '3') {
 			localStorage.removeItem('token')
+			localStorage.removeItem('username')
 			navigate('/')
 			setIsAuth(false)
 		}
