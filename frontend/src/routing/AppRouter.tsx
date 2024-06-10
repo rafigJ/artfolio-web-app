@@ -3,6 +3,7 @@ import { Navigate, Route, Routes, useLocation } from 'react-router-dom'
 import { AuthContext } from '../context'
 import AdminPanelPage from '../pages/AdminPanelPage/AdminPanelPage'
 import CreatePostPage from '../pages/CreatePostPage/CreatePostPage'
+import EditPostPage from '../pages/CreatePostPage/EditPostPage'
 import EditProfilePage from '../pages/EditProfilePage/EditProfilePage'
 import ForgotPasswordPage from '../pages/ForgotPasswordPage/ForgotPasswordPage'
 import LoginPage from '../pages/LoginPage/LoginPage'
@@ -14,16 +15,16 @@ import SearchPage from '../pages/SearchPage/SearchPage'
 
 const AppRouter = () => {
 	const { isAuth, authCredential } = useContext(AuthContext)
-
+	
 	const location = useLocation()
-
+	
 	useEffect(() => {
 		if (typeof window.ym === 'function') {
 			window.ym(97163910, 'hit', location.pathname)
 		}
 	}, [location])
-
-
+	
+	
 	return (
 		<Routes>
 			<Route index path='/' element={<MainPage />} />
@@ -35,6 +36,7 @@ const AppRouter = () => {
 			</>
 			}
 			<Route path='/posts/:id' element={<PostPage />} />
+			<Route path='/posts/edit/:id' element={<EditPostPage />} />
 			<Route path='/profile/:username' element={<ProfilePage />} />
 			{isAuth ?
 				<Route path='/posts/create' element={<CreatePostPage />} />

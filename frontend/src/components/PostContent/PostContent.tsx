@@ -91,11 +91,12 @@ const PostContent = () => {
 			message.error('Произошла ошибка при лайке поста')
 		}
 	}
+	const params = useParams()
 
 	const items: MenuProps['items'] = [
 		{
 			key: '1',
-			label: <Link to={'/posts/create'}>Редактировать</Link>,
+			label: <Link to={`/posts/edit/${params.id}`}>Редактировать</Link>,
 			icon: <EditOutlined />
 		},
 		{
@@ -112,7 +113,6 @@ const PostContent = () => {
 		}
 	]
 
-	const params = useParams()
 	const [post, setPost] = useState<FullPostResponse>({} as FullPostResponse)
 
 	const [fetchPost, isLoading, isError, error] = useFetching(async (id) => {

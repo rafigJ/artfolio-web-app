@@ -18,8 +18,8 @@ import DraggableUploadList from '../DraggableUploadList/DraggableUploadList'
  */
 const CreatePostForm = () => {
 	const navigate = useNavigate()
-	const [post, setPost] = useState<MockPostRequest>({
-		title: 'Заголовок публикации',
+	const [post, setPost] = useState<PostRequest>({
+		name: 'Заголовок публикации',
 		description:
 			'Откройте для себя увлекательный мир современного дизайна ' +
 			'и искусства через глаза творцов и инноваторов. Эта публикация на Artfolio ' +
@@ -52,11 +52,12 @@ const CreatePostForm = () => {
 			return
 		}
 		window.ym(97163910, 'reachGoal', 'createSuccess')
+		console.log(fileList)
 		createPost(trimmedValues, fileList.map(e => e?.originFileObj as File))
 	}
 
 	const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		setPost({ ...post, title: e.target.value })
+		setPost({ ...post, name: e.target.value })
 	}
 
 	const handleDescriptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {

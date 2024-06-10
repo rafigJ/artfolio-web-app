@@ -1,25 +1,13 @@
 import { Divider, Typography } from 'antd'
 import { UploadFile } from 'antd/lib/upload/interface'
-import { FC, useEffect, useState } from 'react'
+import { FC, useEffect, useRef, useState } from 'react'
 import { useObjectUrls } from '../../hooks/useObjectUrls'
-import type { MockPostRequest } from '../../types/MockTypes/MockPostRequest'
+import type { PostRequest } from '../../types/PostRequest'
 
 interface CreatePostFormPreviewProps {
-	post: MockPostRequest
+	post: PostRequest
 	fileList: UploadFile[]
-}
-
-/**
- * Функция для получения временного URL изображения из файла.
- * @param file Файл изображения.
- * @return Promise<string> Возвращает Promise с временным URL изображения.
- * @deprecated заменен на хук useObjectsUrls (https://www.jacobparis.com/content/file-image-thumbnails)
- */
-export const getObjectURLFromFile = (file: File): Promise<string> => {
-	return new Promise<string>(resolve => {
-		const objectURL = URL.createObjectURL(file)
-		resolve(objectURL)
-	})
+	preloadBlobMap?: Map<string, Blob>
 }
 
 /**
@@ -27,17 +15,38 @@ export const getObjectURLFromFile = (file: File): Promise<string> => {
  * Этот компонент динамически отображает заголовок, изображения и описание создаваемой публикации.
  * @param post Объект, передаваемый в запрос.
  * @param fileList Список файлов изображений, которые отображаются на странице.
+ * @param preloadBlobList
  */
-const CreatePostFormPreview: FC<CreatePostFormPreviewProps> = ({ post, fileList }) => {
+const CreatePostFormPreview: FC<CreatePostFormPreviewProps> = ({
+	                                                               post,
+	                                                               fileList,
+	                                                               preloadBlobMap = new Map<string, Blob>()
+                                                               }) => {
 	const [objectURLs, setObjectURLs] = useState<string[]>([])
+	const cachedMap = useRef<Map<string, string>>(new Map<string, string>())
+	
+	
 	const getUrl = useObjectUrls()
 	useEffect(() => {
+		
 		const getObjectURLs = async () => {
+			const map = cachedMap.current
+			preloadBlobMap.forEach((blob, key) => {
+				if (!map.has(key)) {
+					const cachedUrl = URL.createObjectURL(blob)
+					map.set(key, cachedUrl)
+				}
+			})
 			const newObjectURLs: string[] = []
 			for (const file of fileList) {
 				if (file.originFileObj) {
 					const objectURL = getUrl(file.originFileObj)
 					newObjectURLs.push(objectURL)
+				} else if (file.url) {
+					const newVar = map.get(file.uid)
+					if (newVar) {
+						newObjectURLs.push(newVar)
+					}
 				}
 			}
 			setObjectURLs(newObjectURLs)
@@ -47,7 +56,7 @@ const CreatePostFormPreview: FC<CreatePostFormPreviewProps> = ({ post, fileList 
 	
 	return (
 		<div style={{ display: 'flex', flexDirection: 'column' }}>
-			<Typography.Title level={3}>{post.title}</Typography.Title>
+			<Typography.Title level={3}>{post.name}</Typography.Title>
 			{objectURLs.map((objectURL, index) => (
 				<div key={index}>
 					<img
