@@ -3,8 +3,8 @@ export interface FullPostResponse {
 	name: string
 	description: string
 	likeCount: number
-	previewMedia: number
 	mediaIds: number[]
+	hasLike: false,
 	owner: Owner
 }
 
