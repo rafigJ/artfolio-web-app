@@ -7,8 +7,8 @@ import {
 	HeartFilled,
 	HeartOutlined
 } from '@ant-design/icons'
-import { Avatar, Button, Divider, Dropdown, Flex, MenuProps, Skeleton, Typography, message } from 'antd'
-import { useContext, useEffect, useState, type CSSProperties, type FC } from 'react'
+import { Avatar, Button, Divider, Dropdown, Flex, MenuProps, message, Skeleton, Typography } from 'antd'
+import { type CSSProperties, type FC, useContext, useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import $api, { API_URL } from '../../api'
 import PostService from '../../api/PostService'
@@ -35,14 +35,14 @@ const AuthorLinkCard: FC<AuthorLinkCardProps> = ({ owner, style }) => {
 					icon={<AntDesignOutlined />}
 				/>
 			</Link>
-
+			
 			<div style={{ display: 'flex', flexDirection: 'column' }}>
 				<Link to={`/profile/${owner?.username}`}>
 					<Typography.Title style={{ marginTop: '15px' }} level={4}>
 						{owner?.fullName}
 					</Typography.Title>
 				</Link>
-
+				
 				<Typography.Text>Воронеж, Россия</Typography.Text>
 			</div>
 		</div>
@@ -58,8 +58,8 @@ const PostContent = () => {
 	const [likesCount, setLikesCount] = useState(0)
 	const { isAuth } = useContext(AuthContext)
 	const navigate = useNavigate()
-
-
+	
+	
 	const handleLike = async () => {
 		if (!isAuth) {
 			navigate('/login')
@@ -69,13 +69,13 @@ const PostContent = () => {
 			const response = await $api.post(`posts/${post.id}/like`)
 			if (response.status === 200) {
 				setIsLiked(true)
-				setLikesCount((prevCount) => prevCount + 1)
+				setLikesCount(response.data.likeCount)
 			}
 		} catch (error) {
 			message.error('Произошла ошибка при лайке поста')
 		}
 	}
-
+	
 	const handleUnlike = async () => {
 		if (!isAuth) {
 			navigate('/login')
@@ -85,17 +85,18 @@ const PostContent = () => {
 			const response = await $api.delete(`posts/${post.id}/like`)
 			if (response.status === 200) {
 				setIsLiked(false)
-				setLikesCount((prevCount) => prevCount - 1)
+				setLikesCount(response.data.likeCount)
 			}
 		} catch (error) {
 			message.error('Произошла ошибка при лайке поста')
 		}
 	}
-
+	const params = useParams()
+	
 	const items: MenuProps['items'] = [
 		{
 			key: '1',
-			label: <Link to={'/posts/create'}>Редактировать</Link>,
+			label: <Link to={`/posts/edit/${params.id}`}>Редактировать</Link>,
 			icon: <EditOutlined />
 		},
 		{
@@ -111,30 +112,30 @@ const PostContent = () => {
 			danger: true
 		}
 	]
-
-	const params = useParams()
+	
 	const [post, setPost] = useState<FullPostResponse>({} as FullPostResponse)
-
-	const [fetchPost, isLoading, isError, error] = useFetching(async (id) => {
+	
+	const [fetchPost, isLoading, isError] = useFetching(async (id) => {
 		const response = await PostService.getPostById(id)
 		setPost(response.data)
 		setLikesCount(response.data.likeCount)
+		setIsLiked(response.data.hasLike === null ? false : response.data.hasLike)
 	})
-
+	
 	useEffect(() => {
 		fetchPost(params.id)
 	}, [params.id])
-
+	
 	if (isLoading) {
 		return <PostLoadingContent />
 	}
-
+	
 	if (isError) {
 		return (
 			<Error404Result />
 		)
 	}
-
+	
 	return (
 		<>
 			<ReportWindow open={open} setOpen={setOpen} />

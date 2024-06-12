@@ -7,7 +7,7 @@ import { AuthContext } from '../../context'
 import { useFetching } from '../../hooks/useFetching'
 import { EditProfileRequest } from '../../types/EditProfileRequest'
 import { FullUserResponse } from '../../types/FullUserResponse'
-import '../LoginForm/LoginForm.css'
+import './EditProfileForm.css'
 import RegisterFormAvatarUpload from '../RegisterFormAvatarUpload/RegisterFormAvatarUpload'
 
 const EditProfileForm = () => {
@@ -18,7 +18,7 @@ const EditProfileForm = () => {
 	const { authCredential } = useContext(AuthContext)
 	const [profile, setProfile] = useState<FullUserResponse>({} as FullUserResponse)
 
-	const [fetchUser, isLoading, isError, error] = useFetching(async (username) => {
+	const [fetchUser] = useFetching(async (username) => {
 		const response = await UserService.getUserByUsername(username)
 		setProfile(response.data)
 	})
@@ -55,12 +55,11 @@ const EditProfileForm = () => {
 	}
 
 	return (
-		<div className='login-form-container'>
+		<div className='edit-form-container'>
 			<Form
 				form={form}
-				style={{ marginTop: '60px' }}
 				name='edit_profile'
-				className='login-form'
+				className='edit-form'
 				onFinish={onFinish}
 			>
 				<Typography.Title
@@ -184,7 +183,7 @@ const EditProfileForm = () => {
 					<Button
 						type='primary'
 						htmlType='submit'
-						className='login-form-button'
+						className='edit-form-button'
 					>
 						Сохранить изменения
 					</Button>

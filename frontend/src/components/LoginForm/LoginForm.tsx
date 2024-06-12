@@ -15,6 +15,7 @@ const LoginForm = () => {
 			.then(response => {
 				setAuthCredential(response.data)
 				localStorage.setItem('token', response.data.token)
+				localStorage.setItem('username', response.data.username)
 				setIsAuth(true)
 			})
 			.catch((e) => message.error('Ошибка Входа ' + e))
