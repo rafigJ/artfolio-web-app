@@ -19,3 +19,6 @@ application:
     accessKey: ${SPRING_APPLICATION_MINIO_ACCESSKEY}
     secretKey: ${SPRING_APPLICATION_MINIO_SECRETKEY}
     bucketName: ${SPRING_APPLICATION_MINIO_BUCKETNAME}
+springdoc:
+  swagger-ui:
+    url: openapi.yaml

@@ -34,7 +34,20 @@ public class SecurityConfig {
                 .exceptionHandling(configurer ->
                         configurer.authenticationEntryPoint(userAuthenticationEntryPoint))
                 .authorizeHttpRequests((auth -> auth
-                        .requestMatchers("/api/v1/auth/**").permitAll()
+                        .requestMatchers(
+                                "/api/v1/auth/**",
+                                "/openapi.yaml",
+                                "/v2/api-docs",
+                                "/v3/api-docs",
+                                "/v3/api-docs/**",
+                                "/swagger-resources",
+                                "/swagger-resources/**",
+                                "/configuration/ui",
+                                "/configuration/security",
+                                "/swagger-ui/**",
+                                "/web-jars/**",
+                                "/swagger-ui.html"
+                        ).permitAll()
                         .requestMatchers(HttpMethod.OPTIONS).permitAll()
                         .requestMatchers("/api/v1/**").permitAll() // TODO поменять политику после завершения разработки
                         .anyRequest().hasAuthority(Role.ADMIN.name())
