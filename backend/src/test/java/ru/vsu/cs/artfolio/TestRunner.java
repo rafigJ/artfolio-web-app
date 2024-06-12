@@ -6,6 +6,6 @@ import ru.vsu.cs.artfolio.controller.AuthenticationControllerTest;
 import ru.vsu.cs.artfolio.service.PostServiceIT;
 
 @Suite
-@SelectClasses({PostServiceIT.class, AuthenticationControllerTest.class})
+@SelectClasses({AuthenticationControllerTest.class, PostServiceIT.class})
 public class TestRunner {
 }

@@ -39,12 +39,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc(printOnlyOnFailure = false)
 public class AuthenticationControllerTest {
 
-    private static final InputStream mockFile = PostServiceIT.class.getClassLoader().getResourceAsStream("dummy-image.jpg");
     private static final String AUTH_PATH = "/api/v1/auth";
     private static MockMultipartFile mockMultipartFile;
 
     @BeforeAll
     static void downloadFile() throws Exception {
+        InputStream mockFile = PostServiceIT.class.getClassLoader().getResourceAsStream("dummy-image.jpg");
         mockMultipartFile = new MockMultipartFile("dummy-image.jpg", "dummy-image.jpg", "image/jpeg", mockFile);
     }
 
