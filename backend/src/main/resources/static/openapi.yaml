@@ -6,7 +6,7 @@ info:
     url: https://www.apache.org/licenses/LICENSE-2.0.html
   version: 0.0.1
 servers:
-  - url: http://localhost:8080
+  - url: http://79.174.93.30:8080
 tags:
   - name: auth
     description: Регистрация, Авторизация, Сброс пароля
