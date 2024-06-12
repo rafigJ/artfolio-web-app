@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:tc:postgresql:16:///artfolio?TC_DAEMON=true
+    url: jdbc:tc:postgresql:16-alpine:///artfolio?TC_DAEMON=true
     username: artfolio
     password: artfolio
   servlet:
