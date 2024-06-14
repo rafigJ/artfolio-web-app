@@ -8,7 +8,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import ru.vsu.cs.artfolio.dto.MediaDto;
@@ -39,7 +38,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class PostServiceImpl implements PostService {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(PostServiceImpl.class);
+    private static final Logger LOG = LoggerFactory.getLogger(PostServiceImpl.class);
 
     private final MinioService minioService;
     private final LikeService likeService;
@@ -47,22 +46,25 @@ public class PostServiceImpl implements PostService {
     private final MediaRepository mediaRepository;
 
     @Override
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Transactional
     public FullPostResponseDto createPost(UserEntity executor, PostRequestDto requestDto, List<MultipartFile> files) {
-        LOGGER.info("Creating post with data: {}, {}", executor.getUuid(), requestDto);
+        LOG.info("Creating post with data: {}, {}", executor.getUuid(), requestDto);
         if (files.isEmpty()) {
             throw new BadRequestException("Multipart files must have at least one file");
+        }
+        if (files.size() > 10) {
+            throw new BadRequestException("File list must be less than 10");
         }
 
         MultipartFile file = files.get(0);
         PostEntity post = PostMapper.toEntity(requestDto, executor, minioService.uploadPreviewFile(file));
 
-        LOGGER.info("Saving post");
+        LOG.info("Saving post");
         PostEntity createdPost = postRepository.save(post);
         List<MinioResult> mediaFiles = files.stream().map(minioService::uploadFile).toList();
         List<MediaFileEntity> medias = mediaRepository.saveAll(MediaMapper.toEntityList(mediaFiles, createdPost));
 
-        LOGGER.info("Returning response");
+        LOG.info("Returning response");
         List<Long> mediaIds = medias.stream().map(MediaFileEntity::getId).toList();
         return PostMapper.toFullDto(createdPost, mediaIds, 0L, false);
     }
@@ -98,31 +100,34 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Transactional
     public FullPostResponseDto updatePost(UserEntity executor, Long id, PostRequestDto requestDto, List<MultipartFile> files) {
-        LOGGER.info("Updating post with data: {}, {}, {}", executor.getUuid(), id, requestDto);
+        LOG.info("Updating post with data: {}, {}, {}", executor.getUuid(), id, requestDto);
 
         PostEntity postToUpdate = findPostById(id);
         if (!postToUpdate.getOwner().equals(executor)) {
-            LOGGER.warn("Insufficient rights to update post");
-            throw new RestException("Insufficient rights to update post", HttpStatus.UNAUTHORIZED);
+            LOG.warn("Insufficient rights to update post");
+            throw new RestException("Access denied", HttpStatus.UNAUTHORIZED);
         }
 
         MultipartFile file = files.get(0);
-        PostEntity newPost = PostMapper.toEntity(requestDto, executor, minioService.uploadPreviewFile(file));
-        newPost.setId(id);
+        MinioResult previewMedia = minioService.uploadPreviewFile(file);
+        postToUpdate.setName(requestDto.getName());
+        postToUpdate.setDescription(requestDto.getDescription());
+        postToUpdate.setPreviewType(previewMedia.contentType());
+        postToUpdate.setPreviewMediaName(previewMedia.name());
 
         List<String> fileNames = postToUpdate.getMedias().stream().map(MediaFileEntity::getFileName).toList();
         minioService.deleteFiles(fileNames);
         mediaRepository.deleteAllByPostIdEquals(id);
 
-        PostEntity updatedPost = postRepository.save(newPost);
+        postToUpdate = postRepository.save(postToUpdate);
         List<MinioResult> mediaFiles = files.stream().map(minioService::uploadFile).toList();
-        List<MediaFileEntity> medias = mediaRepository.saveAll(MediaMapper.toEntityList(mediaFiles, updatedPost));
+        List<MediaFileEntity> medias = mediaRepository.saveAll(MediaMapper.toEntityList(mediaFiles, postToUpdate));
 
         List<Long> mediaIds = medias.stream().map(MediaFileEntity::getId).toList();
         Boolean hasLike = likeService.hasLike(executor.getUuid(), id);
-        return PostMapper.toFullDto(updatedPost, mediaIds, likeService.getLikeCount(id), hasLike);
+        return PostMapper.toFullDto(postToUpdate, mediaIds, likeService.getLikeCount(id), hasLike);
     }
 
     @Override
@@ -172,4 +177,6 @@ public class PostServiceImpl implements PostService {
         return postRepository.findById(postId)
                 .orElseThrow(() -> new NotFoundException("Post by id: " + postId + " not found"));
     }
+
+
 }

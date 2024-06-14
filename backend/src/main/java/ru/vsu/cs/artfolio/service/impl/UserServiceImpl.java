@@ -2,6 +2,7 @@ package ru.vsu.cs.artfolio.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -22,6 +23,8 @@ import ru.vsu.cs.artfolio.exception.NotExistUserException;
 import ru.vsu.cs.artfolio.exception.NotFoundException;
 import ru.vsu.cs.artfolio.mapper.PostMapper;
 import ru.vsu.cs.artfolio.mapper.UserMapper;
+import ru.vsu.cs.artfolio.mapper.wrappers.MinioRequest;
+import ru.vsu.cs.artfolio.mapper.wrappers.MinioResult;
 import ru.vsu.cs.artfolio.mapper.wrappers.UserAdditionalInfo;
 import ru.vsu.cs.artfolio.repository.CommentRepository;
 import ru.vsu.cs.artfolio.repository.PostRepository;
@@ -31,6 +34,8 @@ import ru.vsu.cs.artfolio.service.LikeService;
 import ru.vsu.cs.artfolio.service.UserService;
 
 import javax.annotation.Nullable;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 
 @Service
@@ -44,14 +49,28 @@ public class UserServiceImpl implements UserService {
     private final MinioService minioService;
     private final FollowService followService;
     private final LikeService likeService;
+    private final ResourceLoader resourceLoader;
 
     @Override
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public FullUserResponseDto updateUserInformation(UserEntity user, UserUpdateRequestDto updatedUser, MultipartFile avatar) {
-        minioService.deleteFile(user.getAvatarName());
-        UserEntity updatedEntity = UserMapper.updateEntity(user, updatedUser, minioService.uploadFile(avatar));
-        UserAdditionalInfo additionalInfo = getUserAdditionalInfo(user, user);
-        return UserMapper.toFullDto(userRepository.save(updatedEntity), additionalInfo);
+    @Transactional
+    public FullUserResponseDto updateUserInformation(UserEntity user, UserUpdateRequestDto updatedUser, @Nullable MultipartFile avatar) {
+        MinioRequest file;
+        try {
+            if (avatar != null) {
+                file = MinioRequest.of(avatar.getInputStream(), avatar.getContentType());
+            } else {
+                // если файл null, то берем изображение по default
+                InputStream defaultInputStream = resourceLoader.getResource("classpath:default_avatar.png").getInputStream();
+                file = MinioRequest.of(defaultInputStream, "image/png");
+            }
+            minioService.deleteFile(user.getAvatarName());
+            MinioResult avatarData = minioService.uploadAvatarFile(file);
+            UserEntity updatedEntity = UserMapper.updateEntity(user, updatedUser, avatarData);
+            UserAdditionalInfo additionalInfo = getUserAdditionalInfo(user, user);
+            return UserMapper.toFullDto(userRepository.save(updatedEntity), additionalInfo);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override

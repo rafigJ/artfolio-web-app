@@ -10,12 +10,14 @@ import io.minio.messages.DeleteError;
 import io.minio.messages.DeleteObject;
 import lombok.RequiredArgsConstructor;
 import net.coobird.thumbnailator.Thumbnails;
+import net.coobird.thumbnailator.geometry.Positions;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import ru.vsu.cs.artfolio.exception.BadRequestException;
 import ru.vsu.cs.artfolio.exception.RestException;
+import ru.vsu.cs.artfolio.mapper.wrappers.MinioRequest;
 import ru.vsu.cs.artfolio.mapper.wrappers.MinioResult;
 
 import javax.imageio.ImageIO;
@@ -39,7 +41,6 @@ public class MinioService {
     public MinioResult uploadPreviewFile(MultipartFile file) {
         ByteArrayOutputStream imageFile = resizeCompressImage(file);
         try (InputStream is = new ByteArrayInputStream(imageFile.toByteArray())) {
-            imageFile.close();
             String name = UUID.randomUUID().toString();
 
             minioClient.putObject(PutObjectArgs.builder()
@@ -50,6 +51,24 @@ public class MinioService {
                     .build());
 
             return new MinioResult(name, file.getContentType());
+        } catch (Exception e) {
+            throw new RestException(e.getMessage(), HttpStatus.BAD_GATEWAY);
+        }
+    }
+
+    public MinioResult uploadAvatarFile(MinioRequest file) {
+        ByteArrayOutputStream imageFile = resizeCompressAvatarFile(file);
+        try (InputStream is = new ByteArrayInputStream(imageFile.toByteArray())) {
+            String name = UUID.randomUUID().toString();
+
+            minioClient.putObject(PutObjectArgs.builder()
+                    .bucket(bucketName)
+                    .object(name)
+                    .stream(is, is.available(), -1)
+                    .contentType(file.contentType())
+                    .build());
+
+            return new MinioResult(name, file.contentType());
         } catch (Exception e) {
             throw new RestException(e.getMessage(), HttpStatus.BAD_GATEWAY);
         }
@@ -123,9 +142,29 @@ public class MinioService {
             }
             Thumbnails.of(originalImage)
                     .size(406, 204)
+                    .crop(Positions.TOP_CENTER)
                     .outputFormat(file.getContentType().substring("image/".length()))
                     .toOutputStream(byteArrayOutputStream);
             return byteArrayOutputStream;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static ByteArrayOutputStream resizeCompressAvatarFile(MinioRequest file) {
+        try (InputStream fileIn = file.inputStream()) {
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            InputStream in = new ByteArrayInputStream(fileIn.readAllBytes());
+            BufferedImage originalImage = ImageIO.read(in);
+            if (originalImage == null) {
+                throw new BadRequestException("File have bad signature (it's not jpg/png format)");
+            }
+            Thumbnails.of(originalImage)
+                    .size(150, 150)
+                    .crop(Positions.CENTER)
+                    .outputFormat(file.contentType().substring("image/".length()))
+                    .toOutputStream(out);
+            return out;
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

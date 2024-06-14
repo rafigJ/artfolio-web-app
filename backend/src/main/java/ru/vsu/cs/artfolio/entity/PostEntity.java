@@ -1,6 +1,5 @@
 package ru.vsu.cs.artfolio.entity;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -42,7 +41,7 @@ public class PostEntity {
 
     private String previewType;
 
-    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "post")
     private List<MediaFileEntity> medias;
 
     @ManyToOne(fetch = EAGER)
@@ -52,7 +51,7 @@ public class PostEntity {
     @Column(name = "create_time")
     private LocalDateTime createTime;
 
-    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "post")
     private List<LikeEntity> likes;
 
     @Column(name = "deleted")

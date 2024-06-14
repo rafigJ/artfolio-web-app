@@ -1,7 +1,6 @@
 package ru.vsu.cs.artfolio.service;
 
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -27,27 +26,24 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
 @ExtendWith(MockitoExtension.class)
-@Sql(value = "/sql/post_service/test_data.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_CLASS)
-@Sql(value = "/sql/post_service/test_data_update.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
-@Sql(value = "/sql/after_all/test_data_clear.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_CLASS)
+@Sql(value = "/sql/post_service/test_data.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+@Sql(value = "/sql/after_all/test_data_clear.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
 public class PostServiceIT {
 
     // test_data.sql
     private static final String DUMMY_FILE_NAME_DB = "dummy_file"; // 'saved' file in media_file table
     private static final UUID USER_UUID = UUID.fromString("7c826e51-b416-475d-97b1-e01b2835db52"); // 'saved' user in _user table
     private static final UUID ADMIN_UUID = UUID.fromString("7c826e51-b416-475d-97b1-e01b2835db53"); // 'saved' admin in _user table
-    private static final InputStream mockFile = PostServiceIT.class.getClassLoader().getResourceAsStream("dummy-image.jpg");
     private static MockMultipartFile mockMultipartFile;
 
     @BeforeAll
     static void downloadFile() throws Exception {
+        final InputStream mockFile = PostServiceIT.class.getClassLoader().getResourceAsStream("dummy-image.jpg");
         mockMultipartFile = new MockMultipartFile("dummy-image.jpg", "dummy-image.jpg", "image/jpeg", mockFile);
     }
 

@@ -26,12 +26,8 @@ import ru.vsu.cs.artfolio.service.impl.MinioService;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @Sql(value = "/sql/auth_controller/test_data.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 @Sql(value = "/sql/after_all/test_data_clear.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
@@ -78,7 +74,7 @@ public class AuthenticationControllerTest {
                         status().isOk(),
                         content().contentType(MediaType.APPLICATION_JSON),
                         jsonPath("$.username").value("boltonArt"),
-                        jsonPath("$.name").value("Рамси Болтон"),
+                        jsonPath("$.name").value("Ramsey Bolton"),
                         jsonPath("$.email").value("bolton@vesteros.com"),
                         jsonPath("$.role").value(Role.USER.name()),
                         jsonPath("$.token").hasJsonPath()
@@ -172,7 +168,7 @@ public class AuthenticationControllerTest {
                         status().isOk(),
                         content().contentType(MediaType.APPLICATION_JSON),
                         jsonPath("$.username").value("boltonArt"),
-                        jsonPath("$.name").value("Рамси Болтон"),
+                        jsonPath("$.name").value("Ramsey Bolton"),
                         jsonPath("$.email").value("bolton@vesteros.com"),
                         jsonPath("$.role").value(Role.USER.name()),
                         jsonPath("$.token").hasJsonPath()

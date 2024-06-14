@@ -1,6 +1,7 @@
 package ru.vsu.cs.artfolio.auth;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -21,11 +22,13 @@ import ru.vsu.cs.artfolio.exception.ExistUserException;
 import ru.vsu.cs.artfolio.exception.IncorrectCredentialsException;
 import ru.vsu.cs.artfolio.exception.NotExistUserException;
 import ru.vsu.cs.artfolio.exception.RestException;
+import ru.vsu.cs.artfolio.mapper.wrappers.MinioRequest;
 import ru.vsu.cs.artfolio.mapper.wrappers.MinioResult;
 import ru.vsu.cs.artfolio.repository.UserRepository;
 import ru.vsu.cs.artfolio.service.impl.MinioService;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.time.LocalDateTime;
 
 @Service
@@ -38,14 +41,25 @@ public class AuthenticationService {
     private final MinioService minioService;
     private final AuthenticationManager authenticationManager;
 
+    private final ResourceLoader resourceLoader;
+
     @Transactional
     public AuthResponseDto register(RegisterRequestDto request, MultipartFile avatarFile) {
         if (repository.existsByEmailOrUsername(request.email(), request.username())) {
             throw new ExistUserException();
         }
-
         try {
-            UserEntity userEntity = convertRequestToEntity(request, minioService.uploadFile(avatarFile), passwordEncoder);
+            MinioRequest file;
+            if (avatarFile != null) {
+                file = MinioRequest.of(avatarFile.getInputStream(), avatarFile.getContentType());
+            } else {
+                // если файл null, то берем изображение по default
+                InputStream defaultInputStream = resourceLoader.getResource("classpath:default_avatar.png").getInputStream();
+                file = MinioRequest.of(defaultInputStream, "image/png");
+            }
+
+            MinioResult avatarData = minioService.uploadAvatarFile(file);
+            UserEntity userEntity = convertRequestToEntity(request, avatarData, passwordEncoder);
             User user = new User(repository.save(userEntity));
             String jwtToken = jwtService.generateToken(user);
             return convertEntityToAuthResponse(userEntity, jwtToken);

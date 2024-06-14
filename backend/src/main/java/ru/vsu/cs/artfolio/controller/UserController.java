@@ -47,10 +47,10 @@ public class UserController {
     }
 
     @PutMapping()
-    @PreAuthorize("isAuthenticated() and hasAuthority('USER')")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<FullUserResponseDto> updateUser(@AuthenticationPrincipal User user,
                                                           @RequestPart("userInfo") @Valid UserUpdateRequestDto request,
-                                                          @RequestPart("avatarFile") MultipartFile avatarFile) {
+                                                          @RequestPart(value = "avatarFile", required = false) MultipartFile avatarFile) {
         LOGGER.info("Обновление данных о {}", user.getUsername());
         return ResponseEntity.ok(service.updateUserInformation(user.getUserEntity(), request, avatarFile));
     }
