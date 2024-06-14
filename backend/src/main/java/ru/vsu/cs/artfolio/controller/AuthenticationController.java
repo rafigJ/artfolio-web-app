@@ -33,8 +33,8 @@ public class AuthenticationController {
 
     @PostMapping("/register")
     public ResponseEntity<AuthResponseDto> register(@RequestPart("userInfo") @Valid RegisterRequestDto request,
-                                                    @RequestPart("avatarFile") MultipartFile avatarFile) {
-        LOG.info("{}", avatarFile);
+                                                    @RequestPart(value = "avatarFile", required = false) MultipartFile avatarFile) {
+        LOG.info("{} {}", request, avatarFile);
         var register = service.register(request, avatarFile);
         return ResponseEntity.ok(register);
     }
