@@ -3,7 +3,7 @@ import { Avatar, Modal, Table, message } from 'antd'
 import { FC, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import $api, { API_URL } from '../../api'
-import { FullUserResponse } from '../../types/FullUserResponse'
+import { FullUserResponse } from '../../types/user/FullUserResponse'
 
 interface SubscribersWindowProps {
 	user: FullUserResponse

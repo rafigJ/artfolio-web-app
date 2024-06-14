@@ -6,7 +6,7 @@ import $api from '../../api/index'
 
 import { useNavigate } from 'react-router-dom'
 import { AuthContext } from '../../context'
-import type { FullUserResponse } from '../../types/FullUserResponse'
+import type { FullUserResponse } from '../../types/user/FullUserResponse'
 
 interface ProfileHeaderProps {
 	profile: FullUserResponse

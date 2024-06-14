@@ -14,13 +14,14 @@ import $api, { API_URL } from '../../api'
 import PostService from '../../api/PostService'
 import { AuthContext } from '../../context'
 import { useFetching } from '../../hooks/useFetching'
-import type { FullPostResponse, Owner } from '../../types/FullPostResponse'
+import type { FullPostResponse } from '../../types/post/FullPostResponse'
+import { UserResponse } from '../../types/UserResponse'
 import Error404Result from '../Error404Result/Error404Result'
 import ReportWindow from '../ReportWindow/ReportWindow'
 import './PostContent.css'
 
 interface AuthorLinkCardProps {
-	owner: Owner
+	owner: UserResponse
 	style: CSSProperties
 }
 

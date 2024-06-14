@@ -6,7 +6,7 @@ import { API_URL } from '../../api'
 import PostService from '../../api/PostService'
 import { AuthContext } from '../../context'
 import { useFetching } from '../../hooks/useFetching'
-import type { FullPostResponse } from '../../types/FullPostResponse'
+import type { FullPostResponse } from '../../types/post/FullPostResponse'
 import CommentList, { type CommentItem } from '../CommentList/CommentList'
 
 const { TextArea } = Input

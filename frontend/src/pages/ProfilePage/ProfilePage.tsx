@@ -7,8 +7,8 @@ import PostCard from '../../components/PostCard/PostCard'
 import ProfileDescription from '../../components/ProfileDescription/ProfileDescription'
 import ProfileHeader from '../../components/ProfileHeader/ProfileHeader'
 import { useFetching } from '../../hooks/useFetching'
-import type { FullUserResponse } from '../../types/FullUserResponse'
-import type { PostResponse } from '../../types/PostResponse'
+import type { FullUserResponse } from '../../types/user/FullUserResponse'
+import type { PostResponse } from '../../types/post/PostResponse'
 
 interface ProfilePostGridProps {
 	data: PostResponse[]

@@ -6,7 +6,7 @@ import { AuthContext } from './context'
 import { useFetching } from './hooks/useFetching'
 import AppRouter from './routing/AppRouter'
 import './styles/App.css'
-import type { AuthResponse } from './types/AuthResponse'
+import type { AuthResponse } from './types/auth/AuthResponse'
 
 const App: React.FC = () => {
 	const [authCredential, setAuthCredential] = useState<AuthResponse>({} as AuthResponse)

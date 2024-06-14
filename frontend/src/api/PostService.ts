@@ -1,23 +1,10 @@
 import type { AxiosResponse } from 'axios'
-import type { FullPostResponse } from '../types/FullPostResponse'
-import type { Product } from '../types/MockTypes/Product'
-import type { PostRequest } from '../types/PostRequest'
-import type { PostResponse } from '../types/PostResponse'
+import type { FullPostResponse } from '../types/post/FullPostResponse'
+import type { PostRequest } from '../types/post/PostRequest'
+import type { PostResponse } from '../types/post/PostResponse'
 import $api from './index'
 
 export default class PostService {
-	static async getProducts(
-		page: number = 0,
-		limit: number = 10
-	): Promise<AxiosResponse<Product[]>> {
-		// TODO Удалить
-		return await $api.get('/photos', {
-			params: {
-				_page: page,
-				_limit: limit,
-			},
-		})
-	}
 	
 	static async createPost(post: PostRequest, files: Blob[]): Promise<AxiosResponse<PostResponse>> {
 		const bodyFormData = new FormData();

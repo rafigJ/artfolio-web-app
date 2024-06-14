@@ -1,8 +1,8 @@
 import { AxiosResponse } from 'axios'
-import { EditProfileRequest } from '../types/EditProfileRequest'
-import type { FullUserResponse } from '../types/FullUserResponse'
+import { EditProfileRequest } from '../types/user/EditProfileRequest'
+import type { FullUserResponse } from '../types/user/FullUserResponse'
 import { IPageResponse } from '../types/IPageResponse'
-import { PostResponse } from '../types/PostResponse'
+import { PostResponse } from '../types/post/PostResponse'
 import $api from './index'
 
 export default class UserService {

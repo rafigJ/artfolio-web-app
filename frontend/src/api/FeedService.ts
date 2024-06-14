@@ -1,6 +1,6 @@
 import type { AxiosResponse } from 'axios'
 import type { IPageResponse } from '../types/IPageResponse'
-import type { PostResponse } from '../types/PostResponse'
+import type { PostResponse } from '../types/post/PostResponse'
 import $api from './index'
 
 export default class FeedService {

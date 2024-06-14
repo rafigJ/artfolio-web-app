@@ -3,7 +3,7 @@ import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import PostService from '../../api/PostService'
 import { useFetching } from '../../hooks/useFetching'
-import type { PostRequest } from '../../types/PostRequest'
+import type { PostRequest } from '../../types/post/PostRequest'
 import CreatePostFormPreview from '../CreatePostFormPreview/CreatePostFormPreview'
 import DraggableUploadList from '../DraggableUploadList/DraggableUploadList'
 

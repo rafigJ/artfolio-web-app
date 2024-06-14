@@ -2,7 +2,7 @@ import { Divider, Typography } from 'antd'
 import { UploadFile } from 'antd/lib/upload/interface'
 import { FC, useEffect, useRef, useState } from 'react'
 import { useObjectUrls } from '../../hooks/useObjectUrls'
-import type { PostRequest } from '../../types/PostRequest'
+import type { PostRequest } from '../../types/post/PostRequest'
 
 interface CreatePostFormPreviewProps {
 	post: PostRequest

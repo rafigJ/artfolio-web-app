@@ -3,7 +3,7 @@ import { Button, Descriptions, Flex, Statistic, Typography } from 'antd'
 import pdfMake from 'pdfmake/build/pdfmake'
 import pdfFonts from 'pdfmake/build/vfs_fonts'
 import { type FC, useState } from 'react'
-import type { FullUserResponse } from '../../types/FullUserResponse'
+import type { FullUserResponse } from '../../types/user/FullUserResponse'
 import SubscribersWindow from '../SubscribersWindow/SubscribersWindow'
 import SubscriptionWindow from '../SubscribtionWindow/SubscriptionWindow'
 
