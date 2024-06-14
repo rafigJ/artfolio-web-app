@@ -1,5 +1,5 @@
 import { EnvironmentOutlined, MailOutlined, UserOutlined } from '@ant-design/icons'
-import { Button, Form, Input, Typography, UploadFile, message } from 'antd'
+import { Button, Form, Input, message, Typography, UploadFile } from 'antd'
 import { useContext, useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import UserService from '../../api/UserService'
@@ -7,30 +7,30 @@ import { AuthContext } from '../../context'
 import { useFetching } from '../../hooks/useFetching'
 import { EditProfileRequest } from '../../types/user/EditProfileRequest'
 import { FullUserResponse } from '../../types/user/FullUserResponse'
-import './EditProfileForm.css'
 import RegisterFormAvatarUpload from '../RegisterFormAvatarUpload/RegisterFormAvatarUpload'
+import './EditProfileForm.css'
 
 const EditProfileForm = () => {
 	const [avatar, setAvatar] = useState<UploadFile[]>([] as UploadFile[])
 	const [form] = Form.useForm()
 	const navigate = useNavigate()
-
-	const { authCredential } = useContext(AuthContext)
+	
+	const { authCredential, setAuthCredential } = useContext(AuthContext)
 	const [profile, setProfile] = useState<FullUserResponse>({} as FullUserResponse)
-
+	
 	const [fetchUser] = useFetching(async (username) => {
 		const response = await UserService.getUserByUsername(username)
 		setProfile(response.data)
 	})
-
+	
 	useEffect(() => {
 		fetchUser(authCredential.username)
 	}, [authCredential.username])
-
+	
 	useEffect(() => {
 		form.setFieldsValue(profile)
 	}, [profile, form])
-
+	
 	const onFinish = async (values: any) => {
 		if (!avatar.length) {
 			message.error('Выберите аватар')
@@ -42,18 +42,24 @@ const EditProfileForm = () => {
 			fullName: values.fullName.trim(),
 			country: values.country ? values.country.trim() : '',
 			city: values.city ? values.city.trim() : '',
-			description: values.description ? values.description.trim() : '',
+			description: values.description ? values.description.trim() : ''
 		}
 		try {
-			UserService.editUserProfile(editProfileRequest, avatar.pop()?.originFileObj)
-			message.success("Профиль успешно обновлён")
-			navigate(`/profile/${profile.username}`)
-		}
-		catch (error) {
-			message.error("Произошла ошибка при редактировании профиля")
+			const response = await UserService.editUserProfile(editProfileRequest, avatar.pop()?.originFileObj)
+			setAuthCredential({
+				username: response.data.username,
+				email: response.data.email,
+				name: response.data.fullName,
+				token: authCredential.token,
+				role: authCredential.role
+			})
+			message.success('Профиль успешно обновлён')
+			navigate(`/profile/${response.data.username}`)
+		} catch (error) {
+			message.error('Произошла ошибка при редактировании профиля')
 		}
 	}
-
+	
 	return (
 		<div className='edit-form-container'>
 			<Form
@@ -69,7 +75,7 @@ const EditProfileForm = () => {
 				>
 					Редактирование профиля
 				</Typography.Title>
-
+				
 				<Form.Item
 					name='username'
 					rules={[
@@ -83,7 +89,7 @@ const EditProfileForm = () => {
 						{
 							pattern: /^[^\u0400-\u04FFёЁ]+$/,
 							message: 'Логин не должен содержать кириллицу!'
-						},
+						}
 					]}
 				>
 					<Input
@@ -92,30 +98,30 @@ const EditProfileForm = () => {
 						autoComplete='off'
 					/>
 				</Form.Item>
-
+				
 				<Form.Item name='fullName'
-					rules={[
-						{ required: true, message: 'Введите имя!' },
-						{ max: 40, message: 'Имя должно содержать не более 40 символов' },
-						{
-							validator: (_, value) => {
-								if (value.trim().replace(/\s/g, '').length < 3) {
-									return Promise.reject('Имя должно быть не меньше 3 символов')
-								}
-								if (value.trim().split(/\s+/).length > 2) {
-									return Promise.reject('Имя не может содержать более двух слов!')
-								}
-								return Promise.resolve()
-							}
-						}
-					]}
+				           rules={[
+					           { required: true, message: 'Введите имя!' },
+					           { max: 40, message: 'Имя должно содержать не более 40 символов' },
+					           {
+						           validator: (_, value) => {
+							           if (value.trim().replace(/\s/g, '').length < 3) {
+								           return Promise.reject('Имя должно быть не меньше 3 символов')
+							           }
+							           if (value.trim().split(/\s+/).length > 2) {
+								           return Promise.reject('Имя не может содержать более двух слов!')
+							           }
+							           return Promise.resolve()
+						           }
+					           }
+				           ]}
 				>
 					<Input
 						prefix={<UserOutlined className='site-form-item-icon' />}
 						placeholder='Полное имя'
 					/>
 				</Form.Item>
-
+				
 				<Form.Item
 					name='email'
 					rules={[
@@ -129,56 +135,56 @@ const EditProfileForm = () => {
 						placeholder='Электронная почта'
 					/>
 				</Form.Item>
-
+				
 				<Form.Item name='country'
-					rules={[
-						{ max: 40, message: 'Название страны должно содержать не более 40 символов' },
-						{
-							validator: (_, value) => {
-								if (value.trim().split(/\s+/).length > 3) {
-									return Promise.reject('Название страны не может содержать более трёх слов!')
-								}
-								return Promise.resolve()
-							}
-						}
-					]}
+				           rules={[
+					           { max: 40, message: 'Название страны должно содержать не более 40 символов' },
+					           {
+						           validator: (_, value) => {
+							           if (value.trim().split(/\s+/).length > 3) {
+								           return Promise.reject('Название страны не может содержать более трёх слов!')
+							           }
+							           return Promise.resolve()
+						           }
+					           }
+				           ]}
 				>
 					<Input
 						prefix={<EnvironmentOutlined className='site-form-item-icon' />}
 						placeholder='Страна'
 					/>
 				</Form.Item>
-
+				
 				<Form.Item name='city'
-					rules={[
-						{ max: 40, message: 'Название города должно содержать не более 40 символов' },
-						{
-							validator: (_, value) => {
-								if (value.trim().split(/\s+/).length > 3) {
-									return Promise.reject('Название города не может содержать более трёх слов!')
-								}
-								return Promise.resolve()
-							}
-						}
-					]}
+				           rules={[
+					           { max: 40, message: 'Название города должно содержать не более 40 символов' },
+					           {
+						           validator: (_, value) => {
+							           if (value.trim().split(/\s+/).length > 3) {
+								           return Promise.reject('Название города не может содержать более трёх слов!')
+							           }
+							           return Promise.resolve()
+						           }
+					           }
+				           ]}
 				>
 					<Input
 						prefix={<EnvironmentOutlined className='site-form-item-icon' />}
 						placeholder='Город'
 					/>
 				</Form.Item>
-
+				
 				<Form.Item name='description'
-					rules={[
-						{ max: 400, message: 'Описание профиля должно содержать не более 400 символов' }
-					]}
+				           rules={[
+					           { max: 400, message: 'Описание профиля должно содержать не более 400 символов' }
+				           ]}
 				>
 					<Input.TextArea placeholder='Описание профиля' rows={4} />
 				</Form.Item>
-
+				
 				Фото профиля:
 				<RegisterFormAvatarUpload avatar={avatar} setAvatar={setAvatar} />
-
+				
 				<Form.Item>
 					<Button
 						type='primary'

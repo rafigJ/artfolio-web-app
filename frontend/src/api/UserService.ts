@@ -11,7 +11,7 @@ export default class UserService {
 		return await $api.get<FullUserResponse>(`/user/${username}`)
 	}
 	
-	static async editUserProfile(request: EditProfileRequest, avatar: File | any) {
+	static async editUserProfile(request: EditProfileRequest, avatar: File | any): Promise<AxiosResponse<FullUserResponse>> {
 		const bodyFormData = new FormData()
 		
 		bodyFormData.append('userInfo', new Blob([JSON.stringify(request)], { type: 'application/json' }))

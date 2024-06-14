@@ -1,19 +1,19 @@
 import type { DropdownProps, MenuProps } from 'antd'
 import { Dropdown } from 'antd'
-import { useContext, useState, type FC } from 'react'
+import { type FC, useContext, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { API_URL } from '../../api'
 import { AuthContext } from '../../context'
+import { AuthResponse } from '../../types/auth/AuthResponse'
 import './HeaderProfileMenu.css'
 
-interface HeaderProfileMenuProps {
-	src: string
-}
-
-const HeaderProfileMenu: FC<HeaderProfileMenuProps> = ({ src }) => {
+const HeaderProfileMenu: FC = () => {
 	const [open, setOpen] = useState(false)
-	const { setIsAuth, authCredential } = useContext(AuthContext)
+	const { setIsAuth, authCredential, setAuthCredential } = useContext(AuthContext)
 	const navigate = useNavigate()
-
+	
+	const [imageSrc, setImageSrc] = useState(`${API_URL}/user/${authCredential?.username}/avatar`)
+	
 	const handleMenuClick: MenuProps['onClick'] = (e) => {
 		if (e.key === '1') {
 			navigate(`/profile/${authCredential?.username}`)
@@ -26,16 +26,17 @@ const HeaderProfileMenu: FC<HeaderProfileMenuProps> = ({ src }) => {
 			localStorage.removeItem('username')
 			navigate('/')
 			setIsAuth(false)
+			setAuthCredential({} as AuthResponse)
 		}
 		setOpen(false)
 	}
-
+	
 	const handleOpenChange: DropdownProps['onOpenChange'] = (nextOpen, info) => {
 		if (info.source === 'trigger' || nextOpen) {
 			setOpen(nextOpen)
 		}
 	}
-
+	
 	const items: MenuProps['items'] = [
 		{
 			label: 'Профиль',
@@ -51,7 +52,13 @@ const HeaderProfileMenu: FC<HeaderProfileMenuProps> = ({ src }) => {
 			danger: true
 		}
 	]
-
+	
+	useEffect(() => {
+		if (authCredential?.username) {
+			setImageSrc(`${API_URL}/user/${authCredential?.username}/avatar`)
+		}
+	}, [authCredential])
+	
 	return (
 		<Dropdown
 			menu={{
@@ -61,7 +68,13 @@ const HeaderProfileMenu: FC<HeaderProfileMenuProps> = ({ src }) => {
 			onOpenChange={handleOpenChange}
 			open={open}
 		>
-			<img className='header-avatar__image' width={32} height={32} alt='Аватар пользователя' src={src} />
+			<img
+				className='header-avatar__image'
+				width={32}
+				height={32}
+				alt='Аватар пользователя'
+				src={imageSrc}
+			/>
 		</Dropdown>
 	)
 }
