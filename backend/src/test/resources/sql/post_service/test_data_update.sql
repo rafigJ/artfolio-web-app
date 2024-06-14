@@ -12,18 +12,18 @@ INSERT INTO artfolio._user(uuid, email, username, password, secret_word, full_na
                            avatar_name, avatar_type, role, create_time, update_time, deleted)
 VALUES ('7c826e51-b416-475d-97b1-e01b2835db52', 'bolton@vesteros.com', 'boltonArt',
         '$2a$10$Ks0w1CzDYTwxYRrkQLBfe.wOmenhtnGBwwQbywSj16R9SQnsAzsFq',
-        '$2a$10$R/TyfojNSA/mSntqEt/rKeQNoAMsX4JjAIL1cUfSH1i1hVkhTcBz.', 'Рамси Болтон', 'Россия', 'Уфа',
-        'Родился я бастардом на Севере Вестероса.', 'dummy_file', 'image/jpeg', 'USER',
+        '$2a$10$R/TyfojNSA/mSntqEt/rKeQNoAMsX4JjAIL1cUfSH1i1hVkhTcBz.', 'Ramsey Bolton', 'Russia', 'Ufa',
+        'Born on Vesteros', 'dummy_file', 'image/jpeg', 'USER',
         '2024-06-04 22:16:35.176926', '2024-06-04 22:16:35.176926', false),
        ('7c826e51-b416-475d-97b1-e01b2835db53', 'boltonAdmin@vesteros.com', 'boltonAdmin',
         '$2a$10$Ks0w1CzDYTwxYRrkQLBfe.wOmenhtnGBwwQbywSj16R9SQnsAzsFq',
-        '$2a$10$R/TyfojNSA/mSntqEt/rKeQNoAMsX4JjAIL1cUfSH1i1hVkhTcBz.', 'Рамси Админ', 'Россия', 'Уфа',
-        'Родился я бастардом на Севере Вестероса.', 'dummy_file', 'image/jpeg', 'ADMIN',
+        '$2a$10$R/TyfojNSA/mSntqEt/rKeQNoAMsX4JjAIL1cUfSH1i1hVkhTcBz.', 'Ramsey Admin', 'Russia', 'Ufa',
+        'Born on Vesteros', 'dummy_file', 'image/jpeg', 'ADMIN',
         '2024-06-04 22:16:35.176926', '2024-06-04 22:16:35.176926', false),
        ('7c826e51-b416-475d-97b1-e01b2835db54', 'boltonDeleted@vesteros.com', 'boltonDeleted',
         '$2a$10$Ks0w1CzDYTwxYRrkQLBfe.wOmenhtnGBwwQbywSj16R9SQnsAzsFq',
-        '$2a$10$R/TyfojNSA/mSntqEt/rKeQNoAMsX4JjAIL1cUfSH1i1hVkhTcBz.', 'Рамси Удаленный', 'Удаленная', 'Уфа',
-        'Родился я бастардом на Севере Вестероса.', 'dummy_file', 'image/jpeg', 'USER',
+        '$2a$10$R/TyfojNSA/mSntqEt/rKeQNoAMsX4JjAIL1cUfSH1i1hVkhTcBz.', 'RamseyDeleted', 'Deleted', 'Deleted',
+        'Born on Vesteros', 'dummy_file', 'image/jpeg', 'USER',
         '2024-06-04 22:16:35.176926', '2024-06-04 22:16:35.176926', true);
 
 -- Insert initial state data into the post table

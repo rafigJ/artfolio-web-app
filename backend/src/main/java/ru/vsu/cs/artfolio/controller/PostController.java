@@ -41,7 +41,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class PostController {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(PostController.class);
+    private static final Logger LOG = LoggerFactory.getLogger(PostController.class);
 
     private final PostService service;
     private final CommentService commentService;
@@ -52,14 +52,14 @@ public class PostController {
             @AuthenticationPrincipal User user,
             @RequestPart("post") @Valid PostRequestDto post,
             @RequestPart("file") List<MultipartFile> listFiles) {
-        LOGGER.info("Пользователь {} сохраняет пост {}", user.getUsername(), post);
+        LOG.info("Пользователь {} сохраняет пост {}", user.getUsername(), post);
         var createdPost = service.createPost(user.getUserEntity(), post, listFiles);
         return ResponseEntity.ok(createdPost);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<FullPostResponseDto> getPostById(@PathVariable("id") Long id, @Nullable @AuthenticationPrincipal User user) {
-        LOGGER.info("Получение поста " + id);
+        LOG.info("Получение поста " + id);
         UserEntity userEntity = user != null ? user.getUserEntity() : null;
         return ResponseEntity.ok(service.getPostById(userEntity, id));
     }
@@ -72,7 +72,7 @@ public class PostController {
             @RequestPart("post") @Valid PostRequestDto post,
             @RequestPart("file") List<MultipartFile> listFiles) {
 
-        LOGGER.info("Пользователь {} обновляет пост {}", user.getUsername(), post);
+        LOG.info("Пользователь {} обновляет пост {}", user.getUsername(), post);
         var updatedPost = service.updatePost(user.getUserEntity(), id, post, listFiles);
         return ResponseEntity.ok(updatedPost);
     }
@@ -82,7 +82,7 @@ public class PostController {
     public ResponseEntity<String> deletePost(
             @PathVariable("id") Long id,
             @AuthenticationPrincipal User user) {
-        LOGGER.info("Пользователь {} удаляет пост с идентификатором {}", user.getUsername(), id);
+        LOG.info("Пользователь {} удаляет пост с идентификатором {}", user.getUsername(), id);
         service.deletePost(user.getUserEntity(), id);
         return ResponseEntity.ok("{\"message\": \"post " + id + " is deleted\"}");
     }
@@ -90,7 +90,7 @@ public class PostController {
     @PostMapping("/{id}/like")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<PostLikeResponse> likePost(@PathVariable("id") Long id, @AuthenticationPrincipal User user) {
-        LOGGER.info("Пользователь {} лайкает пост c id {}", user.getUsername(), id);
+        LOG.info("Пользователь {} лайкает пост c id {}", user.getUsername(), id);
         Long likeCount = service.likePost(user.getUserEntity().getUuid(), id);
         return ResponseEntity.ok(new PostLikeResponse(id, likeCount));
     }
@@ -98,7 +98,7 @@ public class PostController {
     @DeleteMapping("/{id}/like")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<PostLikeResponse> deleteLike(@PathVariable("id") Long id, @AuthenticationPrincipal User user) {
-        LOGGER.info("Пользователь {} удаляет лайк с поста c id {}", user.getUsername(), id);
+        LOG.info("Пользователь {} удаляет лайк с поста c id {}", user.getUsername(), id);
         Long likeCount = service.deleteLikeFromPost(user.getUserEntity().getUuid(), id);
         return ResponseEntity.ok(new PostLikeResponse(id, likeCount));
     }
@@ -115,7 +115,7 @@ public class PostController {
     public ResponseEntity<CommentResponseDto> commentPost(@PathVariable("id") Long id,
                                                           @RequestBody @Valid CommentRequestDto comment,
                                                           @AuthenticationPrincipal User user) {
-        LOGGER.info("Пользователь {} комментирует пост c id {}", user.getUsername(), id);
+        LOG.info("Пользователь {} комментирует пост c id {}", user.getUsername(), id);
         CommentResponseDto createdComment = commentService.createComment(user.getUserEntity(), id, comment);
         return ResponseEntity.ok(createdComment);
     }

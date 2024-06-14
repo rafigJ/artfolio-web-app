@@ -10,6 +10,7 @@ import io.minio.messages.DeleteError;
 import io.minio.messages.DeleteObject;
 import lombok.RequiredArgsConstructor;
 import net.coobird.thumbnailator.Thumbnails;
+import net.coobird.thumbnailator.geometry.Positions;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -39,7 +40,6 @@ public class MinioService {
     public MinioResult uploadPreviewFile(MultipartFile file) {
         ByteArrayOutputStream imageFile = resizeCompressImage(file);
         try (InputStream is = new ByteArrayInputStream(imageFile.toByteArray())) {
-            imageFile.close();
             String name = UUID.randomUUID().toString();
 
             minioClient.putObject(PutObjectArgs.builder()
@@ -123,6 +123,7 @@ public class MinioService {
             }
             Thumbnails.of(originalImage)
                     .size(406, 204)
+                    .crop(Positions.TOP_CENTER)
                     .outputFormat(file.getContentType().substring("image/".length()))
                     .toOutputStream(byteArrayOutputStream);
             return byteArrayOutputStream;
