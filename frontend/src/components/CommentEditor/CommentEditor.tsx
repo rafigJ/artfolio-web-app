@@ -7,7 +7,7 @@ import CommentService from '../../api/CommentService'
 import { AuthContext } from '../../context'
 import { useFetching } from '../../hooks/useFetching'
 import { CommentResponse } from '../../types/comment/CommentResponse'
-import CommentList, { type CommentItem } from '../CommentList/CommentList'
+import CommentList from '../CommentList/CommentList'
 
 const { TextArea } = Input
 

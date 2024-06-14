@@ -1,10 +1,10 @@
 import { AntDesignOutlined } from '@ant-design/icons'
-import { Avatar, Button, Flex, Typography, message } from 'antd'
-import { useContext, useEffect, useState, type FC } from 'react'
-import { API_URL } from '../../api'
-import $api from '../../api/index'
+import { Avatar, Button, Flex, message, Typography } from 'antd'
+import { type FC, useContext, useState } from 'react'
 
 import { useNavigate } from 'react-router-dom'
+import { API_URL } from '../../api'
+import $api from '../../api/index'
 import { AuthContext } from '../../context'
 import type { FullUserResponse } from '../../types/user/FullUserResponse'
 

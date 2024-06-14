@@ -1,7 +1,6 @@
 import { Comment } from '@ant-design/compatible'
 import { DeleteOutlined, EllipsisOutlined, FlagFilled } from '@ant-design/icons'
 import { Avatar, Dropdown, List, message, Typography } from 'antd'
-import useNotification from 'antd/es/notification/useNotification'
 import React, { type FC, useContext, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { API_URL } from '../../api'
