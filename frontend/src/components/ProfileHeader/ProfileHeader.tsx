@@ -13,14 +13,10 @@ interface ProfileHeaderProps {
 }
 
 const ProfileHeader: FC<ProfileHeaderProps> = ({ profile }) => {
-	const [userIsSubscribed, setIsSubscribed] = useState(false)
+	const [userIsSubscribed, setIsSubscribed] = useState(profile?.isFollowed == null ? false : profile.isFollowed)
 	const navigate = useNavigate()
 
 	const { authCredential, isAuth } = useContext(AuthContext)
-
-	useEffect(() => {
-		// Проверка начального состояния подписки (можно добавить запрос к API для получения статуса подписки)
-	}, [])
 
 	const handleSubscribe = async () => {
 		try {
