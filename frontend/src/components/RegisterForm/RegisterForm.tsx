@@ -32,7 +32,7 @@ const RegisterForm: React.FC = () => {
 	const [currentStep, setCurrentStep] = useState<number>(0)
 	const [avatar, setAvatar] = useState<UploadFile[]>([] as UploadFile[])
 	const [firstStepData, setFirstStepData] = useState<FirstStepSlice>({} as FirstStepSlice)
-	const [secondStepData, setSecondStepData] = useState<SecondStepSlice>({} as SecondStepSlice)
+	const [, setSecondStepData] = useState<SecondStepSlice>({} as SecondStepSlice)
 	const { setAuthCredential, setIsAuth } = useContext(AuthContext)
 	
 	const [register, isLoading, isError, error] = useFetching(async (registerRequest: RegistrationRequest, avatar: any) => {

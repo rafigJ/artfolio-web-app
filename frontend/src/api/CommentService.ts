@@ -23,7 +23,7 @@ export default class CommentService {
 		return await $api.post(`/posts/${postId}/comments`, comment)
 	}
 	
-	static async deleteComment(postId: number): Promise<AxiosResponse<void>> {
-		return await $api.delete(`/posts/${postId}/comments`)
+	static async deleteComment(postId: number, commentId: number): Promise<AxiosResponse<void>> {
+		return await $api.delete(`/posts/${postId}/comments/${commentId}`)
 	}
 }
