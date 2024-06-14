@@ -1,11 +1,12 @@
 import { Comment } from '@ant-design/compatible'
 import { DeleteOutlined, EllipsisOutlined, FlagFilled } from '@ant-design/icons'
-import { Avatar, Dropdown, List, MenuProps, message, Typography } from 'antd'
-import React, { type FC, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Avatar, Dropdown, List, message, Typography } from 'antd'
+import useNotification from 'antd/es/notification/useNotification'
+import React, { type FC, useContext, useState } from 'react'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import { API_URL } from '../../api'
-import AuthService from '../../api/AuthService'
 import CommentService from '../../api/CommentService'
+import { AuthContext } from '../../context'
 import { useFetching } from '../../hooks/useFetching'
 import { CommentResponse } from '../../types/comment/CommentResponse'
 import ReportWindow from '../ReportWindow/ReportWindow'
@@ -24,34 +25,36 @@ interface CommentListProps {
 	setData: React.Dispatch<React.SetStateAction<CommentResponse[]>>
 }
 
-const CommentList: FC<CommentListProps> = ({ data , setData}) => {
-	const [activeComment, setActiveComment] = useState<number | null>(null)
+const CommentList: FC<CommentListProps> = ({ data, setData }) => {
+	const [activeComment, setActiveComment] = useState<CommentResponse | null>(null)
+	const { authCredential, isAuth } = useContext(AuthContext)
 	const navigate = useNavigate()
-	
-	const handleCommentHover = (id: number) => {
-		setActiveComment(id)
+	const param = useParams()
+	const handleCommentHover = (comment: CommentResponse) => {
+		setActiveComment(comment)
 	}
 	
 	const handleCommentLeave = () => {
 		setActiveComment(null)
 	}
 	
-	const [deleteComment, isLoading, isError, error] = useFetching(async (postId: number, deleteComment: CommentResponse) => {
+	const [deleteComment] = useFetching(async (postId: number, deleteComment: CommentResponse) => {
 		await CommentService.deleteComment(postId, deleteComment.id)
 			.then(response => {
-				data.filter(p => p.id !== deleteComment.id)
-				message.success('Комментарий ' + deleteComment.comment + ' удален')
+				setData(prevState =>
+					prevState.filter(p => p.id !== deleteComment.id)
+				)
+				message.success('Комментарий ' + deleteComment.comment + ' удален!')
 			})
 			.catch((e) => message.error('Ошибка удаления комментария ' + e))
 	})
-	
 	
 	const [open, setOpen] = useState(false)
 	
 	const showModal = () => {
 		setOpen(true)
 	}
-
+	
 	return (
 		<>
 			<ReportWindow open={open} setOpen={setOpen} />
@@ -62,7 +65,7 @@ const CommentList: FC<CommentListProps> = ({ data , setData}) => {
 				dataSource={data}
 				renderItem={item => (
 					<li
-						onMouseEnter={() => handleCommentHover(item.id)}
+						onMouseEnter={() => handleCommentHover(item)}
 						onMouseLeave={handleCommentLeave}
 					>
 						<div className='comment-container'>
@@ -73,14 +76,15 @@ const CommentList: FC<CommentListProps> = ({ data , setData}) => {
 								                src={`${API_URL}/user/${item.owner.username}/avatar`} />}
 								content={item.comment}
 								datetime={item.createTime} />
-							<Dropdown menu={{ items: [
+							<Dropdown menu={{
+								items: [
 									{
 										key: '1',
 										label: 'Удалить',
 										icon: <DeleteOutlined />,
-										disabled: true,
-										onClick: (item) => {
-											console.log(item)
+										disabled: !(isAuth && (authCredential.role === 'ADMIN' || authCredential.username === activeComment?.owner.username)),
+										onClick: () => {
+											deleteComment(param.id, item)
 										}
 									},
 									{
@@ -90,9 +94,10 @@ const CommentList: FC<CommentListProps> = ({ data , setData}) => {
 										icon: <FlagFilled color='red' />,
 										danger: true
 									}
-								] }} placement='bottomLeft' arrow>
+								]
+							}} placement='bottomLeft' arrow>
 								<EllipsisOutlined
-									className={activeComment === item.id ? 'menu-icon' : 'menu-icon-disable'} />
+									className={activeComment?.id === item.id ? 'menu-icon' : 'menu-icon-disable'} />
 							</Dropdown>
 						</div>
 					</li>
