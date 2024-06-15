@@ -6,7 +6,6 @@ import org.springframework.core.io.ResourceLoader;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import ru.vsu.cs.artfolio.dto.MediaDto;
@@ -86,13 +85,16 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Transactional
     public void deleteUser(UserEntity executor, String username) {
         if (!executor.isAdmin()) {
             throw new BadRequestException("Need permits for that");
         }
         // каскадное удаление
         UserEntity userEntity = findUserByUsername(username);
+        if (userEntity.isAdmin()) {
+            throw new BadRequestException("You can't delete admin");
+        }
         userEntity.setDeleted(true);
 
         List<PostEntity> ownerPosts = postRepository.findAllByOwnerUuid(userEntity.getUuid());
@@ -101,6 +103,7 @@ public class UserServiceImpl implements UserService {
         List<CommentEntity> ownerComments = commentRepository.findAllByUserUuid(userEntity.getUuid());
         ownerComments.forEach(comment -> comment.setDeleted(true));
 
+        followService.deleteAllUserSubscribesAndFollowers(userEntity);
         commentRepository.saveAll(ownerComments);
         postRepository.saveAll(ownerPosts);
         userRepository.save(userEntity);

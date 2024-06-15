@@ -1,6 +1,6 @@
 package ru.vsu.cs.artfolio.service;
 
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -24,9 +24,12 @@ import ru.vsu.cs.artfolio.service.impl.MinioService;
 
 import java.io.InputStream;
 import java.util.List;
-import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static ru.vsu.cs.artfolio.data.TestDataConstants.ADMIN_UUID;
+import static ru.vsu.cs.artfolio.data.TestDataConstants.USER_UUID;
 
 @SpringBootTest
 @Transactional
@@ -35,17 +38,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @Sql(value = "/sql/after_all/test_data_clear.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
 public class PostServiceIT {
 
-    // test_data.sql
-    private static final String DUMMY_FILE_NAME_DB = "dummy_file"; // 'saved' file in media_file table
-    private static final UUID USER_UUID = UUID.fromString("7c826e51-b416-475d-97b1-e01b2835db52"); // 'saved' user in _user table
-    private static final UUID ADMIN_UUID = UUID.fromString("7c826e51-b416-475d-97b1-e01b2835db53"); // 'saved' admin in _user table
-    private static MockMultipartFile mockMultipartFile;
-
-    @BeforeAll
-    static void downloadFile() throws Exception {
-        final InputStream mockFile = PostServiceIT.class.getClassLoader().getResourceAsStream("dummy-image.jpg");
-        mockMultipartFile = new MockMultipartFile("dummy-image.jpg", "dummy-image.jpg", "image/jpeg", mockFile);
-    }
+    private MockMultipartFile mockMultipartFile;
 
     @Autowired
     UserRepository userRepository;
@@ -62,17 +55,10 @@ public class PostServiceIT {
     @Autowired
     PostService postService;
 
-
-    /**
-     * Т.к. test container для minio я ещё не настроил, интеграционный тест работает с реальным
-     * s3 хранилищем. Следовательно, нам нужно очищать созданные файлы.
-     * (Можно также мокать, но так больше случаев можно покрыть)
-     */
-    void clearMinio() {
-        var mediaFiles = mediaRepository.findAll().parallelStream().map(MediaFileEntity::getFileName).toList();
-        var postPreviewFiles = postRepository.findAll().parallelStream().map(PostEntity::getPreviewMediaName).toList();
-        minioService.deleteFiles(mediaFiles);
-        minioService.deleteFiles(postPreviewFiles);
+    @BeforeEach
+    void downloadFile() throws Exception {
+        final InputStream mockFile = PostServiceIT.class.getClassLoader().getResourceAsStream("dummy-image.jpg");
+        mockMultipartFile = new MockMultipartFile("dummy-image.jpg", "dummy-image.jpg", "image/jpeg", mockFile);
     }
 
     @Test
@@ -168,5 +154,17 @@ public class PostServiceIT {
         assertEquals(responseDto.fullName, userEntity.getFullName());
         assertEquals(responseDto.email, userEntity.getEmail());
         assertEquals(responseDto.username, userEntity.getUsername());
+    }
+
+    /**
+     * Т.к. test container для minio я ещё не настроил, интеграционный тест работает с реальным
+     * s3 хранилищем. Следовательно, нам нужно очищать созданные файлы.
+     * (Можно также мокать, но так больше случаев можно покрыть)
+     */
+    void clearMinio() {
+        var mediaFiles = mediaRepository.findAll().parallelStream().map(MediaFileEntity::getFileName).toList();
+        var postPreviewFiles = postRepository.findAll().parallelStream().map(PostEntity::getPreviewMediaName).toList();
+        minioService.deleteFiles(mediaFiles);
+        minioService.deleteFiles(postPreviewFiles);
     }
 }

@@ -81,6 +81,7 @@ public class AuthenticationService {
             throw new IncorrectCredentialsException();
         }
         UserEntity userEntity = repository.findByEmail(request.email())
+                .filter(u -> !u.isDeleted())
                 .orElseThrow(NotExistUserException::new);
 
         User user = new User(userEntity);
@@ -91,6 +92,7 @@ public class AuthenticationService {
     @Transactional
     public void changePassword(ChangePasswordRequestDto requestDto) {
         UserEntity user = repository.findByEmail(requestDto.email())
+                .filter(u -> !u.isDeleted())
                 .orElseThrow(IncorrectCredentialsException::new);
 
         if (!passwordEncoder.matches(requestDto.secretWord(), user.getSecretWord())) {

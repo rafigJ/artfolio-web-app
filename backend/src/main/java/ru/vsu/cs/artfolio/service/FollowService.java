@@ -14,6 +14,14 @@ public interface FollowService {
     void deleteSubscribe(UserEntity subscriber, UserEntity followed);
 
     /**
+     * Для удаление всех FollowEntity связанных с данным пользователем
+     * Используется для каскадного удаления в userService
+     *
+     * @param user пользователь
+     */
+    void deleteAllUserSubscribesAndFollowers(UserEntity user);
+
+    /**
      * @param userId uuid пользователя
      * @return страницу пользователей, на которых подписан пользователь
      */
