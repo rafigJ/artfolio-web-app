@@ -19,6 +19,7 @@ public class CommentMapper {
                 .user(user)
                 .post(PostEntity.builder().id(postId).build())
                 .createTime(LocalDateTime.now())
+                .deleted(false)
                 .build();
     }
 
