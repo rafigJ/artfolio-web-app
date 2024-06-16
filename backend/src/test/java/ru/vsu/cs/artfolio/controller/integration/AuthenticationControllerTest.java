@@ -1,4 +1,4 @@
-package ru.vsu.cs.artfolio.controller;
+package ru.vsu.cs.artfolio.controller.integration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeAll;
