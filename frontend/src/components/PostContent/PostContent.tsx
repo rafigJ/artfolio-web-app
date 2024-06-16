@@ -7,15 +7,15 @@ import {
 	HeartFilled,
 	HeartOutlined
 } from '@ant-design/icons'
-import { Avatar, Button, Divider, Dropdown, Flex, MenuProps, message, Skeleton, Typography } from 'antd'
-import { type CSSProperties, type FC, useContext, useEffect, useState } from 'react'
+import { Avatar, Button, Divider, Dropdown, Flex, MenuProps, Skeleton, Typography, message } from 'antd'
+import { useContext, useEffect, useState, type CSSProperties, type FC } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import $api, { API_URL } from '../../api'
 import PostService from '../../api/PostService'
 import { AuthContext } from '../../context'
 import { useFetching } from '../../hooks/useFetching'
-import type { FullPostResponse } from '../../types/post/FullPostResponse'
 import { UserResponse } from '../../types/UserResponse'
+import type { FullPostResponse } from '../../types/post/FullPostResponse'
 import Error404Result from '../Error404Result/Error404Result'
 import ReportWindow from '../ReportWindow/ReportWindow'
 import './PostContent.css'
@@ -36,14 +36,14 @@ const AuthorLinkCard: FC<AuthorLinkCardProps> = ({ owner, style }) => {
 					icon={<AntDesignOutlined />}
 				/>
 			</Link>
-			
+
 			<div style={{ display: 'flex', flexDirection: 'column' }}>
 				<Link to={`/profile/${owner?.username}`}>
 					<Typography.Title style={{ marginTop: '15px' }} level={4}>
 						{owner?.fullName}
 					</Typography.Title>
 				</Link>
-				
+
 				<Typography.Text>Воронеж, Россия</Typography.Text>
 			</div>
 		</div>
@@ -57,10 +57,10 @@ const PostContent = () => {
 	}
 	const [isLiked, setIsLiked] = useState(false)
 	const [likesCount, setLikesCount] = useState(0)
-	const { isAuth } = useContext(AuthContext)
+	const { authCredential, isAuth } = useContext(AuthContext)
 	const navigate = useNavigate()
-	
-	
+
+
 	const handleLike = async () => {
 		if (!isAuth) {
 			navigate('/login')
@@ -76,7 +76,7 @@ const PostContent = () => {
 			message.error('Произошла ошибка при лайке поста')
 		}
 	}
-	
+
 	const handleUnlike = async () => {
 		if (!isAuth) {
 			navigate('/login')
@@ -93,50 +93,58 @@ const PostContent = () => {
 		}
 	}
 	const params = useParams()
-	
-	const items: MenuProps['items'] = [
-		{
-			key: '1',
-			label: <Link to={`/posts/edit/${params.id}`}>Редактировать</Link>,
-			icon: <EditOutlined />
-		},
-		{
-			key: '2',
-			label: 'Удалить',
-			icon: <DeleteOutlined />
-		},
-		{
-			key: '3',
-			label: 'Пожаловаться',
-			onClick: showModal,
-			icon: <FlagFilled color='red' />,
-			danger: true
-		}
-	]
-	
+
 	const [post, setPost] = useState<FullPostResponse>({} as FullPostResponse)
-	
+
 	const [fetchPost, isLoading, isError] = useFetching(async (id) => {
 		const response = await PostService.getPostById(id)
 		setPost(response.data)
 		setLikesCount(response.data.likeCount)
 		setIsLiked(response.data.hasLike === null ? false : response.data.hasLike)
 	})
-	
+
+	const getMenuItems = () => {
+		const items: MenuProps['items'] = [
+			{
+				key: '3',
+				label: 'Пожаловаться',
+				onClick: showModal,
+				icon: <FlagFilled color='red' />,
+				danger: true
+			}
+		]
+
+		if (isAuth && post.owner && (authCredential.role === 'ADMIN' || authCredential.username === post.owner.username)) {
+			items.unshift({
+				key: '2',
+				label: 'Удалить',
+				icon: <DeleteOutlined />
+			})
+		}
+		if (isAuth && post.owner && (authCredential.username === post.owner.username)) {
+			items.unshift({
+				key: '1',
+				label: <Link to={`/posts/edit/${params.id}`}>Редактировать</Link>,
+				icon: <EditOutlined />
+			})
+		}
+		return items
+	}
+
 	useEffect(() => {
 		fetchPost(params.id)
 	}, [params.id])
-	
+
 	if (isLoading) {
 		return <PostLoadingContent />
 	}
-	
+
 	if (isError) {
 		return (
 			<Error404Result />
 		)
 	}
-	
+
 	return (
 		<>
 			<ReportWindow open={open} setOpen={setOpen} />
@@ -144,7 +152,7 @@ const PostContent = () => {
 				<Typography.Title level={3} className='title'>
 					{post?.name}
 				</Typography.Title>
-				<Dropdown menu={{ items }} placement='bottomLeft' arrow>
+				<Dropdown menu={{ items: getMenuItems() }} placement='bottomLeft' arrow>
 					<Button className='menu-btn'>
 						<EllipsisOutlined />
 					</Button>
