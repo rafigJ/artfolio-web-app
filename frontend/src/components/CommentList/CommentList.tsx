@@ -1,7 +1,9 @@
 import { Comment } from '@ant-design/compatible'
 import { DeleteOutlined, EllipsisOutlined, FlagFilled } from '@ant-design/icons'
-import { Avatar, Dropdown, List, message, Typography } from 'antd'
-import React, { type FC, useContext, useState } from 'react'
+import { Avatar, Dropdown, List, Typography, message } from 'antd'
+import moment from 'moment'
+import 'moment/locale/ru'
+import React, { useContext, useState, type FC } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { API_URL } from '../../api'
 import CommentService from '../../api/CommentService'
@@ -32,11 +34,11 @@ const CommentList: FC<CommentListProps> = ({ data, setData }) => {
 	const handleCommentHover = (comment: CommentResponse) => {
 		setActiveComment(comment)
 	}
-	
+
 	const handleCommentLeave = () => {
 		setActiveComment(null)
 	}
-	
+
 	const [deleteComment] = useFetching(async (postId: number, deleteComment: CommentResponse) => {
 		await CommentService.deleteComment(postId, deleteComment.id)
 			.then(response => {
@@ -47,13 +49,13 @@ const CommentList: FC<CommentListProps> = ({ data, setData }) => {
 			})
 			.catch((e) => message.error('Ошибка удаления комментария ' + e))
 	})
-	
+
 	const [open, setOpen] = useState(false)
-	
+
 	const showModal = () => {
 		setOpen(true)
 	}
-	
+
 	return (
 		<>
 			<ReportWindow open={open} setOpen={setOpen} />
@@ -72,9 +74,9 @@ const CommentList: FC<CommentListProps> = ({ data, setData }) => {
 								style={{ backgroundColor: 'transparent' }}
 								author={<Link to={`/profile/${item.owner.username}`}>{item.owner.fullName} </Link>}
 								avatar={<Avatar onClick={() => navigate(`/profile/${item.owner.username}`)}
-								                src={`${API_URL}/user/${item.owner.username}/avatar`} />}
+									src={`${API_URL}/user/${item.owner.username}/avatar`} />}
 								content={item.comment}
-								datetime={item.createTime} />
+								datetime={moment(item.createTime).fromNow()} />
 							<Dropdown menu={{
 								items: [
 									{
