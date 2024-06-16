@@ -10,6 +10,7 @@ import ru.vsu.cs.artfolio.dto.comment.CommentRequestDto;
 import ru.vsu.cs.artfolio.dto.comment.CommentResponseDto;
 import ru.vsu.cs.artfolio.entity.CommentEntity;
 import ru.vsu.cs.artfolio.entity.UserEntity;
+import ru.vsu.cs.artfolio.exception.BadRequestException;
 import ru.vsu.cs.artfolio.exception.NotFoundException;
 import ru.vsu.cs.artfolio.exception.RestException;
 import ru.vsu.cs.artfolio.mapper.CommentMapper;
@@ -46,7 +47,7 @@ public class CommentServiceImpl implements CommentService {
                 .orElseThrow(() -> new NotFoundException("Comment by " + commentId + " not found"));
 
         if (!comment.getPost().getId().equals(postId)) {
-            throw new RestException("Comment by " + commentId + " doesn't belong to post by " + postId, HttpStatus.BAD_REQUEST);
+            throw new BadRequestException("Comment by " + commentId + " doesn't belong to post by " + postId);
         }
 
         if (comment.getUser().equals(user) || user.isAdmin()) {
