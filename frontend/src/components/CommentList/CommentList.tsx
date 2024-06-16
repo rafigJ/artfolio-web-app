@@ -56,6 +56,29 @@ const CommentList: FC<CommentListProps> = ({ data, setData }) => {
 		setOpen(true)
 	}
 
+	const getMenuItems = (item: CommentResponse) => {
+		const items = [
+			{
+				key: '2',
+				onClick: showModal,
+				label: 'Пожаловаться',
+				icon: <FlagFilled color='red' />,
+				danger: true
+			}
+		]
+
+		if (isAuth && (authCredential.role === 'ADMIN' || authCredential.username === item.owner.username)) {
+			items.unshift({
+				key: '1',
+				label: 'Удалить',
+				icon: <DeleteOutlined />,
+				onClick: () => deleteComment(Number(param.id), item),
+				danger: false
+			})
+		}
+
+		return items
+	}
 	return (
 		<>
 			<ReportWindow open={open} setOpen={setOpen} />
@@ -78,24 +101,7 @@ const CommentList: FC<CommentListProps> = ({ data, setData }) => {
 								content={item.comment}
 								datetime={moment(item.createTime).fromNow()} />
 							<Dropdown menu={{
-								items: [
-									{
-										key: '1',
-										label: 'Удалить',
-										icon: <DeleteOutlined />,
-										disabled: !(isAuth && (authCredential.role === 'ADMIN' || authCredential.username === activeComment?.owner.username)),
-										onClick: () => {
-											deleteComment(param.id, item)
-										}
-									},
-									{
-										key: '2',
-										onClick: showModal,
-										label: 'Пожаловаться',
-										icon: <FlagFilled color='red' />,
-										danger: true
-									}
-								]
+								items: getMenuItems(item)
 							}} placement='bottomLeft' arrow>
 								<EllipsisOutlined
 									className={activeComment?.id === item.id ? 'menu-icon' : 'menu-icon-disable'} />
