@@ -1,6 +1,8 @@
 package ru.vsu.cs.artfolio.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -22,6 +24,8 @@ import ru.vsu.cs.artfolio.service.CommentService;
 @RequiredArgsConstructor
 public class CommentServiceImpl implements CommentService {
 
+    private static final Logger LOG = LoggerFactory.getLogger(CommentServiceImpl.class);
+
     private final CommentRepository commentRepository;
     private final PostRepository postRepository;
 
@@ -34,6 +38,7 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public CommentResponseDto createComment(UserEntity user, Long postId, CommentRequestDto requestDto) {
         if (!postRepository.existsById(postId)) {
+            LOG.warn("Post by " + postId + " id not found");
             throw new NotFoundException("Post by " + postId + " id not found");
         }
         CommentEntity comment = CommentMapper.toEntity(requestDto, postId, user);
@@ -47,6 +52,7 @@ public class CommentServiceImpl implements CommentService {
                 .orElseThrow(() -> new NotFoundException("Comment by " + commentId + " not found"));
 
         if (!comment.getPost().getId().equals(postId)) {
+            LOG.warn("Comment by " + commentId + " doesn't belong to post by " + postId);
             throw new BadRequestException("Comment by " + commentId + " doesn't belong to post by " + postId);
         }
 
@@ -54,7 +60,8 @@ public class CommentServiceImpl implements CommentService {
             comment.setDeleted(true);
             commentRepository.save(comment);
         } else {
-            throw new RestException("Insufficient rights to delete comment", HttpStatus.UNAUTHORIZED);
+            LOG.warn("User {} can't delete comment {}. He must be Admin or Author", user.getUsername(), commentId);
+            throw new RestException("Access denied", HttpStatus.UNAUTHORIZED);
         }
     }
 

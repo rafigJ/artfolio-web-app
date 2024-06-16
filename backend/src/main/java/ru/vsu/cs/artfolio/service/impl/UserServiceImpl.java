@@ -169,6 +169,7 @@ public class UserServiceImpl implements UserService {
     private UserAdditionalInfo getUserAdditionalInfo(@Nullable UserEntity executor, UserEntity fetchUser) {
         List<Long> userPosts = postRepository.findAllByOwnerUuid(fetchUser.getUuid())
                 .parallelStream()
+                .filter(p -> !p.getDeleted())
                 .map(PostEntity::getId)
                 .toList();
 

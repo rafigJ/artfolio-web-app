@@ -68,7 +68,7 @@ public class TestDataConstants {
 
     // ADMIN additional info (like count, post count, subscribers, followers)
     public static final Long ADMIN_LIKE_COUNT = 0L;
-    public static final Long ADMIN_POST_COUNT = 1L;
+    public static final Long ADMIN_POST_COUNT = 0L; // not deleted
     public static final Long ADMIN_SUBSCRIBERS_COUNT = 0L;
     public static final Long ADMIN_FOLLOWING_COUNT = 0L;
 

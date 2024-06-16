@@ -36,12 +36,12 @@ import javax.annotation.Nullable;
 @RequiredArgsConstructor
 public class UserController {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(PostController.class);
+    private static final Logger LOG = LoggerFactory.getLogger(PostController.class);
     private final UserService service;
 
     @GetMapping("/{username}")
     public ResponseEntity<FullUserResponseDto> getUserByUsername(@Nullable @AuthenticationPrincipal User user, @PathVariable("username") String username) {
-        LOGGER.info("Получение данных о {}", username);
+        LOG.info("Get data about user: {}", username);
         UserEntity executor = user != null ? user.getUserEntity() : null;
         return ResponseEntity.ok(service.getUserByUsername(executor, username));
     }
@@ -51,7 +51,7 @@ public class UserController {
     public ResponseEntity<FullUserResponseDto> updateUser(@AuthenticationPrincipal User user,
                                                           @RequestPart("userInfo") @Valid UserUpdateRequestDto request,
                                                           @RequestPart(value = "avatarFile", required = false) MultipartFile avatarFile) {
-        LOGGER.info("Обновление данных о {}", user.getUsername());
+        LOG.info("Update user {}", user.getUsername());
         return ResponseEntity.ok(service.updateUserInformation(user.getUserEntity(), request, avatarFile));
     }
 
@@ -59,7 +59,7 @@ public class UserController {
     @PreAuthorize("isAuthenticated() and hasAuthority('ADMIN')")
     public ResponseEntity<?> deleteUserByUsername(@AuthenticationPrincipal User user,
                                                   @PathVariable("username") String username) {
-        LOGGER.info("Удаление пользователя {}", username);
+        LOG.info("Delete user: {}", username);
         service.deleteUser(user.getUserEntity(), username);
         return ResponseEntity.ok("{\"message\": \"user " + username + " is deleted\"}");
     }
@@ -76,6 +76,7 @@ public class UserController {
     public ResponseEntity<PageDto<PostResponseDto>> getPostsByUsername(@RequestParam(value = "_page", defaultValue = "0") Integer page,
                                                                        @RequestParam(value = "_limit", defaultValue = "10") Integer limit,
                                                                        @PathVariable("username") String username) {
+        LOG.info("Get posts by user: {}", username);
         var posts = service.getPostsPageByUsername(username, PageRequest.of(page, limit));
         return ResponseEntity.ok(posts);
     }
@@ -84,12 +85,14 @@ public class UserController {
     public ResponseEntity<PageDto<UserResponseDto>> getSubscribes(@RequestParam(value = "_page", defaultValue = "0") Integer page,
                                                                   @RequestParam(value = "_limit", defaultValue = "10") Integer limit,
                                                                   @PathVariable("username") String username) {
+        LOG.info("Get {} subscribes", username);
         return ResponseEntity.ok(service.getAllUserSubscribes(username, PageRequest.of(page, limit)));
     }
 
     @PostMapping("/{username}/subscribes")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<String> subscribe(@PathVariable("username") String username, @AuthenticationPrincipal User user) {
+        LOG.info("{} subscribes to {}", user.getUsername(), username);
         service.subscribe(user.getUserEntity(), username);
         return ResponseEntity.ok("{\"message\": \"subscribed to " + username + "\"}");
     }
@@ -97,6 +100,7 @@ public class UserController {
     @DeleteMapping("/{username}/subscribes")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<String> deleteSubscribe(@PathVariable("username") String username, @AuthenticationPrincipal User user) {
+        LOG.info("{} deletes subscribe from {}", user.getUsername(), username);
         service.deleteSubscribe(user.getUserEntity(), username);
         return ResponseEntity.ok("{\"message\": \"delete subscribe from " + username + "\"}");
     }
@@ -105,6 +109,7 @@ public class UserController {
     public ResponseEntity<PageDto<?>> getFollowers(@RequestParam(value = "_page", defaultValue = "0") Integer page,
                                                    @RequestParam(value = "_limit", defaultValue = "10") Integer limit,
                                                    @PathVariable("username") String username) {
+        LOG.info("Get {} followers", username);
         return ResponseEntity.ok(service.getAllUserFollowers(username, PageRequest.of(page, limit)));
     }
 

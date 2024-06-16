@@ -52,27 +52,27 @@ public class PostController {
             @AuthenticationPrincipal User user,
             @RequestPart("post") @Valid PostRequestDto post,
             @RequestPart("file") List<MultipartFile> listFiles) {
-        LOG.info("Пользователь {} сохраняет пост {}", user.getUsername(), post);
+        LOG.info("User {} saves the post {}", user.getUsername(), post);
         var createdPost = service.createPost(user.getUserEntity(), post, listFiles);
         return ResponseEntity.ok(createdPost);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<FullPostResponseDto> getPostById(@PathVariable("id") Long id, @Nullable @AuthenticationPrincipal User user) {
-        LOG.info("Получение поста " + id);
+        LOG.info("Get post by id: {} by user: {}", id, user != null ? user.getUsername(): null);
         UserEntity userEntity = user != null ? user.getUserEntity() : null;
         return ResponseEntity.ok(service.getPostById(userEntity, id));
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("isAuthenticated() and hasAuthority('USER')")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<FullPostResponseDto> updatePost(
             @PathVariable("id") Long id,
             @AuthenticationPrincipal User user,
             @RequestPart("post") @Valid PostRequestDto post,
             @RequestPart("file") List<MultipartFile> listFiles) {
 
-        LOG.info("Пользователь {} обновляет пост {}", user.getUsername(), post);
+        LOG.info("User {} update post {}", user.getUsername(), post);
         var updatedPost = service.updatePost(user.getUserEntity(), id, post, listFiles);
         return ResponseEntity.ok(updatedPost);
     }
@@ -82,7 +82,7 @@ public class PostController {
     public ResponseEntity<String> deletePost(
             @PathVariable("id") Long id,
             @AuthenticationPrincipal User user) {
-        LOG.info("Пользователь {} удаляет пост с идентификатором {}", user.getUsername(), id);
+        LOG.info("User {} delete post by id {}", user.getUsername(), id);
         service.deletePost(user.getUserEntity(), id);
         return ResponseEntity.ok("{\"message\": \"post " + id + " is deleted\"}");
     }
@@ -90,7 +90,7 @@ public class PostController {
     @PostMapping("/{id}/like")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<PostLikeResponse> likePost(@PathVariable("id") Long id, @AuthenticationPrincipal User user) {
-        LOG.info("Пользователь {} лайкает пост c id {}", user.getUsername(), id);
+        LOG.info("User {} likes post with id {}", user.getUsername(), id);
         Long likeCount = service.likePost(user.getUserEntity().getUuid(), id);
         return ResponseEntity.ok(new PostLikeResponse(id, likeCount));
     }
@@ -98,7 +98,7 @@ public class PostController {
     @DeleteMapping("/{id}/like")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<PostLikeResponse> deleteLike(@PathVariable("id") Long id, @AuthenticationPrincipal User user) {
-        LOG.info("Пользователь {} удаляет лайк с поста c id {}", user.getUsername(), id);
+        LOG.info("User {} delete like from post with id {}", user.getUsername(), id);
         Long likeCount = service.deleteLikeFromPost(user.getUserEntity().getUuid(), id);
         return ResponseEntity.ok(new PostLikeResponse(id, likeCount));
     }
@@ -115,7 +115,7 @@ public class PostController {
     public ResponseEntity<CommentResponseDto> commentPost(@PathVariable("id") Long id,
                                                           @RequestBody @Valid CommentRequestDto comment,
                                                           @AuthenticationPrincipal User user) {
-        LOG.info("Пользователь {} комментирует пост c id {}", user.getUsername(), id);
+        LOG.info("User {} comments post by id {}", user.getUsername(), id);
         CommentResponseDto createdComment = commentService.createComment(user.getUserEntity(), id, comment);
         return ResponseEntity.ok(createdComment);
     }
