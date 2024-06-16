@@ -3,7 +3,7 @@ import React, { useContext, useState } from 'react'
 import AuthService from '../../api/AuthService'
 import { AuthContext } from '../../context'
 import { useFetching } from '../../hooks/useFetching'
-import type { RegistrationRequest } from '../../types/RegistrationRequest'
+import type { RegistrationRequest } from '../../types/auth/RegistrationRequest'
 import '../LoginForm/LoginForm.css'
 import RegisterFormFirstStep from '../RegisterFormSteps/RegisterFormFirstStep'
 import RegisterFormSecondStep from '../RegisterFormSteps/RegisterFormSecondStep'
@@ -32,7 +32,7 @@ const RegisterForm: React.FC = () => {
 	const [currentStep, setCurrentStep] = useState<number>(0)
 	const [avatar, setAvatar] = useState<UploadFile[]>([] as UploadFile[])
 	const [firstStepData, setFirstStepData] = useState<FirstStepSlice>({} as FirstStepSlice)
-	const [secondStepData, setSecondStepData] = useState<SecondStepSlice>({} as SecondStepSlice)
+	const [, setSecondStepData] = useState<SecondStepSlice>({} as SecondStepSlice)
 	const { setAuthCredential, setIsAuth } = useContext(AuthContext)
 	
 	const [register, isLoading, isError, error] = useFetching(async (registerRequest: RegistrationRequest, avatar: any) => {

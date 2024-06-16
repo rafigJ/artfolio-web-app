@@ -1,3 +1,5 @@
+import { UserResponse } from '../UserResponse'
+
 export interface FullPostResponse {
 	id: number
 	name: string
@@ -5,10 +7,5 @@ export interface FullPostResponse {
 	likeCount: number
 	mediaIds: number[]
 	hasLike: false,
-	owner: Owner
-}
-
-export interface Owner {
-	fullName: string
-	username: string
+	owner: UserResponse
 }

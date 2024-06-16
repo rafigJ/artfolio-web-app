@@ -8,5 +8,7 @@ export interface FullUserResponse {
 	email: string
 	postCount: number
 	subscribersCount: number
+	followingCount: number
 	likeCount: number
+	isFollowed: boolean
 }

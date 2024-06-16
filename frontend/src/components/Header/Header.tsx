@@ -1,8 +1,7 @@
 import { LoginOutlined, PlusOutlined } from '@ant-design/icons'
 import { Button, Layout, Typography } from 'antd'
-import { useContext } from 'react'
+import { ReactNode, useContext, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { API_URL } from '../../api'
 import { AuthContext } from '../../context'
 import HeaderProfileMenu from '../HeaderProfileMenu/HeaderProfileMenu'
 import SearchInput from '../SearchInput/SearchInput'
@@ -10,6 +9,21 @@ import SearchInput from '../SearchInput/SearchInput'
 const Header = () => {
 	const navigate = useNavigate()
 	const { isAuth, authCredential } = useContext(AuthContext)
+	const [profileMenu, setProfileMenu] = useState<ReactNode>()
+	
+	useEffect(() => {
+		const profileMenu = isAuth ?
+			<HeaderProfileMenu />
+			:
+			<Button
+				icon={<LoginOutlined />}
+				size='large'
+				onClick={() => navigate('/login')}
+			>
+				Войти
+			</Button>
+		setProfileMenu(profileMenu)
+	}, [isAuth, authCredential])
 	
 	return (
 		<Layout.Header
@@ -36,17 +50,7 @@ const Header = () => {
 			>
 				Опубликовать
 			</Button>
-			{isAuth ?
-				<HeaderProfileMenu src={`${API_URL}/user/${authCredential?.username}/avatar`} />
-				:
-				<Button
-					icon={<LoginOutlined />}
-					size='large'
-					onClick={() => navigate('/login')}
-				>
-					Войти
-				</Button>
-			}
+			{profileMenu}
 		</Layout.Header>
 	)
 }

@@ -1,5 +1,5 @@
 import {createContext, Dispatch, SetStateAction} from "react";
-import type { AuthResponse } from '../types/AuthResponse'
+import type { AuthResponse } from '../types/auth/AuthResponse'
 
 interface AuthContextProps {
     authCredential: AuthResponse;

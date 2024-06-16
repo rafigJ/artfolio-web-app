@@ -5,17 +5,17 @@ import { Link, useNavigate } from 'react-router-dom'
 import UserService from '../../api/UserService'
 import { AuthContext } from '../../context'
 import { useFetching } from '../../hooks/useFetching'
-import { EditProfileRequest } from '../../types/EditProfileRequest'
-import { FullUserResponse } from '../../types/FullUserResponse'
-import './EditProfileForm.css'
+import { EditProfileRequest } from '../../types/user/EditProfileRequest'
+import { FullUserResponse } from '../../types/user/FullUserResponse'
 import RegisterFormAvatarUpload from '../RegisterFormAvatarUpload/RegisterFormAvatarUpload'
+import './EditProfileForm.css'
 
 const EditProfileForm = () => {
 	const [avatar, setAvatar] = useState<UploadFile[]>([] as UploadFile[])
 	const [form] = Form.useForm()
 	const navigate = useNavigate()
 
-	const { authCredential } = useContext(AuthContext)
+	const { authCredential, setAuthCredential } = useContext(AuthContext)
 	const [profile, setProfile] = useState<FullUserResponse>({} as FullUserResponse)
 
 	const [fetchUser] = useFetching(async (username) => {
@@ -42,15 +42,21 @@ const EditProfileForm = () => {
 			fullName: values.fullName.trim(),
 			country: values.country ? values.country.trim() : '',
 			city: values.city ? values.city.trim() : '',
-			description: values.description ? values.description.trim() : '',
+			description: values.description ? values.description.trim() : ''
 		}
 		try {
-			UserService.editUserProfile(editProfileRequest, avatar.pop()?.originFileObj)
-			message.success("Профиль успешно обновлён")
-			navigate(`/profile/${profile.username}`)
-		}
-		catch (error) {
-			message.error("Произошла ошибка при редактировании профиля")
+			const response = await UserService.editUserProfile(editProfileRequest, avatar.pop()?.originFileObj)
+			setAuthCredential({
+				username: response.data.username,
+				email: response.data.email,
+				name: response.data.fullName,
+				token: authCredential.token,
+				role: authCredential.role
+			})
+			message.success('Профиль успешно обновлён')
+			navigate(`/profile/${response.data.username}`)
+		} catch (error) {
+			message.error('Произошла ошибка при редактировании профиля')
 		}
 	}
 
@@ -83,7 +89,7 @@ const EditProfileForm = () => {
 						{
 							pattern: /^[^\u0400-\u04FFёЁ]+$/,
 							message: 'Логин не должен содержать кириллицу!'
-						},
+						}
 					]}
 				>
 					<Input
@@ -168,12 +174,13 @@ const EditProfileForm = () => {
 					/>
 				</Form.Item>
 
-				<Form.Item name='description'
-					rules={[
-						{ max: 400, message: 'Описание профиля должно содержать не более 400 символов' }
-					]}
-				>
-					<Input.TextArea placeholder='Описание профиля' rows={4} />
+				<Form.Item name='description'>
+					<Input.TextArea
+						placeholder='Описание профиля'
+						rows={4}
+						maxLength={400}
+						showCount
+					/>
 				</Form.Item>
 
 				Фото профиля:

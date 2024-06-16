@@ -3,7 +3,7 @@ import { Avatar, Card, Typography } from 'antd'
 import { type FC } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { API_URL } from '../../api'
-import type { PostResponse } from '../../types/PostResponse'
+import type { PostResponse } from '../../types/post/PostResponse'
 
 const { Meta } = Card
 

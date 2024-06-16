@@ -2,8 +2,8 @@ import { FileTextOutlined, HeartOutlined } from '@ant-design/icons'
 import { Button, Descriptions, Flex, Statistic, Typography } from 'antd'
 import pdfMake from 'pdfmake/build/pdfmake'
 import pdfFonts from 'pdfmake/build/vfs_fonts'
-import { useState, type FC } from 'react'
-import type { FullUserResponse } from '../../types/FullUserResponse'
+import { type FC, useState } from 'react'
+import type { FullUserResponse } from '../../types/user/FullUserResponse'
 import SubscribersWindow from '../SubscribersWindow/SubscribersWindow'
 import SubscriptionWindow from '../SubscribtionWindow/SubscriptionWindow'
 
@@ -21,10 +21,10 @@ const ProfileDescription: FC<ProfileDescriptionProps> = ({ profile }) => {
 		setOpenSubscribers(true)
 	}
 	const [openSubscriptions, setOpenSubscribtions] = useState(false)
-	const showSubscribtions = () => {
+	const showSubscriptions = () => {
 		setOpenSubscribtions(true)
 	}
-
+	
 	const handleExportDescription = () => {
 		window.ym(97163910, 'reachGoal', 'exportTo')
 		const docDefinition = {
@@ -40,17 +40,17 @@ const ProfileDescription: FC<ProfileDescriptionProps> = ({ profile }) => {
 				{ text: 'Описание:', bold: true },
 				profile?.description,
 				{ text: 'Количество лайков: ', bold: true },
-				100,
+				profile?.likeCount,
 				{ text: 'Количество публикаций: ', bold: true },
-				5,
+				profile?.postCount,
 				{ text: 'Количество подписчиков: ', bold: true },
-				100,
+				profile?.subscribersCount
 			]
 		}
-
+		
 		pdfMake.createPdf(docDefinition).download('profile_description.pdf')
 	}
-
+	
 	return (
 		<>
 			<SubscribersWindow open={openSubscribers} setOpen={setOpenSubscribers} user={profile} />
@@ -63,23 +63,23 @@ const ProfileDescription: FC<ProfileDescriptionProps> = ({ profile }) => {
 							{
 								key: '1',
 								label: 'Имя пользователя',
-								children: profile.username,
+								children: profile.username
 							},
 							{
 								key: '2',
 								label: 'Электронная почта',
-								children: profile.email,
+								children: profile.email
 							},
 							{
 								key: '3',
 								label: 'Город проживания',
-								children: profile.city,
+								children: profile.city
 							},
 							{
 								key: '4',
 								label: 'Страна проживания',
-								children: profile.country,
-							},
+								children: profile.country
+							}
 						]} />
 					<Paragraph>{profile?.description}</Paragraph>
 				</Flex>
@@ -100,10 +100,10 @@ const ProfileDescription: FC<ProfileDescriptionProps> = ({ profile }) => {
 							title='Подписчики:'
 							value={profile?.subscribersCount} />
 					</div>
-					<div onClick={showSubscribtions} style={{ cursor: 'pointer' }}>
+					<div onClick={showSubscriptions} style={{ cursor: 'pointer' }}>
 						<Statistic
 							title='Подписки'
-							value=' ' />
+							value={profile?.followingCount} />
 					</div>
 				</Flex>
 			</Flex>

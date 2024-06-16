@@ -1,13 +1,13 @@
 import { Comment } from '@ant-design/compatible'
-import { Avatar, Button, Form, Input } from 'antd'
+import { Avatar, Button, Form, Input, message } from 'antd'
 import React, { useContext, useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { API_URL } from '../../api'
-import PostService from '../../api/PostService'
+import CommentService from '../../api/CommentService'
 import { AuthContext } from '../../context'
 import { useFetching } from '../../hooks/useFetching'
-import type { FullPostResponse } from '../../types/FullPostResponse'
-import CommentList, { type CommentItem } from '../CommentList/CommentList'
+import { CommentResponse } from '../../types/comment/CommentResponse'
+import CommentList from '../CommentList/CommentList'
 
 const { TextArea } = Input
 
@@ -23,7 +23,14 @@ const Editor = ({ onChange, onSubmit, submitting, value }: EditorProps) => (
 	<>
 		<Form.Item>
 			<TextArea
+				onPressEnter={(event) => {
+					if (event.key === 'Enter' && !event.shiftKey) {
+						event.preventDefault()
+						onSubmit()
+					}
+				}}
 				placeholder='Введите комментарий'
+				showCount
 				maxLength={300}
 				rows={4}
 				onChange={onChange}
@@ -44,65 +51,56 @@ const Editor = ({ onChange, onSubmit, submitting, value }: EditorProps) => (
 )
 
 const CommentEditor: React.FC = () => {
-	const [comments, setComments] = useState<CommentItem[]>([])
 	const [submitting, setSubmitting] = useState(false)
 	const [value, setValue] = useState('')
-	
+
 	const navigate = useNavigate()
 	const params = useParams()
 	const { isAuth, authCredential } = useContext(AuthContext)
-	
-	const handleSubmit = () => {
-		if (!isAuth) {
-			navigate('/login')
-		}
-		
-		if (!value) return
-		
-		setSubmitting(true)
-		
-		setTimeout(() => {
-			setSubmitting(false)
-			setValue('')
-			setComments(prevComments => [
-				...prevComments,
-				{
-					author: authCredential?.name,
-					avatar: `${API_URL}/user/${authCredential?.username}/avatar`,
-					content: <p>{value}</p>,
-					datetime: new Date().toISOString(),
-					id: prevComments.length
-				}
-			])
-		}, 1000)
-	}
-	
+
 	const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
 		if (!isAuth) {
 			navigate('/login')
 		}
 		setValue(e.target.value)
 	}
-	
-	const [post, setPost] = useState<FullPostResponse>({} as FullPostResponse)
-	
-	const [fetchPost, isLoading, isError] = useFetching(async (id) => {
-		const response = await PostService.getPostById(id)
-		setPost(response.data)
+
+	const [comments, setComments] = useState<CommentResponse[]>([])
+
+	const [fetchComments, isLoading, isError] = useFetching(async (id) => {
+		const response = await CommentService.getComments(id, 0, 1000)
+		setComments(p => [...p, ...response.data.content])
 	})
-	
+
+	const handleSubmit = () => {
+		if (!isAuth) {
+			navigate('/login')
+		}
+
+		if (!value) return
+
+		setSubmitting(true)
+		CommentService.createComment(Number(params.id), { comment: value.trim() })
+			.then(c => setComments(p => [...p, c.data]))
+			.catch(e => message.error('Ошибка комментирования ' + e))
+			.finally(() => {
+				setSubmitting(false)
+				setValue('')
+			})
+	}
+
 	useEffect(() => {
-		fetchPost(params.id)
+		fetchComments(params.id)
 	}, [params.id])
-	
+
 	if (isLoading || isError) {
 		return <></>
 	}
-	
+
 	return (
 		<>
 			{comments.length > 0 ? (
-				<CommentList data={comments} />
+				<CommentList data={comments} setData={setComments} />
 			) : (
 				<div style={{ marginTop: 28 }} />
 			)}

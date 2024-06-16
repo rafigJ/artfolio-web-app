@@ -4,7 +4,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { API_URL } from '../../api'
 import PostService from '../../api/PostService'
 import { useFetching } from '../../hooks/useFetching'
-import type { PostRequest } from '../../types/PostRequest'
+import type { PostRequest } from '../../types/post/PostRequest'
 import CreatePostFormPreview from '../CreatePostFormPreview/CreatePostFormPreview'
 import DraggableUploadList from '../DraggableUploadList/DraggableUploadList'
 

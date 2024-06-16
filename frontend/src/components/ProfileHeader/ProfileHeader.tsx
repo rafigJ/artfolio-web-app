@@ -1,26 +1,22 @@
 import { AntDesignOutlined } from '@ant-design/icons'
-import { Avatar, Button, Flex, Typography, message } from 'antd'
-import { useContext, useEffect, useState, type FC } from 'react'
-import { API_URL } from '../../api'
-import $api from '../../api/index'
+import { Avatar, Button, Flex, message, Typography } from 'antd'
+import { type FC, useContext, useState } from 'react'
 
 import { useNavigate } from 'react-router-dom'
+import { API_URL } from '../../api'
+import $api from '../../api/index'
 import { AuthContext } from '../../context'
-import type { FullUserResponse } from '../../types/FullUserResponse'
+import type { FullUserResponse } from '../../types/user/FullUserResponse'
 
 interface ProfileHeaderProps {
 	profile: FullUserResponse
 }
 
 const ProfileHeader: FC<ProfileHeaderProps> = ({ profile }) => {
-	const [userIsSubscribed, setIsSubscribed] = useState(false)
+	const [userIsSubscribed, setIsSubscribed] = useState(profile?.isFollowed == null ? false : profile.isFollowed)
 	const navigate = useNavigate()
 
 	const { authCredential, isAuth } = useContext(AuthContext)
-
-	useEffect(() => {
-		// Проверка начального состояния подписки (можно добавить запрос к API для получения статуса подписки)
-	}, [])
 
 	const handleSubscribe = async () => {
 		try {

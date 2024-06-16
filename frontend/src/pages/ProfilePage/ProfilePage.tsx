@@ -7,8 +7,8 @@ import PostCard from '../../components/PostCard/PostCard'
 import ProfileDescription from '../../components/ProfileDescription/ProfileDescription'
 import ProfileHeader from '../../components/ProfileHeader/ProfileHeader'
 import { useFetching } from '../../hooks/useFetching'
-import type { FullUserResponse } from '../../types/FullUserResponse'
-import type { PostResponse } from '../../types/PostResponse'
+import type { FullUserResponse } from '../../types/user/FullUserResponse'
+import type { PostResponse } from '../../types/post/PostResponse'
 
 interface ProfilePostGridProps {
 	data: PostResponse[]
@@ -40,13 +40,14 @@ const ProfilePage = () => {
 	const params = useParams()
 	
 	const [profile, setProfile] = useState<FullUserResponse>({} as FullUserResponse)
+	const [posts, setPosts] = useState<PostResponse[]>([])
 	
-	const [fetchUser, isLoading, isError, error] = useFetching(async (username) => {
+	const [fetchUser, isLoading, isError] = useFetching(async (username) => {
 		const response = await UserService.getUserByUsername(username)
+		const postResponses = await UserService.getPostsByUsername(username)
 		setProfile(response.data)
+		setPosts(postResponses.data.content)
 	})
-	
-	const data: PostResponse[] = []
 	
 	useEffect(() => {
 		fetchUser(params.username)
@@ -71,7 +72,7 @@ const ProfilePage = () => {
 					{
 						key: '1',
 						label: 'Публикации',
-						children: <ProfilePostGrid data={data} />
+						children: <ProfilePostGrid data={posts} />
 					},
 					{
 						key: '2',

@@ -4,7 +4,7 @@ import { FC, useContext, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import $api, { API_URL } from '../../api'
 import { AuthContext } from '../../context'
-import { FullUserResponse } from '../../types/FullUserResponse'
+import { FullUserResponse } from '../../types/user/FullUserResponse'
 
 interface SubscriptionsWindowProps {
 	user: FullUserResponse
