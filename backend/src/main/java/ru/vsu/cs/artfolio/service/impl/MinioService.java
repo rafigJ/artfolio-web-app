@@ -158,7 +158,7 @@ public class MinioService {
             }
             Thumbnails.of(originalImage)
                     .size(406, 204)
-                    .crop(Positions.TOP_CENTER)
+                    .crop(Positions.CENTER)
                     .outputFormat(file.getContentType().substring("image/".length()))
                     .toOutputStream(byteArrayOutputStream);
             return byteArrayOutputStream;
