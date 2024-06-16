@@ -87,11 +87,13 @@ const RegisterFormSecondStep: FC<RegisterFormSecondStep> = ({ onFinishStep2, ava
 				Фото профиля:
 				<RegisterFormAvatarUpload avatar={avatar} setAvatar={setAvatar} />
 
-				<Form.Item name='description'
-					rules={[
-						{ max: 400, message: 'Описание профиля должно содержать не более 400 символов' }
-					]}>
-					<Input.TextArea placeholder='Описание профиля' rows={4} />
+				<Form.Item name='description'>
+					<Input.TextArea
+						placeholder='Описание профиля'
+						rows={4}
+						maxLength={400}
+						showCount
+					/>
 				</Form.Item>
 				<Form.Item>
 					<Button
