@@ -49,36 +49,33 @@ public class PostServiceImpl implements PostService {
     @Transactional
     public FullPostResponseDto createPost(UserEntity executor, PostRequestDto requestDto, List<MultipartFile> files) {
         LOG.info("Creating post with data: {}, {}", executor.getUuid(), requestDto);
-        if (files.isEmpty()) {
-            throw new BadRequestException("Multipart files must have at least one file");
-        }
-        if (files.size() > 10) {
-            throw new BadRequestException("File list must be less than 10");
-        }
+        validateFiles(files);
 
         MultipartFile file = files.get(0);
         PostEntity post = PostMapper.toEntity(requestDto, executor, minioService.uploadPreviewFile(file));
 
-        LOG.info("Saving post");
         PostEntity createdPost = postRepository.save(post);
         List<MinioResult> mediaFiles = files.stream().map(minioService::uploadFile).toList();
         List<MediaFileEntity> medias = mediaRepository.saveAll(MediaMapper.toEntityList(mediaFiles, createdPost));
 
-        LOG.info("Returning response");
         List<Long> mediaIds = medias.stream().map(MediaFileEntity::getId).toList();
         return PostMapper.toFullDto(createdPost, mediaIds, 0L, false);
     }
 
+    private static void validateFiles(List<MultipartFile> files) {
+        if (files.isEmpty()) {
+            LOG.warn("Multipart files must have at least one file");
+            throw new BadRequestException("Multipart files must have at least one file");
+        }
+        if (files.size() > 10) {
+            LOG.warn("File list must be less than 10");
+            throw new BadRequestException("File list must be less than 10");
+        }
+    }
+
     @Override
     public FullPostResponseDto getPostById(@Nullable UserEntity user, Long id) {
-        PostEntity postEntity;
-        if (user != null && user.isAdmin()) {
-            postEntity = findPostById(id);
-        } else {
-            postEntity = postRepository.findById(id)
-                    .filter(p -> !p.getDeleted())
-                    .orElseThrow(() -> new NotFoundException("Post by id: " + id + " not found"));
-        }
+        PostEntity postEntity = (user != null && user.isAdmin()) ? findPostById(id) : findNonDeletedPostById(id);
 
         List<Long> mediaIds = postEntity.getMedias().stream()
                 .sorted(Comparator.comparingInt(MediaFileEntity::getPosition))
@@ -88,15 +85,25 @@ public class PostServiceImpl implements PostService {
         return PostMapper.toFullDto(postEntity, mediaIds, likeService.getLikeCount(id), hasLike);
     }
 
+    private PostEntity findNonDeletedPostById(Long id) {
+        return postRepository.findById(id)
+                .filter(p -> !p.getDeleted())
+                .orElseThrow(() -> new NotFoundException("Post by id: " + id + " not found"));
+    }
+
     @Override
     public void deletePost(UserEntity executor, Long id) {
         PostEntity post = findPostById(id);
-        if (post.getOwner().equals(executor) || executor.isAdmin()) {
+        if (isAuthorizedToDelete(executor, post)) {
             post.setDeleted(true);
             postRepository.save(post);
         } else {
-            throw new RestException("Insufficient rights to delete", HttpStatus.UNAUTHORIZED);
+            throw new RestException("Access denied", HttpStatus.UNAUTHORIZED);
         }
+    }
+
+    private static boolean isAuthorizedToDelete(UserEntity executor, PostEntity post) {
+        return post.getOwner().equals(executor) || executor.isAdmin();
     }
 
     @Override
@@ -106,10 +113,22 @@ public class PostServiceImpl implements PostService {
 
         PostEntity postToUpdate = findPostById(id);
         if (!postToUpdate.getOwner().equals(executor)) {
-            LOG.warn("Insufficient rights to update post");
+            LOG.warn("Access denied");
             throw new RestException("Access denied", HttpStatus.UNAUTHORIZED);
         }
 
+        updatePostDetails(postToUpdate, requestDto, files);
+
+        postRepository.save(postToUpdate);
+        List<MinioResult> mediaFiles = files.stream().map(minioService::uploadFile).toList();
+        List<MediaFileEntity> medias = mediaRepository.saveAll(MediaMapper.toEntityList(mediaFiles, postToUpdate));
+
+        List<Long> mediaIds = medias.stream().map(MediaFileEntity::getId).toList();
+        Boolean hasLike = likeService.hasLike(executor.getUuid(), id);
+        return PostMapper.toFullDto(postToUpdate, mediaIds, likeService.getLikeCount(id), hasLike);
+    }
+
+    private void updatePostDetails(PostEntity postToUpdate, PostRequestDto requestDto, List<MultipartFile> files) {
         MultipartFile file = files.get(0);
         MinioResult previewMedia = minioService.uploadPreviewFile(file);
         postToUpdate.setName(requestDto.getName());
@@ -117,17 +136,13 @@ public class PostServiceImpl implements PostService {
         postToUpdate.setPreviewType(previewMedia.contentType());
         postToUpdate.setPreviewMediaName(previewMedia.name());
 
+        deleteExistingMedias(postToUpdate);
+    }
+
+    private void deleteExistingMedias(PostEntity postToUpdate) {
         List<String> fileNames = postToUpdate.getMedias().stream().map(MediaFileEntity::getFileName).toList();
         minioService.deleteFiles(fileNames);
-        mediaRepository.deleteAllByPostIdEquals(id);
-
-        postToUpdate = postRepository.save(postToUpdate);
-        List<MinioResult> mediaFiles = files.stream().map(minioService::uploadFile).toList();
-        List<MediaFileEntity> medias = mediaRepository.saveAll(MediaMapper.toEntityList(mediaFiles, postToUpdate));
-
-        List<Long> mediaIds = medias.stream().map(MediaFileEntity::getId).toList();
-        Boolean hasLike = likeService.hasLike(executor.getUuid(), id);
-        return PostMapper.toFullDto(postToUpdate, mediaIds, likeService.getLikeCount(id), hasLike);
+        mediaRepository.deleteAllByPostIdEquals(postToUpdate.getId());
     }
 
     @Override
@@ -140,20 +155,22 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public Long likePost(UUID userId, Long postId) {
-        if (!postRepository.existsById(postId)) {
-            throw new NotFoundException("Post by id: " + postId + " not found");
-        }
+        verifyPostExists(postId);
         likeService.createLike(userId, postId);
         return likeService.getLikeCount(postId);
     }
 
     @Override
     public Long deleteLikeFromPost(UUID userId, Long postId) {
+        verifyPostExists(postId);
+        likeService.deleteLike(userId, postId);
+        return likeService.getLikeCount(postId);
+    }
+
+    private void verifyPostExists(Long postId) {
         if (!postRepository.existsById(postId)) {
             throw new NotFoundException("Post by id: " + postId + " not found");
         }
-        likeService.deleteLike(userId, postId);
-        return likeService.getLikeCount(postId);
     }
 
     @Override
@@ -177,6 +194,5 @@ public class PostServiceImpl implements PostService {
         return postRepository.findById(postId)
                 .orElseThrow(() -> new NotFoundException("Post by id: " + postId + " not found"));
     }
-
 
 }

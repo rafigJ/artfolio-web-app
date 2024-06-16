@@ -1,6 +1,8 @@
 package ru.vsu.cs.artfolio.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -10,6 +12,7 @@ import ru.vsu.cs.artfolio.dto.comment.CommentRequestDto;
 import ru.vsu.cs.artfolio.dto.comment.CommentResponseDto;
 import ru.vsu.cs.artfolio.entity.CommentEntity;
 import ru.vsu.cs.artfolio.entity.UserEntity;
+import ru.vsu.cs.artfolio.exception.BadRequestException;
 import ru.vsu.cs.artfolio.exception.NotFoundException;
 import ru.vsu.cs.artfolio.exception.RestException;
 import ru.vsu.cs.artfolio.mapper.CommentMapper;
@@ -20,6 +23,8 @@ import ru.vsu.cs.artfolio.service.CommentService;
 @Service
 @RequiredArgsConstructor
 public class CommentServiceImpl implements CommentService {
+
+    private static final Logger LOG = LoggerFactory.getLogger(CommentServiceImpl.class);
 
     private final CommentRepository commentRepository;
     private final PostRepository postRepository;
@@ -33,6 +38,7 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public CommentResponseDto createComment(UserEntity user, Long postId, CommentRequestDto requestDto) {
         if (!postRepository.existsById(postId)) {
+            LOG.warn("Post by " + postId + " id not found");
             throw new NotFoundException("Post by " + postId + " id not found");
         }
         CommentEntity comment = CommentMapper.toEntity(requestDto, postId, user);
@@ -46,14 +52,16 @@ public class CommentServiceImpl implements CommentService {
                 .orElseThrow(() -> new NotFoundException("Comment by " + commentId + " not found"));
 
         if (!comment.getPost().getId().equals(postId)) {
-            throw new RestException("Comment by " + commentId + " doesn't belong to post by " + postId, HttpStatus.BAD_REQUEST);
+            LOG.warn("Comment by " + commentId + " doesn't belong to post by " + postId);
+            throw new BadRequestException("Comment by " + commentId + " doesn't belong to post by " + postId);
         }
 
         if (comment.getUser().equals(user) || user.isAdmin()) {
             comment.setDeleted(true);
             commentRepository.save(comment);
         } else {
-            throw new RestException("Insufficient rights to delete comment", HttpStatus.UNAUTHORIZED);
+            LOG.warn("User {} can't delete comment {}. He must be Admin or Author", user.getUsername(), commentId);
+            throw new RestException("Access denied", HttpStatus.UNAUTHORIZED);
         }
     }
 

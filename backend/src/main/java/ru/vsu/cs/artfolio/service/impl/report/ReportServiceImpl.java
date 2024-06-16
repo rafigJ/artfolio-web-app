@@ -1,6 +1,8 @@
 package ru.vsu.cs.artfolio.service.impl.report;
 
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -25,6 +27,8 @@ import ru.vsu.cs.artfolio.service.report.ReportService;
 @RequiredArgsConstructor
 public class ReportServiceImpl implements ReportService {
 
+    private static final Logger LOG = LoggerFactory.getLogger(ReportServiceImpl.class);
+
     private final PostReportService postReportService;
     private final CommentReportService commentReportService;
 
@@ -41,7 +45,8 @@ public class ReportServiceImpl implements ReportService {
     @Override
     public CommentReportResponseDto setCommentReportReviewed(UserEntity executor, Long commentReportId, ReportReviewRequestDto reviewDto) {
         if (!executor.isAdmin()) {
-            throw new RestException("Insufficient rights to update report", HttpStatus.UNAUTHORIZED);
+            LOG.warn("{} is not admin. Access denied", executor.getUsername());
+            throw new RestException("Access denied", HttpStatus.UNAUTHORIZED);
         }
         return commentReportService.setReviewed(executor, commentReportId, reviewDto);
     }
@@ -61,7 +66,8 @@ public class ReportServiceImpl implements ReportService {
     @Override
     public PostReportResponseDto setPostReportReviewed(UserEntity executor, Long postReportId, ReportReviewRequestDto reviewDto) {
         if (!executor.isAdmin()) {
-            throw new RestException("Insufficient rights to update report", HttpStatus.UNAUTHORIZED);
+            LOG.warn("{} is not admin. Access denied", executor.getUsername());
+            throw new RestException("Access denied", HttpStatus.UNAUTHORIZED);
         }
         return postReportService.setReviewed(executor, postReportId, reviewDto);
     }

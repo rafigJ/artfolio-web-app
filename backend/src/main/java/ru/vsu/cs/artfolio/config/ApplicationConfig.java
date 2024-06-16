@@ -23,6 +23,7 @@ public class ApplicationConfig {
     @Bean
     public UserDetailsService userDetailsService() {
         return username -> new User(repository.findByEmail(username)
+                .filter(u -> !u.isDeleted())
                 .orElseThrow(NotExistUserException::new));
     }
 

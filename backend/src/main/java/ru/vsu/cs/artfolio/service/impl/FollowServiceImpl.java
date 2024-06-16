@@ -40,6 +40,12 @@ public class FollowServiceImpl implements FollowService {
     }
 
     @Override
+    public void deleteAllUserSubscribesAndFollowers(UserEntity user) {
+        var uuid = user.getUuid();
+        repository.deleteAllByFollowedUuidOrSubscriberUuid(uuid, uuid);
+    }
+
+    @Override
     public PageDto<UserResponseDto> getAllUserSubscribes(UUID userId, Pageable page) {
         Page<UserEntity> subscribes = repository.findAllBySubscriberUuid(userId, page).map(FollowEntity::getFollowed);
         return UserMapper.toPageDto(subscribes);

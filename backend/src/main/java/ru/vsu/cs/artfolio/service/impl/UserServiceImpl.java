@@ -6,7 +6,6 @@ import org.springframework.core.io.ResourceLoader;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import ru.vsu.cs.artfolio.dto.MediaDto;
@@ -19,7 +18,6 @@ import ru.vsu.cs.artfolio.entity.CommentEntity;
 import ru.vsu.cs.artfolio.entity.PostEntity;
 import ru.vsu.cs.artfolio.entity.UserEntity;
 import ru.vsu.cs.artfolio.exception.BadRequestException;
-import ru.vsu.cs.artfolio.exception.NotExistUserException;
 import ru.vsu.cs.artfolio.exception.NotFoundException;
 import ru.vsu.cs.artfolio.mapper.PostMapper;
 import ru.vsu.cs.artfolio.mapper.UserMapper;
@@ -78,21 +76,24 @@ public class UserServiceImpl implements UserService {
         UserEntity fetchUser = findUserByUsername(username);
         UserAdditionalInfo additionalInfo = getUserAdditionalInfo(executor, fetchUser);
 
-        if (!fetchUser.isDeleted() || (executor != null && (executor.isAdmin() || executor.equals(fetchUser)))) {
+        if (!fetchUser.isDeleted() || (executor != null && executor.isAdmin())) {
             return UserMapper.toFullDto(fetchUser, additionalInfo);
         } else {
-            throw new NotExistUserException();
+            throw new NotFoundException("User by " + username + " username not found");
         }
     }
 
     @Override
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Transactional
     public void deleteUser(UserEntity executor, String username) {
         if (!executor.isAdmin()) {
             throw new BadRequestException("Need permits for that");
         }
         // каскадное удаление
         UserEntity userEntity = findUserByUsername(username);
+        if (userEntity.isAdmin()) {
+            throw new BadRequestException("You can't delete admin");
+        }
         userEntity.setDeleted(true);
 
         List<PostEntity> ownerPosts = postRepository.findAllByOwnerUuid(userEntity.getUuid());
@@ -101,6 +102,7 @@ public class UserServiceImpl implements UserService {
         List<CommentEntity> ownerComments = commentRepository.findAllByUserUuid(userEntity.getUuid());
         ownerComments.forEach(comment -> comment.setDeleted(true));
 
+        followService.deleteAllUserSubscribesAndFollowers(userEntity);
         commentRepository.saveAll(ownerComments);
         postRepository.saveAll(ownerPosts);
         userRepository.save(userEntity);
@@ -167,6 +169,7 @@ public class UserServiceImpl implements UserService {
     private UserAdditionalInfo getUserAdditionalInfo(@Nullable UserEntity executor, UserEntity fetchUser) {
         List<Long> userPosts = postRepository.findAllByOwnerUuid(fetchUser.getUuid())
                 .parallelStream()
+                .filter(p -> !p.getDeleted())
                 .map(PostEntity::getId)
                 .toList();
 

@@ -25,7 +25,7 @@ import javax.annotation.Nullable;
 @RequiredArgsConstructor
 public class FeedController {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(FeedController.class);
+    private static final Logger LOG = LoggerFactory.getLogger(FeedController.class);
     private final FeedService feedService;
 
     @GetMapping()
@@ -36,18 +36,18 @@ public class FeedController {
         Pageable pageable = PageRequest.of(page, limit);
         PageDto<PostResponseDto> posts = switch (section) {
             case NEW -> {
-                LOGGER.info("Получение постов NEW page = {}, limit = {}", page, limit);
+                LOG.info("Get posts NEW page = {}, limit = {}", page, limit);
                 yield feedService.getPostsPageOrderedByTime(pageable);
             }
             case POPULAR -> {
-                LOGGER.info("Получение постов POPULAR page = {}, limit = {}", page, limit);
+                LOG.info("Get posts POPULAR page = {}, limit = {}", page, limit);
                 yield feedService.getPostsPageOrderedByPopularity(pageable);
             }
             case SUBSCRIBE -> {
                 if (user == null) {
                     throw new BadRequestException("user must be logged in for SUBSCRIBE query");
                 }
-                LOGGER.info("Пользователь {} получает посты SUBSCRIBE page = {}, limit = {}", user.getUserEntity().getUsername(), page, limit);
+                LOG.info("User {} get posts SUBSCRIBE page = {}, limit = {}", user.getUserEntity().getUsername(), page, limit);
                 yield feedService.getPostsPageOrderedByFollowerSubscribe(user.getUserEntity(), pageable);
             }
         };
@@ -58,6 +58,7 @@ public class FeedController {
     public ResponseEntity<PageDto<PostResponseDto>> searchPosts(@RequestParam(value = "_page", defaultValue = "0") Integer page,
                                                                 @RequestParam(value = "_limit", defaultValue = "10") Integer limit,
                                                                 @RequestParam(value = "name") String name) {
+        LOG.info("Get posts by search query: {}", name);
         Pageable pageable = PageRequest.of(page, limit);
         PageDto<PostResponseDto> posts = feedService.getPostsPageByName(name, pageable);
         return ResponseEntity.ok(posts);
