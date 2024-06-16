@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.vsu.cs.artfolio.dto.user.FullUserResponseDto;
 import ru.vsu.cs.artfolio.dto.user.request.UserUpdateRequestDto;
 import ru.vsu.cs.artfolio.entity.UserEntity;
+import ru.vsu.cs.artfolio.exception.NotFoundException;
 import ru.vsu.cs.artfolio.repository.UserRepository;
 import ru.vsu.cs.artfolio.service.impl.MinioService;
 
@@ -20,14 +21,40 @@ import java.io.InputStream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.doReturn;
+import static ru.vsu.cs.artfolio.data.TestDataConstants.ADMIN_CITY;
+import static ru.vsu.cs.artfolio.data.TestDataConstants.ADMIN_COUNTRY;
+import static ru.vsu.cs.artfolio.data.TestDataConstants.ADMIN_EMAIL;
+import static ru.vsu.cs.artfolio.data.TestDataConstants.ADMIN_FOLLOWING_COUNT;
+import static ru.vsu.cs.artfolio.data.TestDataConstants.ADMIN_FULL_NAME;
+import static ru.vsu.cs.artfolio.data.TestDataConstants.ADMIN_LIKE_COUNT;
+import static ru.vsu.cs.artfolio.data.TestDataConstants.ADMIN_POST_COUNT;
+import static ru.vsu.cs.artfolio.data.TestDataConstants.ADMIN_SUBSCRIBERS_COUNT;
+import static ru.vsu.cs.artfolio.data.TestDataConstants.ADMIN_USERNAME;
 import static ru.vsu.cs.artfolio.data.TestDataConstants.ADMIN_UUID;
 import static ru.vsu.cs.artfolio.data.TestDataConstants.AVATAR_NAME;
+import static ru.vsu.cs.artfolio.data.TestDataConstants.DELETED_CITY;
+import static ru.vsu.cs.artfolio.data.TestDataConstants.DELETED_COUNTRY;
+import static ru.vsu.cs.artfolio.data.TestDataConstants.DELETED_EMAIL;
+import static ru.vsu.cs.artfolio.data.TestDataConstants.DELETED_FOLLOWING_COUNT;
+import static ru.vsu.cs.artfolio.data.TestDataConstants.DELETED_FULL_NAME;
+import static ru.vsu.cs.artfolio.data.TestDataConstants.DELETED_LIKE_COUNT;
+import static ru.vsu.cs.artfolio.data.TestDataConstants.DELETED_POST_COUNT;
+import static ru.vsu.cs.artfolio.data.TestDataConstants.DELETED_SUBSCRIBERS_COUNT;
+import static ru.vsu.cs.artfolio.data.TestDataConstants.DELETED_USERNAME;
+import static ru.vsu.cs.artfolio.data.TestDataConstants.DELETED_UUID;
+import static ru.vsu.cs.artfolio.data.TestDataConstants.DESCRIPTION;
 import static ru.vsu.cs.artfolio.data.TestDataConstants.USER_CITY;
 import static ru.vsu.cs.artfolio.data.TestDataConstants.USER_COUNTRY;
 import static ru.vsu.cs.artfolio.data.TestDataConstants.USER_EMAIL;
+import static ru.vsu.cs.artfolio.data.TestDataConstants.USER_FOLLOWING_COUNT;
 import static ru.vsu.cs.artfolio.data.TestDataConstants.USER_FULL_NAME;
+import static ru.vsu.cs.artfolio.data.TestDataConstants.USER_LIKE_COUNT;
+import static ru.vsu.cs.artfolio.data.TestDataConstants.USER_POST_COUNT;
+import static ru.vsu.cs.artfolio.data.TestDataConstants.USER_SUBSCRIBERS_COUNT;
 import static ru.vsu.cs.artfolio.data.TestDataConstants.USER_USERNAME;
 import static ru.vsu.cs.artfolio.data.TestDataConstants.USER_UUID;
 
@@ -83,16 +110,96 @@ public class UserServiceIT {
         FullUserResponseDto res = userService.getUserByUsername(null, username);
 
         // then
-        assertEquals(USER_UUID, res.uuid);
-        assertEquals(USER_USERNAME, res.username);
-        assertEquals(USER_EMAIL, res.email);
-        assertEquals(USER_FULL_NAME, res.fullName);
-        assertEquals(USER_COUNTRY, res.country);
-        assertEquals(USER_CITY, res.city);
+        assertUserEquals(res);
+        assertNull(res.isFollowed);
     }
 
     @Test
-    void deleteUser_ByAdminUser_DeletesUser() throws Exception {
+    void getUserByUsername_ByUnknown_NotExistId_ThrowingNotFoundException() throws Exception {
+        // given
+
+        // when & then
+        assertThrows(NotFoundException.class, () -> userService.getUserByUsername(null, "dummy_random_username"));
+    }
+
+    @Test
+    void getUserByUsername_ByUnknown_DeletedUser_ThrowingNotFoundException() throws Exception {
+        // given
+
+        // when & then
+        assertThrows(NotFoundException.class, () -> userService.getUserByUsername(null, DELETED_USERNAME));
+    }
+
+    @Test
+    void getUserByUsername_ByUser_ExistId_ReturnFullUserResponse() throws Exception {
+        // given
+        var userExecutor = userRepository.findById(USER_UUID).orElseThrow();
+        var username = ADMIN_USERNAME;
+
+        // when
+        FullUserResponseDto res = userService.getUserByUsername(userExecutor, username);
+
+        // then
+        assertAdminEquals(res);
+        assertNotNull(res.isFollowed);
+    }
+
+    @Test
+    void getUserByUsername_ByUser_NotExistId_ThrowingNotFoundException() throws Exception {
+        // given
+        var userExecutor = userRepository.findById(USER_UUID).orElseThrow();
+
+        // when & then
+        assertThrows(NotFoundException.class, () -> userService.getUserByUsername(userExecutor, "dummy_random_username"));
+    }
+
+    @Test
+    void getUserByUsername_ByUser_DeletedUser_ThrowingNotFoundException() throws Exception {
+        // given
+        var userExecutor = userRepository.findById(USER_UUID).orElseThrow();
+
+        // when & then
+        assertThrows(NotFoundException.class, () -> userService.getUserByUsername(userExecutor, DELETED_USERNAME));
+    }
+
+    @Test
+    void getUserByUsername_ByAdmin_ExistId_ReturnFullUserResponse() throws Exception {
+        // given
+        var adminExecutor = userRepository.findById(ADMIN_UUID).orElseThrow();
+        var username = USER_USERNAME;
+
+        // when
+        FullUserResponseDto res = userService.getUserByUsername(adminExecutor, username);
+
+        // then
+        assertUserEquals(res);
+        assertNotNull(res.isFollowed);
+    }
+
+    @Test
+    void getUserByUsername_ByAdmin_NotExistId_ThrowingNotFoundException() throws Exception {
+        // given
+        var adminExecutor = userRepository.findById(ADMIN_UUID).orElseThrow();
+
+        // when & then
+        assertThrows(NotFoundException.class, () -> userService.getUserByUsername(adminExecutor, "dummy_random_username"));
+    }
+
+    @Test
+    void getUserByUsername_ByAdmin_DeletedUser_ReturnFullUserResponse() throws Exception {
+        // given
+        var adminExecutor = userRepository.findById(ADMIN_UUID).orElseThrow();
+
+        // when
+        FullUserResponseDto res = userService.getUserByUsername(adminExecutor, DELETED_USERNAME);
+
+        // then
+        assertDeletedUserEquals(res);
+        assertNotNull(res.isFollowed);
+    }
+
+    @Test
+    void deleteUser_ByAdmin_DeletesUser() throws Exception {
         // given
         var executor = userRepository.findById(ADMIN_UUID).orElseThrow();
 
@@ -130,6 +237,48 @@ public class UserServiceIT {
     void clearMinio() {
         var avatarFiles = userRepository.findAll().parallelStream().map(UserEntity::getAvatarName).toList();
         minioService.deleteFiles(avatarFiles);
+    }
+
+    private static void assertUserEquals(FullUserResponseDto actual) {
+        assertEquals(USER_UUID, actual.uuid);
+        assertEquals(USER_FULL_NAME, actual.fullName);
+        assertEquals(DESCRIPTION, actual.description);
+        assertEquals(USER_COUNTRY, actual.country);
+        assertEquals(USER_CITY, actual.city);
+        assertEquals(USER_USERNAME, actual.username);
+        assertEquals(USER_EMAIL, actual.email);
+        assertEquals(USER_POST_COUNT, actual.postCount);
+        assertEquals(USER_SUBSCRIBERS_COUNT, actual.subscribersCount);
+        assertEquals(USER_FOLLOWING_COUNT, actual.followingCount);
+        assertEquals(USER_LIKE_COUNT, actual.likeCount);
+    }
+
+    private static void assertDeletedUserEquals(FullUserResponseDto actual) {
+        assertEquals(DELETED_UUID, actual.uuid);
+        assertEquals(DELETED_FULL_NAME, actual.fullName);
+        assertEquals(DESCRIPTION, actual.description);
+        assertEquals(DELETED_COUNTRY, actual.country);
+        assertEquals(DELETED_CITY, actual.city);
+        assertEquals(DELETED_USERNAME, actual.username);
+        assertEquals(DELETED_EMAIL, actual.email);
+        assertEquals(DELETED_POST_COUNT, actual.postCount);
+        assertEquals(DELETED_SUBSCRIBERS_COUNT, actual.subscribersCount);
+        assertEquals(DELETED_FOLLOWING_COUNT, actual.followingCount);
+        assertEquals(DELETED_LIKE_COUNT, actual.likeCount);
+    }
+
+    private static void assertAdminEquals(FullUserResponseDto actual) {
+        assertEquals(ADMIN_UUID, actual.uuid);
+        assertEquals(ADMIN_FULL_NAME, actual.fullName);
+        assertEquals(DESCRIPTION, actual.description);
+        assertEquals(ADMIN_COUNTRY, actual.country);
+        assertEquals(ADMIN_CITY, actual.city);
+        assertEquals(ADMIN_USERNAME, actual.username);
+        assertEquals(ADMIN_EMAIL, actual.email);
+        assertEquals(ADMIN_POST_COUNT, actual.postCount);
+        assertEquals(ADMIN_SUBSCRIBERS_COUNT, actual.subscribersCount);
+        assertEquals(ADMIN_FOLLOWING_COUNT, actual.followingCount);
+        assertEquals(ADMIN_LIKE_COUNT, actual.likeCount);
     }
 
 }

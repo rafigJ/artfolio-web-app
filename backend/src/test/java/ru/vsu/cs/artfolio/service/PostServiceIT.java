@@ -27,8 +27,17 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static ru.vsu.cs.artfolio.data.TestDataConstants.ADMIN_UUID;
+import static ru.vsu.cs.artfolio.data.TestDataConstants.POST_1_DESCRIPTION;
+import static ru.vsu.cs.artfolio.data.TestDataConstants.POST_1_ID;
+import static ru.vsu.cs.artfolio.data.TestDataConstants.POST_1_LIKE_COUNT;
+import static ru.vsu.cs.artfolio.data.TestDataConstants.POST_1_MEDIA_COUNT;
+import static ru.vsu.cs.artfolio.data.TestDataConstants.POST_1_NAME;
+import static ru.vsu.cs.artfolio.data.TestDataConstants.USER_EMAIL;
+import static ru.vsu.cs.artfolio.data.TestDataConstants.USER_FULL_NAME;
+import static ru.vsu.cs.artfolio.data.TestDataConstants.USER_USERNAME;
 import static ru.vsu.cs.artfolio.data.TestDataConstants.USER_UUID;
 
 @SpringBootTest
@@ -78,26 +87,23 @@ public class PostServiceIT {
         assertEquals(2, savedPost.getMediaIds().size());
 
         UserResponseDto owner = savedPost.getOwner();
-        assertUserEquals(owner, executor);
+        assertUserEquals(owner);
         clearMinio();
     }
 
     @Test
     void getPostById_ByUnknown_ValidId_ReturnFullPostResponseDto() {
         // given savedPost with 1L id
-        var realOwner = userRepository.findById(USER_UUID).orElseThrow();
 
         // when
         FullPostResponseDto post = postService.getPostById(null, 1L);
+
         // then
-        assertNotNull(post.getId());
-        assertEquals("post1", post.getName());
-        assertEquals("description", post.getDescription());
-        assertEquals(0, post.getLikeCount());
-        assertEquals(2, post.getMediaIds().size());
+        assertPost1Equals(post);
+        assertNull(post.getHasLike());
 
         UserResponseDto owner = post.getOwner();
-        assertUserEquals(owner, realOwner);
+        assertUserEquals(owner);
     }
 
     @Test
@@ -109,36 +115,27 @@ public class PostServiceIT {
         FullPostResponseDto post = postService.getPostById(executor, 1L);
 
         // then
-        assertNotNull(post.getId());
-        assertEquals("post1", post.getName());
-        assertEquals("description", post.getDescription());
-        assertEquals(0, post.getLikeCount());
-        assertEquals(2, post.getMediaIds().size());
+        assertPost1Equals(post);
         assertEquals(false, post.getHasLike());
 
         UserResponseDto owner = post.getOwner();
-        assertUserEquals(owner, executor);
+        assertUserEquals(owner);
     }
 
     @Test
     void getPostById_ByAdmin_ValidId_ReturnFullPostResponseDto() throws Exception {
         // given
-        var realOwner = userRepository.findById(USER_UUID).orElseThrow();
         var executor = userRepository.findById(ADMIN_UUID).orElseThrow();
 
         // when
         FullPostResponseDto post = postService.getPostById(executor, 1L);
 
         // then
-        assertNotNull(post.getId());
-        assertEquals("post1", post.getName());
-        assertEquals("description", post.getDescription());
-        assertEquals(0, post.getLikeCount());
-        assertEquals(2, post.getMediaIds().size());
+        assertPost1Equals(post);
         assertEquals(false, post.getHasLike());
 
         UserResponseDto owner = post.getOwner();
-        assertUserEquals(owner, realOwner);
+        assertUserEquals(owner);
     }
 
     @Test
@@ -147,13 +144,6 @@ public class PostServiceIT {
 
         // when & then
         assertThrows(NotFoundException.class, () -> postService.getPostById(null, 1000L));
-    }
-
-    private void assertUserEquals(UserResponseDto responseDto, UserEntity userEntity) {
-        assertEquals(responseDto.uuid, userEntity.getUuid());
-        assertEquals(responseDto.fullName, userEntity.getFullName());
-        assertEquals(responseDto.email, userEntity.getEmail());
-        assertEquals(responseDto.username, userEntity.getUsername());
     }
 
     /**
@@ -166,5 +156,20 @@ public class PostServiceIT {
         var postPreviewFiles = postRepository.findAll().parallelStream().map(PostEntity::getPreviewMediaName).toList();
         minioService.deleteFiles(mediaFiles);
         minioService.deleteFiles(postPreviewFiles);
+    }
+
+    private static void assertPost1Equals(FullPostResponseDto actual) {
+        assertEquals(POST_1_ID, actual.id);
+        assertEquals(POST_1_NAME, actual.getName());
+        assertEquals(POST_1_DESCRIPTION, actual.getDescription());
+        assertEquals(POST_1_LIKE_COUNT, actual.getLikeCount());
+        assertEquals(POST_1_MEDIA_COUNT, actual.getMediaIds().size());
+    }
+
+    private static void assertUserEquals(UserResponseDto actual) {
+        assertEquals(USER_UUID, actual.uuid);
+        assertEquals(USER_FULL_NAME, actual.fullName);
+        assertEquals(USER_EMAIL, actual.email);
+        assertEquals(USER_USERNAME, actual.username);
     }
 }

@@ -18,7 +18,6 @@ import ru.vsu.cs.artfolio.entity.CommentEntity;
 import ru.vsu.cs.artfolio.entity.PostEntity;
 import ru.vsu.cs.artfolio.entity.UserEntity;
 import ru.vsu.cs.artfolio.exception.BadRequestException;
-import ru.vsu.cs.artfolio.exception.NotExistUserException;
 import ru.vsu.cs.artfolio.exception.NotFoundException;
 import ru.vsu.cs.artfolio.mapper.PostMapper;
 import ru.vsu.cs.artfolio.mapper.UserMapper;
@@ -77,10 +76,10 @@ public class UserServiceImpl implements UserService {
         UserEntity fetchUser = findUserByUsername(username);
         UserAdditionalInfo additionalInfo = getUserAdditionalInfo(executor, fetchUser);
 
-        if (!fetchUser.isDeleted() || (executor != null && (executor.isAdmin() || executor.equals(fetchUser)))) {
+        if (!fetchUser.isDeleted() || (executor != null && executor.isAdmin())) {
             return UserMapper.toFullDto(fetchUser, additionalInfo);
         } else {
-            throw new NotExistUserException();
+            throw new NotFoundException("User by " + username + " username not found");
         }
     }
 
