@@ -30,6 +30,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -42,43 +43,19 @@ public class MinioService {
 
     private final MinioClient minioClient;
 
-
     public MinioResult uploadPreviewFile(MultipartFile file) {
-        ByteArrayOutputStream imageFile = resizeCompressPreviewImage(file);
-        try (InputStream is = new ByteArrayInputStream(imageFile.toByteArray())) {
-            String name = UUID.randomUUID().toString();
-
-            minioClient.putObject(PutObjectArgs.builder()
-                    .bucket(bucketName)
-                    .object(name)
-                    .stream(is, is.available(), -1)
-                    .contentType(file.getContentType())
-                    .build());
-
-            return new MinioResult(name, file.getContentType());
-        } catch (Exception e) {
-            LOG.warn("Upload preview file {} throw exception: {}", file.getName(), e.getMessage());
-            throw new RestException(e.getMessage(), HttpStatus.BAD_GATEWAY);
+        try {
+            ByteArrayOutputStream imageFile = resizeCompressImage(file);
+            return uploadToMinio(file.getContentType(), imageFile, file.getOriginalFilename());
+        } catch (IOException e) {
+            LOG.warn("Upload file {} threw exception: {}", file.getName(), e.getMessage());
+            throw new RuntimeException(e);
         }
     }
 
     public MinioResult uploadAvatarFile(MinioRequest file) {
-        ByteArrayOutputStream imageFile = resizeCompressAvatarFile(file);
-        try (InputStream is = new ByteArrayInputStream(imageFile.toByteArray())) {
-            String name = UUID.randomUUID().toString();
-
-            minioClient.putObject(PutObjectArgs.builder()
-                    .bucket(bucketName)
-                    .object(name)
-                    .stream(is, is.available(), -1)
-                    .contentType(file.contentType())
-                    .build());
-
-            return new MinioResult(name, file.contentType());
-        } catch (Exception e) {
-            LOG.warn("Upload avatar throw exception: {}", e.getMessage());
-            throw new RestException(e.getMessage(), HttpStatus.BAD_GATEWAY);
-        }
+        ByteArrayOutputStream imageFile = resizeCompressImage(file.inputStream(), file.contentType(), 150, 150);
+        return uploadToMinio(file.contentType(), imageFile, "avatar");
     }
 
     public MinioResult uploadFile(MultipartFile file) {
@@ -92,39 +69,36 @@ public class MinioService {
                     .build());
             return new MinioResult(name, file.getContentType());
         } catch (Exception e) {
-            LOG.warn("Upload file {} throw exception: {}", file.getName(), e.getMessage());
+            LOG.warn("Upload file {} threw exception: {}", file.getOriginalFilename(), e.getMessage());
             throw new RestException(e.getMessage(), HttpStatus.BAD_GATEWAY);
         }
     }
 
     public InputStream downloadFile(String fileName) {
         try {
-            return minioClient.getObject(
-                    GetObjectArgs.builder()
-                            .bucket(bucketName)
-                            .object(fileName)
-                            .build()
-            );
+            return minioClient.getObject(GetObjectArgs.builder()
+                    .bucket(bucketName)
+                    .object(fileName)
+                    .build());
         } catch (Exception e) {
-            LOG.warn("Download file {} throw exception: {}", fileName, e.getMessage());
+            LOG.warn("Download file {} threw exception: {}", fileName, e.getMessage());
             throw new RestException(e.getMessage(), HttpStatus.BAD_GATEWAY);
         }
     }
 
     public void deleteFiles(List<String> fileNames) {
-        var deleteObjects = fileNames.stream().map(DeleteObject::new).toList();
-        Iterable<Result<DeleteError>> results = minioClient.removeObjects(
-                RemoveObjectsArgs.builder()
-                        .bucket(bucketName)
-                        .objects(deleteObjects)
-                        .build()
-        );
+        List<DeleteObject> deleteObjects = fileNames.stream().map(DeleteObject::new).collect(Collectors.toList());
+        Iterable<Result<DeleteError>> results = minioClient.removeObjects(RemoveObjectsArgs.builder()
+                .bucket(bucketName)
+                .objects(deleteObjects)
+                .build());
+
         for (Result<DeleteError> result : results) {
             try {
                 DeleteError error = result.get();
-                LOG.warn("Error in deleting object " + error.objectName() + "; " + error.message());
+                LOG.warn("Error in deleting object {}: {}", error.objectName(), error.message());
             } catch (Exception e) {
-                LOG.warn("Delete files {} throw exception: {}", fileNames, e.getMessage());
+                LOG.warn("Delete files {} threw exception: {}", fileNames, e.getMessage());
                 throw new RestException(e.getMessage(), HttpStatus.BAD_GATEWAY);
             }
         }
@@ -135,62 +109,54 @@ public class MinioService {
             minioClient.removeObject(RemoveObjectArgs.builder()
                     .bucket(bucketName)
                     .object(fileName)
-                    .build()
-            );
+                    .build());
         } catch (Exception e) {
-            LOG.warn("Delete file {} throw exception: {}", fileName, e.getMessage());
+            LOG.warn("Delete file {} threw exception: {}", fileName, e.getMessage());
             throw new RestException(e.getMessage(), HttpStatus.BAD_GATEWAY);
         }
     }
 
-    private static ByteArrayOutputStream resizeCompressPreviewImage(MultipartFile file) {
-        try {
-            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-            InputStream in = new ByteArrayInputStream(file.getBytes());
+    private static ByteArrayOutputStream resizeCompressImage(MultipartFile file) throws IOException {
+        return resizeCompressImage(new ByteArrayInputStream(file.getBytes()), file.getContentType(), 406, 204);
+    }
+
+    private static ByteArrayOutputStream resizeCompressImage(InputStream inputStream, String contentType, int width, int height) {
+        try (InputStream in = inputStream; ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()) {
             BufferedImage originalImage = ImageIO.read(in);
             if (originalImage == null) {
-                LOG.warn("File have bad signature (it's not jpg/png format)");
-                throw new BadRequestException("File have bad signature (it's not jpg/png format)");
+                throw new BadRequestException("File has a bad signature (it's not in jpg/png format)");
             }
-            if (file.getContentType() == null) {
-                LOG.warn("File {} must have content-type field", file);
-                throw new BadRequestException("File must have content-type field");
+
+            if (contentType == null || !contentType.startsWith("image/")) {
+                throw new BadRequestException("File must have a valid image content-type");
             }
+
+            String outputFormat = contentType.substring("image/" .length());
             Thumbnails.of(originalImage)
-                    .size(406, 204)
+                    .size(width, height)
                     .crop(Positions.CENTER)
-                    .outputFormat(file.getContentType().substring("image/".length()))
+                    .outputFormat(outputFormat)
                     .toOutputStream(byteArrayOutputStream);
+
             return byteArrayOutputStream;
         } catch (IOException e) {
-            LOG.warn("Resize compress image {} throw exception: {}", file.getName(), e.getMessage());
-            throw new RuntimeException(e);
+            throw new RuntimeException("Resize compress image threw exception", e);
         }
     }
 
-    private static ByteArrayOutputStream resizeCompressAvatarFile(MinioRequest file) {
-        try (InputStream fileIn = file.inputStream()) {
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
-            InputStream in = new ByteArrayInputStream(fileIn.readAllBytes());
-            BufferedImage originalImage = ImageIO.read(in);
-
-            if (originalImage == null) {
-                LOG.warn("File have bad signature (it's not jpg/png format)");
-                throw new BadRequestException("File have bad signature (it's not jpg/png format)");
-            }
-            if (file.contentType() == null) {
-                LOG.warn("File {} must have content-type field", file);
-                throw new BadRequestException("File must have content-type field");
-            }
-            Thumbnails.of(originalImage)
-                    .size(150, 150)
-                    .crop(Positions.CENTER)
-                    .outputFormat(file.contentType().substring("image/".length()))
-                    .toOutputStream(out);
-            return out;
-        } catch (IOException e) {
-            LOG.warn("Resize compress avatar file throw exception: {}", e.getMessage());
-            throw new RuntimeException(e);
+    private MinioResult uploadToMinio(String contentType, ByteArrayOutputStream imageFile, String fileName) {
+        try (InputStream is = new ByteArrayInputStream(imageFile.toByteArray())) {
+            String name = UUID.randomUUID().toString();
+            minioClient.putObject(PutObjectArgs.builder()
+                    .bucket(bucketName)
+                    .object(name)
+                    .stream(is, is.available(), -1)
+                    .contentType(contentType)
+                    .build());
+            return new MinioResult(name, contentType);
+        } catch (Exception e) {
+            LOG.warn("Upload file {} threw exception: {}", fileName, e.getMessage());
+            throw new RestException(e.getMessage(), HttpStatus.BAD_GATEWAY);
         }
     }
 }
