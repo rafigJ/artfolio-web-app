@@ -31,6 +31,10 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public PageDto<CommentResponseDto> getAllByPostId(Long postId, Pageable page) {
+        if (!postRepository.existsById(postId)) {
+            LOG.warn("Post by " + postId + " id not found");
+            throw new NotFoundException("Post by " + postId + " id not found");
+        }
         Page<CommentEntity> comments = commentRepository.findAllByPostIdAndDeletedIsFalse(postId, page);
         return CommentMapper.toPageDto(comments);
     }

@@ -1,6 +1,7 @@
 package ru.vsu.cs.artfolio.auth;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.jsonwebtoken.JwtException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpHeaders;
@@ -25,7 +26,7 @@ public class UserAuthenticationEntryPoint implements AuthenticationEntryPoint {
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         response.setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
 
-        String errorMessage = "Unauthorized path";
+        String errorMessage = "Access denied";
         int statusCode = HttpServletResponse.SC_UNAUTHORIZED;
 
         if (request.getAttribute(RUNTIME_ERROR) != null) {

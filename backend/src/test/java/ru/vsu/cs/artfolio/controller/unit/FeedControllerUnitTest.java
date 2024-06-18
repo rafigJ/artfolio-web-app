@@ -18,6 +18,7 @@ import ru.vsu.cs.artfolio.dto.post.PostResponseDto;
 import ru.vsu.cs.artfolio.dto.user.UserResponseDto;
 import ru.vsu.cs.artfolio.entity.UserEntity;
 import ru.vsu.cs.artfolio.exception.BadRequestException;
+import ru.vsu.cs.artfolio.exception.RestException;
 import ru.vsu.cs.artfolio.service.FeedService;
 
 import java.time.LocalDateTime;
@@ -50,7 +51,7 @@ public class FeedControllerUnitTest {
     void setUp() {
         pageable = PageRequest.of(0, 10);
         var uuid = UUID.randomUUID();
-        var owner = new UserResponseDto(uuid, "Test User", "test@user.com", "testUser");
+        var owner = new UserResponseDto(uuid, "Test User", "test@user.com", "testUser", "Country", "City");
         List<PostResponseDto> posts = Collections.singletonList(new PostResponseDto(1L, "Test Post", 10L, owner));
         postPage = new PageDto<>(posts, 1L, 1);
 
@@ -104,7 +105,7 @@ public class FeedControllerUnitTest {
         // given - no specific setup needed
 
         // when & then
-        assertThrows(BadRequestException.class, () -> feedController.getPostsPage(0, 10, FeedSection.SUBSCRIBE, null));
+        assertThrows(RestException.class, () -> feedController.getPostsPage(0, 10, FeedSection.SUBSCRIBE, null));
     }
 
     @Test

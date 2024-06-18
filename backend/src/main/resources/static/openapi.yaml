@@ -4,7 +4,7 @@ info:
   license:
     name: Apache 2.0
     url: https://www.apache.org/licenses/LICENSE-2.0.html
-  version: 0.0.1
+  version: 0.0.2
 servers:
   - url: http://79.174.93.30:8080
   - url: http://localhost:8080
@@ -44,11 +44,17 @@ paths:
         required: true
       responses:
         '200':
-          description: Successful operation
+          description: Пост успешно создан!
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/FullPostResponse'
+        '401':
+          description: Доступ запрещен (нужно авторизоваться)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDenied'
         default:
           description: Error
           content:
@@ -76,6 +82,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/FullPostResponse'
+        '404':
+          description: Пост с данным идентификатором не найден
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostByIdNotFound'
         default:
           description: Error
           content:
@@ -108,11 +120,17 @@ paths:
         required: true
       responses:
         '200':
-          description: Successful operation
+          description: Пост обновлен успешно!
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/FullPostResponse'
+        '401':
+          description: Доступ запрещен (нужно авторизоваться)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDenied'
         default:
           description: Error
           content:
@@ -136,6 +154,12 @@ paths:
       responses:
         '200':
           description: Successful operation
+        '401':
+          description: Доступ запрещен (нужно авторизоваться)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDenied'
         default:
           description: Error
           content:
@@ -166,6 +190,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PostLikeResponse'
+        '401':
+          description: Доступ запрещен (нужно авторизоваться)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDenied'
         default:
           description: Error
           content:
@@ -193,6 +223,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PostLikeResponse'
+        '401':
+          description: Доступ запрещен (нужно авторизоваться)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDenied'
         default:
           description: Error
           content:
@@ -215,6 +251,7 @@ paths:
           schema:
             type: integer
       operationId: getPreviewMediaByPostId
+
       responses:
         '200':
           description: Successful operation
@@ -227,12 +264,10 @@ paths:
               schema:
                 type: string
                 format: binary
+        '404':
+          description: Пост с данным идентификатором не найден
         default:
           description: Error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
 
   # get full media by id
   /api/v1/posts/medias/{mediaId}:
@@ -259,12 +294,10 @@ paths:
               schema:
                 type: string
                 format: binary
+        '404':
+          description: Медиа-файл с данным идентификатором не найден
         default:
           description: Error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
 
   # comment post
   /api/v1/posts/{postId}/comments:
@@ -299,6 +332,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CommentsPage'
+        '404':
+          description: Пост с данным идентификатором не найден
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostByIdNotFound'
         default:
           description: Error
           content:
@@ -331,6 +370,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CommentResponse'
+        '401':
+          description: Доступ запрещен (нужно авторизоваться)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDenied'
+        '404':
+          description: Пост с данным идентификатором не найден
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostByIdNotFound'
         default:
           description: Error
           content:
@@ -360,6 +411,28 @@ paths:
       responses:
         '200':
           description: Successful operation
+        '400':
+          description: Комментарий не принадлежит посту с postId
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Comment by 0 doesn't belong to post by 10"
+        '401':
+          description: Доступ запрещен (нужно авторизоваться)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDenied'
+        '404':
+          description: Комментарий с данным идентификатором не найден
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommentByIdNotFound'
         default:
           description: Error
           content:
@@ -406,6 +479,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PostsPage'
+        '401':
+          description: Пользователь должен быть авторизован, для получение SUBSCRIBE списка
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "user must be logged in for SUBSCRIBE query"
         default:
           description: Error
           content:
@@ -475,6 +558,22 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/FullUserResponse'
+        '401':
+          description: Доступ запрещен (нужно авторизоваться)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDenied'
+        '400':
+          description: Сигнатура файла не png/jpg/jpeg
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "File have bad signature (it's not jpg/png format)"
         default:
           description: Error
           content:
@@ -503,6 +602,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/FullUserResponse'
+        '404':
+          description: Пользователь с данным username не найден
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserByIdNotFound'
         default:
           description: Error
           content:
@@ -526,6 +631,18 @@ paths:
       responses:
         '200':
           description: Successful operation
+        '401':
+          description: Доступ запрещен (нужно авторизоваться)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDenied'
+        '404':
+          description: Пользователь с данным username не найден
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserByIdNotFound'
         default:
           description: Error
           content:
@@ -559,6 +676,8 @@ paths:
               schema:
                 type: string
                 format: binary
+        '404':
+          description: Пользователь с данным username не найден
         default:
           description: Error
           content:
@@ -626,6 +745,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UsersPage'
+        '404':
+          description: Пользователь с данным username не найден
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserByIdNotFound'
         default:
           description: Error
           content:
@@ -647,6 +772,28 @@ paths:
       responses:
         '200':
           description: Successful operation
+        '401':
+          description: Доступ запрещен (нужно авторизоваться)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDenied'
+        '404':
+          description: Пользователь с данным username не найден
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserByIdNotFound'
+        '400':
+          description: Нельзя подписываться на самого себя / на удаленного пользователя
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Can't subscribe to deleted user"
         default:
           description: Error
           content:
@@ -670,6 +817,18 @@ paths:
       responses:
         '200':
           description: Successful operation
+        '401':
+          description: Доступ запрещен (нужно авторизоваться)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDenied'
+        '404':
+          description: Пользователь с данным username не найден
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserByIdNotFound'
         default:
           description: Error
           content:
@@ -699,6 +858,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UsersPage'
+        '404':
+          description: Пользователь с данным username не найден
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserByIdNotFound'
         default:
           description: Error
           content:
@@ -792,10 +957,19 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                description: Страница из жалоб на посты
-                items:
-                  $ref: '#/components/schemas/PostReportResponse'
+                $ref: '#/components/schemas/PostReportResponse'
+        '401':
+          description: Доступ запрещен (нужно авторизоваться и нужно быть АДМИНОМ)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDenied'
+        '404':
+          description: Жалоба с данным идентификатором не найдена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReportByIdNotFound'
         default:
           description: Error
           content:
@@ -834,6 +1008,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CommentReportResponse'
+        '401':
+          description: Доступ запрещен (нужно авторизоваться и нужно быть АДМИНОМ)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDenied'
+        '404':
+          description: Жалоба с данным идентификатором не найден
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReportByIdNotFound'
         default:
           description: Error
           content:
@@ -870,6 +1056,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PostReportResponse'
+        '401':
+          description: Доступ запрещен (нужно авторизоваться)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDenied'
+        '404':
+          description: Пост с данным идентификатором не найден
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostByIdNotFound'
         default:
           description: Error
           content:
@@ -904,6 +1102,19 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CommentReportResponse'
+        '401':
+          description: Доступ запрещен (нужно авторизоваться)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDenied'
+
+        '404':
+          description: Пост с данным идентификатором не найден
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommentByIdNotFound'
         default:
           description: Error
           content:
@@ -929,6 +1140,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AuthResponse'
+        '401':
+          description: Доступ запрещен (нужно авторизоваться)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDenied'
         default:
           description: Error
           content:
@@ -959,6 +1176,17 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AuthResponse'
+        '400':
+          description: Неверные учетные данные
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Incorrect credentials"
+
         default:
           description: Error
           content:
@@ -989,6 +1217,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AuthResponse'
+        '400':
+          description: Ошибка валидации | пользователь с таким email или username уже существует
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  email:
+                    type: string
+                    example: "Invalid email format"
         default:
           description: Error
           content:
@@ -1015,6 +1253,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AuthResponse'
+        '400':
+          description: Неверные учетные данные
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Incorrect credentials"
         default:
           description: Error
           content:
@@ -1303,6 +1551,12 @@ components:
         email:
           type: string
           example: bolton@vesteros.com
+        country:
+          type: string
+          example: Россия
+        city:
+          type: string
+          example: Уфа
     UsersPage:
       type: object
       properties:
@@ -1419,6 +1673,36 @@ components:
           type: integer
           example: 10
     # error
+    ReportByIdNotFound:
+      type: object
+      properties:
+        message:
+          type: string
+          example: "Report by 0 id not found"
+    UserByIdNotFound:
+      type: object
+      properties:
+        message:
+          type: string
+          example: "User by {username} username not found"
+    PostByIdNotFound:
+      type: object
+      properties:
+        message:
+          type: string
+          example: "Post by id: 0 not found"
+    CommentByIdNotFound:
+      type: object
+      properties:
+        message:
+          type: string
+          example: "Comment by id: 0 not found"
+    AccessDenied:
+      type: object
+      properties:
+        message:
+          type: string
+          example: Access denied
     Error:
       type: object
       properties:
