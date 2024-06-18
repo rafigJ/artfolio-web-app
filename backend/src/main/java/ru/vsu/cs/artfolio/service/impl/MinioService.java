@@ -44,7 +44,7 @@ public class MinioService {
 
 
     public MinioResult uploadPreviewFile(MultipartFile file) {
-        ByteArrayOutputStream imageFile = resizeCompressImage(file);
+        ByteArrayOutputStream imageFile = resizeCompressPreviewImage(file);
         try (InputStream is = new ByteArrayInputStream(imageFile.toByteArray())) {
             String name = UUID.randomUUID().toString();
 
@@ -143,7 +143,7 @@ public class MinioService {
         }
     }
 
-    private static ByteArrayOutputStream resizeCompressImage(MultipartFile file) {
+    private static ByteArrayOutputStream resizeCompressPreviewImage(MultipartFile file) {
         try {
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
             InputStream in = new ByteArrayInputStream(file.getBytes());

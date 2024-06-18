@@ -5,7 +5,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,6 +18,7 @@ import ru.vsu.cs.artfolio.controller.enums.FeedSection;
 import ru.vsu.cs.artfolio.dto.PageDto;
 import ru.vsu.cs.artfolio.dto.post.PostResponseDto;
 import ru.vsu.cs.artfolio.exception.BadRequestException;
+import ru.vsu.cs.artfolio.exception.RestException;
 import ru.vsu.cs.artfolio.service.FeedService;
 
 import javax.annotation.Nullable;
@@ -45,7 +48,7 @@ public class FeedController {
             }
             case SUBSCRIBE -> {
                 if (user == null) {
-                    throw new BadRequestException("user must be logged in for SUBSCRIBE query");
+                    throw new RestException("user must be logged in for SUBSCRIBE query", HttpStatus.UNAUTHORIZED);
                 }
                 LOG.info("User {} get posts SUBSCRIBE page = {}, limit = {}", user.getUserEntity().getUsername(), page, limit);
                 yield feedService.getPostsPageOrderedByFollowerSubscribe(user.getUserEntity(), pageable);

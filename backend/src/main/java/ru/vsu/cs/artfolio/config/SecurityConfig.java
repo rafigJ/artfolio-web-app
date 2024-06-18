@@ -35,7 +35,6 @@ public class SecurityConfig {
                         configurer.authenticationEntryPoint(userAuthenticationEntryPoint))
                 .authorizeHttpRequests((auth -> auth
                         .requestMatchers(
-                                "/api/v1/auth/**",
                                 "/openapi.yaml",
                                 "/v2/api-docs",
                                 "/v3/api-docs",
@@ -49,7 +48,15 @@ public class SecurityConfig {
                                 "/swagger-ui.html"
                         ).permitAll()
                         .requestMatchers(HttpMethod.OPTIONS).permitAll()
-                        .requestMatchers("/api/v1/**").permitAll() // TODO поменять политику после завершения разработки
+                        .requestMatchers(HttpMethod.POST, "/api/v1/auth/**").permitAll()
+                        .requestMatchers(HttpMethod.PATCH, "/api/v1/auth/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/posts/**", "/api/v1/feed/**", "/api/v1/user/**").permitAll()
+                        .requestMatchers("/api/v1/auth/**").authenticated()
+                        .requestMatchers(HttpMethod.POST, "/api/v1/reports/**", "/api/v1/user/**").authenticated()
+                        .requestMatchers("/api/v1/posts/**").authenticated()
+                        .requestMatchers(HttpMethod.PUT, "/api/v1/user/**").authenticated()
+                        .requestMatchers(HttpMethod.DELETE, "/api/v1/user/**").authenticated()
+                        .requestMatchers("/api/v1/reports/**", "/api/v1/user/**").hasAuthority(Role.ADMIN.name())
                         .anyRequest().hasAuthority(Role.ADMIN.name())
                 ))
                 .sessionManagement(s ->

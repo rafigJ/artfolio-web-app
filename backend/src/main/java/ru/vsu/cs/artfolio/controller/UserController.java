@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -27,6 +28,7 @@ import ru.vsu.cs.artfolio.dto.user.FullUserResponseDto;
 import ru.vsu.cs.artfolio.dto.user.UserResponseDto;
 import ru.vsu.cs.artfolio.dto.user.request.UserUpdateRequestDto;
 import ru.vsu.cs.artfolio.entity.UserEntity;
+import ru.vsu.cs.artfolio.exception.NotFoundException;
 import ru.vsu.cs.artfolio.service.UserService;
 
 import javax.annotation.Nullable;
@@ -66,10 +68,16 @@ public class UserController {
 
     @GetMapping("/{username}/avatar")
     public ResponseEntity<InputStreamResource> getUserAvatar(@PathVariable("username") String username) {
-        var avatar = service.downloadAvatar(username);
-        return ResponseEntity.ok()
-                .contentType(MediaType.valueOf(avatar.contentType()))
-                .body(new InputStreamResource(avatar.fileStream()));
+        try {
+            var avatar = service.downloadAvatar(username);
+            return ResponseEntity.ok()
+                    .contentType(MediaType.valueOf(avatar.contentType()))
+                    .body(new InputStreamResource(avatar.fileStream()));
+        } catch (NotFoundException e) {
+            return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
     @GetMapping("/{username}/posts")
