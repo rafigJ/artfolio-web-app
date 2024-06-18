@@ -16,4 +16,6 @@ public final class UserResponseDto {
     public String fullName;
     public String email;
     public String username;
+    public String country;
+    public String city;
 }

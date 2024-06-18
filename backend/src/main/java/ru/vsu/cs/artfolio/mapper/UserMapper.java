@@ -20,6 +20,8 @@ public class UserMapper {
                 .fullName(user.getFullName())
                 .email(user.getEmail())
                 .username(user.getUsername())
+                .city(user.getCity())
+                .country(user.getCountry())
                 .build();
     }
 
