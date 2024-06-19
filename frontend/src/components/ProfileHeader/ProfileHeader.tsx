@@ -65,8 +65,7 @@ const ProfileHeader: FC<ProfileHeaderProps> = ({ profile }) => {
 				<Flex vertical style={{ marginLeft: '15px' }}>
 					<Typography.Title level={3}>{profile?.fullName}</Typography.Title>
 					<Typography.Text style={{ marginBottom: '5px' }}>
-						{`${profile?.city}, 
-					${profile?.country}`}
+						{[profile?.city, profile?.country].filter(p => p).join(', ')}
 					</Typography.Text>
 					{isAuth && authCredential.username === profile.username ? (
 						<Button

@@ -96,11 +96,11 @@ const CommentList: FC<CommentListProps> = ({ data, setData }) => {
 					>
 						<div className='comment-container'>
 							<Comment
-								style={{ backgroundColor: 'transparent' }}
+								style={{ backgroundColor: 'transparent', maxWidth: '100%' }}
 								author={<Link to={`/profile/${item.owner.username}`}>{item.owner.fullName} </Link>}
 								avatar={<Avatar onClick={() => navigate(`/profile/${item.owner.username}`)}
 									src={`${API_URL}/user/${item.owner.username}/avatar`} />}
-								content={item.comment}
+								content={<p>{item.comment}</p>}
 								datetime={moment(item.createTime).fromNow()} />
 							<Dropdown menu={{
 								items: getMenuItems(item)

@@ -53,32 +53,38 @@ const Editor = ({ onChange, onSubmit, submitting, value }: EditorProps) => (
 const CommentEditor: React.FC = () => {
 	const [submitting, setSubmitting] = useState(false)
 	const [value, setValue] = useState('')
-
+	
 	const navigate = useNavigate()
 	const params = useParams()
 	const { isAuth, authCredential } = useContext(AuthContext)
-
+	
 	const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
 		if (!isAuth) {
 			navigate('/login')
 		}
 		setValue(e.target.value)
 	}
-
+	
 	const [comments, setComments] = useState<CommentResponse[]>([])
-
+	
 	const [fetchComments, isLoading, isError] = useFetching(async (id) => {
 		const response = await CommentService.getComments(id, 0, 1000)
 		setComments(p => [...p, ...response.data.content])
 	})
-
+	
 	const handleSubmit = () => {
 		if (!isAuth) {
 			navigate('/login')
 		}
-
-		if (!value) return
-
+		
+		if (!value || value.trim().length === 0) {
+			message.warning('Введите комментарий')
+			return
+		}
+		if ((value.trim().split('\n').length) > 4) {
+			message.warning('Комментарий не должен содержать больше 4 строк')
+			return
+		}
 		setSubmitting(true)
 		CommentService.createComment(Number(params.id), { comment: value.trim() })
 			.then(c => setComments(p => [...p, c.data]))
@@ -88,15 +94,15 @@ const CommentEditor: React.FC = () => {
 				setValue('')
 			})
 	}
-
+	
 	useEffect(() => {
 		fetchComments(params.id)
 	}, [params.id])
-
+	
 	if (isLoading || isError) {
 		return <></>
 	}
-
+	
 	return (
 		<>
 			{comments.length > 0 ? (
