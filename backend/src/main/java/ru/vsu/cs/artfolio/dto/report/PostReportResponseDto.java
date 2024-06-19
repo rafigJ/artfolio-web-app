@@ -24,6 +24,9 @@ public final class PostReportResponseDto {
     private Long postId;
 
     @NonNull
+    private String reason;
+
+    @NonNull
     private Boolean reviewed;
 
     @NonNull

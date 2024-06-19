@@ -10,6 +10,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -19,6 +20,7 @@ import ru.vsu.cs.artfolio.auth.user.Role;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 @Entity
@@ -75,6 +77,31 @@ public class UserEntity {
     @Column(nullable = false, name = "update_time")
     private LocalDateTime updateTime;
 
+    @Getter(AccessLevel.PRIVATE)
+    @Column(nullable = false, name = "deleted")
+    private Boolean deleted;
+
     @OneToMany(mappedBy = "followed", fetch = FetchType.LAZY)
     private List<FollowEntity> followers;
+
+    public boolean isAdmin() {
+        return this.role.equals(Role.ADMIN);
+    }
+
+    public boolean isDeleted() {
+        return deleted;
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        if (this == object) return true;
+        if (object == null || getClass() != object.getClass()) return false;
+        UserEntity that = (UserEntity) object;
+        return Objects.equals(uuid, that.uuid);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(uuid);
+    }
 }

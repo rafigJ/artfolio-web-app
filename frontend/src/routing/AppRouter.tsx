@@ -3,6 +3,7 @@ import { Navigate, Route, Routes, useLocation } from 'react-router-dom'
 import { AuthContext } from '../context'
 import AdminPanelPage from '../pages/AdminPanelPage/AdminPanelPage'
 import CreatePostPage from '../pages/CreatePostPage/CreatePostPage'
+import EditPostPage from '../pages/CreatePostPage/EditPostPage'
 import EditProfilePage from '../pages/EditProfilePage/EditProfilePage'
 import ForgotPasswordPage from '../pages/ForgotPasswordPage/ForgotPasswordPage'
 import LoginPage from '../pages/LoginPage/LoginPage'
@@ -35,6 +36,7 @@ const AppRouter = () => {
 			</>
 			}
 			<Route path='/posts/:id' element={<PostPage />} />
+			<Route path='/posts/edit/:id' element={<EditPostPage />} />
 			<Route path='/profile/:username' element={<ProfilePage />} />
 			{isAuth ?
 				<Route path='/posts/create' element={<CreatePostPage />} />
@@ -46,9 +48,10 @@ const AppRouter = () => {
 				:
 				<Route path='/profile/edit' element={<Navigate replace to='/login' />} />
 			}
-			{/* {isAuth && authCredential.role === 'ADMIN' && */}
-			<Route path='/admin' element={<AdminPanelPage />} />
-			{/* } */}
+			{isAuth && authCredential.role === 'ADMIN' && <>
+				<Route path='/admin' element={<AdminPanelPage />} />
+			</>
+			}
 			<Route path='*' element={<Navigate replace to='/' />} />
 		</Routes>
 	)

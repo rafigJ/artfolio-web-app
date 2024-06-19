@@ -1,18 +1,19 @@
 import type { DropdownProps, MenuProps } from 'antd'
 import { Dropdown } from 'antd'
-import { useContext, useState, type FC } from 'react'
+import { useContext, useEffect, useState, type FC } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { API_URL } from '../../api'
 import { AuthContext } from '../../context'
+import { AuthResponse } from '../../types/auth/AuthResponse'
 import './HeaderProfileMenu.css'
 
-interface HeaderProfileMenuProps {
-	src: string
-}
-
-const HeaderProfileMenu: FC<HeaderProfileMenuProps> = ({ src }) => {
+const HeaderProfileMenu: FC = () => {
 	const [open, setOpen] = useState(false)
-	const { setIsAuth, authCredential } = useContext(AuthContext)
+	const [imageKey, setImageKey] = useState(0)
+	const { setIsAuth, authCredential, setAuthCredential } = useContext(AuthContext)
 	const navigate = useNavigate()
+
+	const [imageSrc, setImageSrc] = useState(`${API_URL}/user/${authCredential?.username}/avatar`)
 
 	const handleMenuClick: MenuProps['onClick'] = (e) => {
 		if (e.key === '1') {
@@ -22,9 +23,14 @@ const HeaderProfileMenu: FC<HeaderProfileMenuProps> = ({ src }) => {
 			navigate(`/profile/edit`)
 		}
 		if (e.key === '3') {
+			navigate(`/admin`)
+		}
+		if (e.key === '4') {
 			localStorage.removeItem('token')
+			localStorage.removeItem('username')
 			navigate('/')
 			setIsAuth(false)
+			setAuthCredential({} as AuthResponse)
 		}
 		setOpen(false)
 	}
@@ -46,10 +52,28 @@ const HeaderProfileMenu: FC<HeaderProfileMenuProps> = ({ src }) => {
 		},
 		{
 			label: 'Выйти',
-			key: '3',
+			key: '4',
 			danger: true
 		}
 	]
+
+	if (authCredential.role === 'ADMIN') {
+		items.splice(2, 0,
+			{
+				label: 'Панель администратора',
+				key: '3',
+				danger: true,
+			},
+		)
+	}
+
+
+	useEffect(() => {
+		if (authCredential?.username) {
+			setImageKey(Math.random())
+			setImageSrc(`${API_URL}/user/${authCredential?.username}/avatar`)
+		}
+	}, [authCredential])
 
 	return (
 		<Dropdown
@@ -60,7 +84,14 @@ const HeaderProfileMenu: FC<HeaderProfileMenuProps> = ({ src }) => {
 			onOpenChange={handleOpenChange}
 			open={open}
 		>
-			<img className='header-avatar__image' width={32} height={32} alt='Аватар пользователя' src={src} />
+			<img
+				key={imageKey}
+				className='header-avatar__image'
+				width={32}
+				height={32}
+				alt='Аватар пользователя'
+				src={imageSrc}
+			/>
 		</Dropdown>
 	)
 }

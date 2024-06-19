@@ -23,7 +23,7 @@ public interface PostService {
     /**
      * Получить пост по id.
      * Для Администратора user возвращает пост, независимо от того, помечен он удаленным или нет.
-     * @param user - пользователь, который пытается получить доступ к ресурсу, null если он анонимный
+     * @param user пользователь, который пытается получить доступ к ресурсу, null если он анонимный
      */
     FullPostResponseDto getPostById(@Nullable UserEntity user, Long id);
 
@@ -33,8 +33,6 @@ public interface PostService {
     void deletePost(UserEntity executor, Long id);
 
     FullPostResponseDto updatePost(UserEntity executor, Long id, PostRequestDto requestDto, List<MultipartFile> images);
-
-    PageDto<PostResponseDto> getPostsPageByUserId(UUID userId, Pageable page);
 
     PageDto<PostResponseDto> getPostsPageBySpecifications(Specification<PostEntity> specification, Pageable page);
 

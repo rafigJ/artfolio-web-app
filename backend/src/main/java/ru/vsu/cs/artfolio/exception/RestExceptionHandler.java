@@ -17,28 +17,24 @@ import java.util.Map;
 public class RestExceptionHandler {
 
     @ExceptionHandler(value = {RestException.class})
-    @ResponseBody
-    public ResponseEntity<RestExceptionDto> handler(RestException ex) {
+    public ResponseEntity<?> handler(RestException ex) {
         return ResponseEntity.status(ex.getStatus())
                 .body(new RestExceptionDto(ex.getMessage()));
     }
 
     @ExceptionHandler(value = {AccessDeniedException.class})
-    @ResponseBody
-    public ResponseEntity<RestExceptionDto> handler(AccessDeniedException ex) {
+    public ResponseEntity<?> handler(AccessDeniedException ex) {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                 .body(new RestExceptionDto(ex.getMessage()));
     }
 
     @ExceptionHandler(value = {Exception.class})
-    @ResponseBody
-    public ResponseEntity<RestExceptionDto> handler(Exception ex) {
+    public ResponseEntity<?> handler(Exception ex) {
         return ResponseEntity.status(HttpStatus.BAD_GATEWAY)
                 .body(new RestExceptionDto(ex.getMessage()));
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    @ResponseBody
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex) {
 
         Map<String, String> errors = new HashMap<>();

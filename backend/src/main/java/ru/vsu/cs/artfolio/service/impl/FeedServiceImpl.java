@@ -12,19 +12,13 @@ import ru.vsu.cs.artfolio.repository.UserRepository;
 import ru.vsu.cs.artfolio.service.FeedService;
 import ru.vsu.cs.artfolio.service.PostService;
 
-import java.util.UUID;
-
-import static ru.vsu.cs.artfolio.criteria.PostSpecifications.nameContainsIgnoreCaseSortByCreateTime;
-import static ru.vsu.cs.artfolio.criteria.PostSpecifications.postsByFollowedUsers;
-import static ru.vsu.cs.artfolio.criteria.PostSpecifications.sortByCreateTime;
-import static ru.vsu.cs.artfolio.criteria.PostSpecifications.sortByLikeCount;
+import static ru.vsu.cs.artfolio.criteria.PostSpecifications.*;
 
 @Service
 @RequiredArgsConstructor
 public class FeedServiceImpl implements FeedService {
 
     private final PostService postService;
-    private final UserRepository userRepository;
 
     @Override
     public PageDto<PostResponseDto> getPostsPageOrderedByTime(Pageable page) {
@@ -43,8 +37,7 @@ public class FeedServiceImpl implements FeedService {
     }
 
     @Override
-    public PageDto<PostResponseDto> getPostsPageOrderedByFollowerSubscribe(UUID userId, Pageable page) {
-        UserEntity user = userRepository.getReferenceById(userId);
+    public PageDto<PostResponseDto> getPostsPageOrderedByFollowerSubscribe(UserEntity user, Pageable page) {
         return postService.getPostsPageBySpecifications(postsByFollowedUsers(user), page);
     }
 

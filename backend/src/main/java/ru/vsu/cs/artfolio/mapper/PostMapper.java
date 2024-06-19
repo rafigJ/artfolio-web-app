@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public class PostMapper {
-    public static FullPostResponseDto toFullDto(PostEntity postEntity, List<Long> mediaIds, Long likeCount) {
+    public static FullPostResponseDto toFullDto(PostEntity postEntity, List<Long> mediaIds, Long likeCount, Boolean hasLike) {
         return FullPostResponseDto.builder()
                 .id(postEntity.getId())
                 .mediaIds(mediaIds)
@@ -21,6 +21,7 @@ public class PostMapper {
                 .owner(UserMapper.toDto(postEntity.getOwner()))
                 .description(postEntity.getDescription())
                 .likeCount(likeCount)
+                .hasLike(hasLike)
                 .build();
     }
 

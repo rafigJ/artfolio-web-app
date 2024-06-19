@@ -14,17 +14,19 @@ import $api, { API_URL } from '../../api'
 import PostService from '../../api/PostService'
 import { AuthContext } from '../../context'
 import { useFetching } from '../../hooks/useFetching'
-import type { FullPostResponse, Owner } from '../../types/FullPostResponse'
+import { UserResponse } from '../../types/UserResponse'
+import type { FullPostResponse } from '../../types/post/FullPostResponse'
 import Error404Result from '../Error404Result/Error404Result'
-import ReportWindow from '../ReportWindow/ReportWindow'
+import ReportPostWindow from '../ReportWindow/ReportPostWindow'
 import './PostContent.css'
 
 interface AuthorLinkCardProps {
-	owner: Owner
+	owner: UserResponse
 	style: CSSProperties
 }
 
 const AuthorLinkCard: FC<AuthorLinkCardProps> = ({ owner, style }) => {
+	const place = [owner?.city, owner?.country].filter(p => p).join(', ')
 	return (
 		<div style={style}>
 			<Link to={`/profile/${owner?.username}`}>
@@ -43,20 +45,20 @@ const AuthorLinkCard: FC<AuthorLinkCardProps> = ({ owner, style }) => {
 					</Typography.Title>
 				</Link>
 
-				<Typography.Text>Воронеж, Россия</Typography.Text>
+				<Typography.Text>{place}</Typography.Text>
 			</div>
 		</div>
 	)
 }
 
 const PostContent = () => {
-	const [open, setOpen] = useState(false)
-	const showModal = () => {
-		setOpen(true)
+	const [openPostReport, setOpenPostReport] = useState(false)
+	const showPostReport = () => {
+		setOpenPostReport(true)
 	}
 	const [isLiked, setIsLiked] = useState(false)
 	const [likesCount, setLikesCount] = useState(0)
-	const { isAuth } = useContext(AuthContext)
+	const { authCredential, isAuth } = useContext(AuthContext)
 	const navigate = useNavigate()
 
 
@@ -69,7 +71,7 @@ const PostContent = () => {
 			const response = await $api.post(`posts/${post.id}/like`)
 			if (response.status === 200) {
 				setIsLiked(true)
-				setLikesCount((prevCount) => prevCount + 1)
+				setLikesCount(response.data.likeCount)
 			}
 		} catch (error) {
 			message.error('Произошла ошибка при лайке поста')
@@ -85,41 +87,63 @@ const PostContent = () => {
 			const response = await $api.delete(`posts/${post.id}/like`)
 			if (response.status === 200) {
 				setIsLiked(false)
-				setLikesCount((prevCount) => prevCount - 1)
+				setLikesCount(response.data.likeCount)
 			}
 		} catch (error) {
 			message.error('Произошла ошибка при лайке поста')
 		}
 	}
-
-	const items: MenuProps['items'] = [
-		{
-			key: '1',
-			label: <Link to={'/posts/create'}>Редактировать</Link>,
-			icon: <EditOutlined />
-		},
-		{
-			key: '2',
-			label: 'Удалить',
-			icon: <DeleteOutlined />
-		},
-		{
-			key: '3',
-			label: 'Пожаловаться',
-			onClick: showModal,
-			icon: <FlagFilled color='red' />,
-			danger: true
-		}
-	]
-
 	const params = useParams()
+
 	const [post, setPost] = useState<FullPostResponse>({} as FullPostResponse)
 
-	const [fetchPost, isLoading, isError, error] = useFetching(async (id) => {
+	const [fetchPost, isLoading, isError] = useFetching(async (id) => {
 		const response = await PostService.getPostById(id)
 		setPost(response.data)
 		setLikesCount(response.data.likeCount)
+		setIsLiked(response.data.hasLike === null ? false : response.data.hasLike)
 	})
+
+	const [deletePost] = useFetching(async (id) => {
+		PostService.deletePost(id)
+			.then(() => {
+				message.success("Публикация успешно удалена")
+				navigate('/login')
+			}
+			)
+			.catch(e => {
+				message.error(`Ошибка удаления публикации ${e}`)
+			})
+	})
+
+	const getMenuItems = () => {
+		const items: MenuProps['items'] = [
+			{
+				key: '3',
+				label: 'Пожаловаться',
+				onClick: () => { isAuth ? showPostReport() : navigate('/login') },
+				icon: <FlagFilled color='red' />,
+				danger: true
+			}
+		]
+
+		if (isAuth && post.owner && (authCredential.role === 'ADMIN' || authCredential.username === post.owner.username)) {
+			items.unshift({
+				key: '2',
+				label: 'Удалить',
+				icon: <DeleteOutlined />,
+				onClick: () => deletePost(post.id)
+			})
+		}
+		if (isAuth && post.owner && (authCredential.username === post.owner.username)) {
+			items.unshift({
+				key: '1',
+				label: <Link to={`/posts/edit/${params.id}`}>Редактировать</Link>,
+				icon: <EditOutlined />
+			})
+		}
+		return items
+	}
 
 	useEffect(() => {
 		fetchPost(params.id)
@@ -137,12 +161,12 @@ const PostContent = () => {
 
 	return (
 		<>
-			<ReportWindow open={open} setOpen={setOpen} />
+			<ReportPostWindow open={openPostReport} setOpen={setOpenPostReport} />
 			<div className='title-container'>
 				<Typography.Title level={3} className='title'>
 					{post?.name}
 				</Typography.Title>
-				<Dropdown menu={{ items }} placement='bottomLeft' arrow>
+				<Dropdown menu={{ items: getMenuItems() }} placement='bottomLeft' arrow>
 					<Button className='menu-btn'>
 						<EllipsisOutlined />
 					</Button>

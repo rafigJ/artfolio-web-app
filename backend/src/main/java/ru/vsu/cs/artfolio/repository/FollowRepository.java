@@ -19,10 +19,17 @@ public interface FollowRepository extends JpaRepository<FollowEntity, Long> {
      */
     Page<FollowEntity> findAllByFollowedUuid(UUID uuid, Pageable page);
 
+    Long countByFollowedUuid(UUID uuid);
 
     /**
      * Для получения подписок пользователя с uuid (на которых он сам подписался)
      */
     Page<FollowEntity> findAllBySubscriberUuid(UUID uuid, Pageable page);
 
+    Long countBySubscriberUuid(UUID uuid);
+
+    /**
+     * Для удаления всех сущностей, связанных с конкретным пользователем
+     */
+    void deleteAllByFollowedUuidOrSubscriberUuid(UUID followId, UUID subscriberId);
 }

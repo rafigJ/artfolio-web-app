@@ -1,6 +1,6 @@
 import { AxiosResponse } from 'axios'
-import { AuthResponse } from '../types/AuthResponse'
-import type { RegistrationRequest } from '../types/RegistrationRequest'
+import { AuthResponse } from '../types/auth/AuthResponse'
+import type { RegistrationRequest } from '../types/auth/RegistrationRequest'
 import $api from './index'
 
 export default class AuthService {
@@ -13,7 +13,9 @@ export default class AuthService {
 		const bodyFormData = new FormData()
 		
 		bodyFormData.append('userInfo', new Blob([JSON.stringify(request)], { type: 'application/json' }))
-		bodyFormData.append('avatarFile', avatar)
+		if (avatar) {
+			bodyFormData.append('avatarFile', avatar)
+		}
 		return await $api.post<AuthResponse>('/auth/register', bodyFormData)
 	}
 	

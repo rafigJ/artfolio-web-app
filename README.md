@@ -15,6 +15,8 @@
 [Figma](https://www.figma.com/file/LuFdvnE8l1kkywsWD1nu5K/Artfolio?type=design&node-id=79-2319&mode=design&t=72VEuIMZaCgoNarr-0)
 
 ## Документация
+[Swagger документация (OpenApi 3)](http://79.174.93.30:8080/swagger-ui/index.html)
+
 [Техническое задание](https://github.com/rafigJ/artfolio-web-app/blob/master/Documentation/%D0%A2%D0%B5%D1%85%D0%BD%D0%B8%D1%87%D0%B5%D1%81%D0%BA%D0%BE%D0%B5%20%D0%B7%D0%B0%D0%B4%D0%B0%D0%BD%D0%B8%D0%B5/%D0%A2%D0%97_%D0%A4%D0%B8%D0%BD%D0%B0%D0%BB.pdf)
 
 [Оформительские задачи](https://github.com/rafigJ/artfolio-web-app/blob/master/Documentation/%D0%9E%D1%84%D0%BE%D1%80%D0%BC%D0%B8%D1%82%D0%B5%D0%BB%D1%8C%D1%81%D0%BA%D0%B8%D0%B5%20%D0%B7%D0%B0%D0%B4%D0%B0%D1%87%D0%B8/%D0%9E%D1%84%D0%BE%D1%80%D0%BC%D0%B8%D1%82%D0%B5%D0%BB%D1%8C%D1%81%D0%BA%D0%B8%D0%B5%20%D0%B7%D0%B0%D0%B4%D0%B0%D1%87%D0%B8%20(%D1%86).jpg)
@@ -28,7 +30,7 @@
 
 [Видеодемонстрация экранов 2 аттестация](https://drive.google.com/file/d/1XPzvDkrKQy9Lxy4fbOVKVUbzqQrX0jv9/view?usp=sharing)
 
-[Видеопрезентация Защита](https://drive.google.com/drive/folders/1588rl638kQ7oWBYgDIIZ9sM31hZNdnHD)
+[Видеопрезентация Защита](https://drive.google.com/file/d/1AmkdE9bSw20Jcara-WfNAPC21058NfpM/view?usp=sharing)
 
 [Видео про backend и деплой](https://drive.google.com/drive/folders/1-Jy6gHRVGVeQtqDWyh5TVf8tAm-mRTiH)
 
@@ -45,4 +47,8 @@
 - Секретное слово: someSecret
 
 Администратор: 
-- Позже добавим
+- Логин (email): admin@artfolio.ru
+- Пароль: someAdminPassword1
+- Секретное слово: admin1
+
+! **Просьба, если меняете пароли с помощью секретного слова, меняйте его также обратно**

@@ -23,9 +23,10 @@ const beforeUpload = (file: FileType) => {
 interface RegisterFormAvatarUploadProps {
 	avatar: UploadFile[]
 	setAvatar: React.Dispatch<React.SetStateAction<UploadFile[]>>
+	setBlob?: React.Dispatch<React.SetStateAction<Blob | undefined>>
 }
 
-const RegisterFormAvatarUpload: React.FC<RegisterFormAvatarUploadProps> = ({ avatar, setAvatar }) => {
+const RegisterFormAvatarUpload: React.FC<RegisterFormAvatarUploadProps> = ({ avatar, setAvatar, setBlob }) => {
 	
 	const uploadButton = (
 		<button style={{ border: 0, background: 'none' }} type='button'>
@@ -36,6 +37,9 @@ const RegisterFormAvatarUpload: React.FC<RegisterFormAvatarUploadProps> = ({ ava
 	
 	const onChange: UploadProps['onChange'] = ({ fileList }) => {
 		setAvatar(fileList)
+		if (setBlob !== undefined) {
+			setBlob(undefined)
+		}
 	}
 	
 	return (
@@ -44,7 +48,7 @@ const RegisterFormAvatarUpload: React.FC<RegisterFormAvatarUploadProps> = ({ ava
 				name='avatar'
 				listType='picture-circle'
 				className='avatar-uploader'
-				showUploadList={{ showRemoveIcon: false, showDownloadIcon: false, showPreviewIcon: false }}
+				showUploadList={{ showDownloadIcon: false, showPreviewIcon: false }}
 				beforeUpload={beforeUpload}
 				fileList={avatar}
 				onChange={onChange}

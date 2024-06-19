@@ -3,7 +3,7 @@ import React, { type FC, useEffect, useState } from 'react'
 import InfiniteScroll from 'react-infinite-scroll-component'
 import FeedService from '../../api/FeedService'
 import { useFetching } from '../../hooks/useFetching'
-import type { PostResponse } from '../../types/PostResponse'
+import type { PostResponse } from '../../types/post/PostResponse'
 import PostCard from '../PostCard/PostCard'
 
 interface SearchPostGridProps {

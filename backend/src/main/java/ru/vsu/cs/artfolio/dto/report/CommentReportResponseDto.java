@@ -24,6 +24,9 @@ public final class CommentReportResponseDto {
     private Long postId;
 
     @NonNull
+    private String reason;
+
+    @NonNull
     private Long commentId;
 
     @NonNull

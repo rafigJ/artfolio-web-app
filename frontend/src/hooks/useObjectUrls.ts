@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react'
 
 export function useObjectUrls() {
-	const mapRef = useRef<Map<File, string> | null>(null)
+	const mapRef = useRef<Map<Blob, string> | null>(null)
 	useEffect(() => {
 		const map = new Map()
 		mapRef.current = map
@@ -13,7 +13,7 @@ export function useObjectUrls() {
 			mapRef.current = null
 		}
 	}, [])
-	return function getObjectUrl(file: File) {
+	return function getObjectUrl(file: Blob) {
 		const map = mapRef.current
 		if (!map) {
 			throw Error('Cannot getObjectUrl while unmounted')

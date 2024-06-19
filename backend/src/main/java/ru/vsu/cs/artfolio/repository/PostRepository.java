@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import ru.vsu.cs.artfolio.entity.PostEntity;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -13,5 +14,7 @@ public interface PostRepository extends JpaRepository<PostEntity, Long>, JpaSpec
 
     Optional<PostEntity> findByName(String postName);
 
-    Page<PostEntity> findAllByOwnerUuid(UUID uuid, Pageable pageable);
+    Page<PostEntity> findAllByOwnerUuidAndDeletedIsFalse(UUID uuid, Pageable pageable);
+
+    List<PostEntity> findAllByOwnerUuid(UUID uuid);
 }

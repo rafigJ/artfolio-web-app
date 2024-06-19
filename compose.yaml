@@ -3,7 +3,7 @@ services:
   backend:
     image: artfolio-app-backend:latest # mvn -DskipTests spring-boot:build-image в помощь
     ports:
-      - 8080:8080
+      - "8080:8080"
     depends_on:
           - postgres_db
           - minio
@@ -24,7 +24,7 @@ services:
     build:
       context: ./frontend
     ports: 
-      - 80:80
+      - "80:80"
     environment:
       REACT_APP_API_URL: http://backend:8080
       
@@ -37,7 +37,7 @@ services:
       - postgres_data:/var/lib/postgresql/data
     restart: always   
     ports:
-      - 5432:5432
+      - "5432:5432"
   
   minio:
     image: minio/minio:RELEASE.2024-04-18T19-09-19Z.fips

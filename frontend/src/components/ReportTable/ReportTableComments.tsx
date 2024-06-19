@@ -1,25 +1,29 @@
 import { DownOutlined } from '@ant-design/icons'
-import { Button, Dropdown, MenuProps, Space, Table, TableProps } from 'antd'
-import { FC, useState } from 'react'
+import { Button, Dropdown, MenuProps, Space, Table, TableProps, message } from 'antd'
+import { format } from 'date-fns'
+import { FC, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { ReportResponse } from '../../types/ReportResponse'
+import ReportService from '../../api/ReportService'
+import { useFetching } from '../../hooks/useFetching'
+import { ReportType, Reviewed } from '../../types/reports/ReportRequest'
+import { ReportResponse } from '../../types/reports/ReportResponse'
 
 
 
 const ReportTableComments: FC = () => {
 
-	const [reviewed, setReviewed] = useState(false)
+	const [listReviewed, setListReviewed] = useState(false)
 
 	const items: MenuProps['items'] = [
 		{
 			key: '1',
 			label: 'Нерассмотренные',
-			onClick: () => setReviewed(false),
+			onClick: () => setListReviewed(false),
 		},
 		{
 			key: '2',
 			label: 'Рассмотренные',
-			onClick: () => setReviewed(true),
+			onClick: () => setListReviewed(true),
 		},
 	]
 
@@ -65,7 +69,7 @@ const ReportTableComments: FC = () => {
 			render: (text) => <span>{text}</span>,
 		},
 		{
-			title: 'Профиль автора поста',
+			title: 'Профиль автора комментария',
 			dataIndex: ['targetUser', 'username'],
 			key: 'authorProfile',
 			render: (author) =>
@@ -77,21 +81,31 @@ const ReportTableComments: FC = () => {
 		},
 		{
 			title: 'Время оставления жалобы',
-			dataIndex: 'time',
-			key: 'time',
+			dataIndex: 'createTime',
+			key: 'createTime',
+			render: (createTime) =>
+				<span>
+					{format(new Date(createTime), 'dd.MM.yyyy HH:mm:ss')}
+				</span>
 		},
 		{
 			title: 'Статус',
 			dataIndex: 'reviewed',
 			key: 'reviewed',
-			render: (reviewed) =>
+			render: (reviewed: boolean, record: ReportResponse) =>
 				<span>
 					{reviewed ? (
-						<Button type="link">
+						<Button
+							type='link'
+							onClick={() => handleReview(record.id, record.reviewed)}
+						>
 							Отметить как нерассмотренную
 						</Button>
 					) : (
-						<Button type="link">
+						<Button
+							type='link'
+							onClick={() => handleReview(record.id, record.reviewed)}
+						>
 							Отметить как рассмотренную
 						</Button>
 					)}
@@ -99,105 +113,41 @@ const ReportTableComments: FC = () => {
 		},
 	]
 
-	const data: ReportResponse[] = [
-		{
-			id: 159,
-			postId: 33,
-			commentId: 52,
-			comment: "Б**%%ТЬ, КАКАЯ ЖЕ Х***А!",
-			reason: "Очень много мата!",
-			reviewed: false,
-			time: '2022-04-30 12:45',
-			targetUser: {
-				fullName: "Рамси Болтон",
-				username: "boltonArts"
-			},
-			sender: {
-				fullName: "Рамси Болтон",
-				username: "boltonArts"
-			}
-		},
-		{
-			id: 160,
-			postId: 34,
-			commentId: 53,
-			comment: "Ваша мать в ***де!",
-			reason: "Оскорбительный комментарий",
-			reviewed: false,
-			time: '2022-04-30 12:45',
-			targetUser: {
-				fullName: "Тирион Ланнистер",
-				username: "tyrionFan"
-			},
-			sender: {
-				fullName: "Тирион Ланнистер",
-				username: "tyrionFan"
-			}
-		},
-		{
-			id: 161,
-			postId: 35,
-			commentId: 54,
-			comment: "Какая прекрасная погода сегодня!",
-			reason: "Нарушение правил сообщества",
-			reviewed: true,
-			time: '2022-04-30 12:45',
-			targetUser: {
-				fullName: "Джон Сноу",
-				username: "johnSnow"
-			},
-			sender: {
-				fullName: "Джон Сноу",
-				username: "johnSnow"
-			}
-		},
-		{
-			id: 162,
-			postId: 36,
-			commentId: 55,
-			comment: "Хороший пост, спасибо за информацию!",
-			reason: "Нецензурная лексика",
-			reviewed: true,
-			time: '2022-04-30 12:45',
-			targetUser: {
-				fullName: "Дейенерис Таргариен",
-				username: "dragonQueen"
-			},
-			sender: {
-				fullName: "Дейенерис Таргариен",
-				username: "dragonQueen"
-			}
-		},
-		{
-			id: 163,
-			postId: 37,
-			commentId: 56,
-			comment: "Очень интересный материал!",
-			reason: "Нарушение правил сообщества",
-			reviewed: false,
-			time: '2022-04-30 12:45',
-			targetUser: {
-				fullName: "Санса Старк",
-				username: "sansaFan"
-			},
-			sender: {
-				fullName: "Санса Старк",
-				username: "sansaFan"
-			}
-		}
-	]
+	const [reports, setReports] = useState<ReportResponse[]>([])
 
+	const [fetchReports, isLoading, isError] = useFetching(async () => {
+		const response = await ReportService.getReports(ReportType.comment, 0, 1000, (listReviewed ? Reviewed.TRUE : Reviewed.FALSE))
+		setReports(response.data.content)
+	})
 
-	const filteredData = data.filter(item => item.reviewed === reviewed)
+	useEffect(() => {
+		fetchReports()
+	}, [listReviewed])
+
+	if (isLoading || isError) {
+		return <></>
+	}
+
+	const handleReview = async (reportId: number, reportReviewed: boolean) => {
+		ReportService.reviewCommentReport(reportId, !reportReviewed)
+			.then(() => {
+				fetchReports()
+				listReviewed ?
+					message.success("Жалоба отмечена как нерассмотренная")
+					:
+					message.success("Жалоба отмечена как рассмотренная")
+			})
+			.catch(e => message.error('Ошибка отметки жалобы ' + e))
+	}
 
 	return (
 		<><Dropdown menu={{ items }} placement='bottomLeft'>
 			<Space style={{ marginBottom: 20 }}>
-				{reviewed ? 'Рассмотренные' : 'Нерассмотренные'}
+				{listReviewed ? 'Рассмотренные' : 'Нерассмотренные'}
 				<DownOutlined />
 			</Space>
 		</Dropdown>
-			<Table columns={columns} dataSource={filteredData} /></>
+			<Table columns={columns} dataSource={reports} /></>
 	)
 }
 
