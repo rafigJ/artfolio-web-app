@@ -1,14 +1,18 @@
 import { Input, Modal, Typography, message } from 'antd'
 import { FC, useState } from 'react'
+import { useParams } from 'react-router-dom'
+import ReportService from '../../api/ReportService'
 
-interface ReportWindowProps {
+interface ReportCommentWindowProps {
 	open: boolean
 	setOpen: (state: boolean) => void
+	commentId: number
 }
 
-const ReportWindow: FC<ReportWindowProps> = ({ open, setOpen }) => {
+const ReportCommentWindow: FC<ReportCommentWindowProps> = ({ open, setOpen, commentId }) => {
 	const [confirmLoading, setConfirmLoading] = useState(false)
 	const [reportText, setReportText] = useState('')
+	const params = useParams()
 
 
 	const handleOk = () => {
@@ -18,12 +22,17 @@ const ReportWindow: FC<ReportWindowProps> = ({ open, setOpen }) => {
 		}
 
 		setConfirmLoading(true)
-		setTimeout(() => {
-			setOpen(false)
-			setConfirmLoading(false)
-			setReportText('')
-			message.success("Жалоба успешно отправлена")
-		}, 2000)
+		ReportService.sendCommentReport(commentId,
+			{ reason: reportText.trim() })
+			.then(() => {
+				setReportText('')
+				message.success("Жалоба успешно отправлена")
+				setOpen(false)
+			})
+			.catch(e => message.error('Ошибка отправки жалобы ' + e))
+			.finally(() => {
+				setConfirmLoading(false)
+			})
 	}
 
 	const handleCancel = () => {
@@ -37,7 +46,7 @@ const ReportWindow: FC<ReportWindowProps> = ({ open, setOpen }) => {
 
 	return (
 		<Modal
-			title="Жалоба"
+			title="Жалоба на комментарий"
 			open={open}
 			okText="Отправить"
 			okType='danger'
@@ -62,4 +71,4 @@ const ReportWindow: FC<ReportWindowProps> = ({ open, setOpen }) => {
 	)
 }
 
-export default ReportWindow
+export default ReportCommentWindow

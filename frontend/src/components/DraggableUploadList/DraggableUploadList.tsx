@@ -59,6 +59,11 @@ const DraggableUploadList: FC<DraggableUploadListProps> = ({
 				message.error(`${file.name} is not a png/jpg file`)
 				return Upload.LIST_IGNORE
 			}
+			const isLt10M = file.size / 1024 / 1024 <= 10
+			if (!isLt10M) {
+				message.error('Картинка должна быть меньше 10 МБ')
+				return Upload.LIST_IGNORE
+			}
 			return false
 		},
 		maxCount: 10,

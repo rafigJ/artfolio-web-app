@@ -17,7 +17,7 @@ import { useFetching } from '../../hooks/useFetching'
 import { UserResponse } from '../../types/UserResponse'
 import type { FullPostResponse } from '../../types/post/FullPostResponse'
 import Error404Result from '../Error404Result/Error404Result'
-import ReportWindow from '../ReportWindow/ReportWindow'
+import ReportPostWindow from '../ReportWindow/ReportPostWindow'
 import './PostContent.css'
 
 interface AuthorLinkCardProps {
@@ -26,6 +26,7 @@ interface AuthorLinkCardProps {
 }
 
 const AuthorLinkCard: FC<AuthorLinkCardProps> = ({ owner, style }) => {
+	const place = [owner?.city, owner?.country].filter(p => p).join(', ')
 	return (
 		<div style={style}>
 			<Link to={`/profile/${owner?.username}`}>
@@ -44,16 +45,16 @@ const AuthorLinkCard: FC<AuthorLinkCardProps> = ({ owner, style }) => {
 					</Typography.Title>
 				</Link>
 
-				<Typography.Text>Воронеж, Россия</Typography.Text>
+				<Typography.Text>{place}</Typography.Text>
 			</div>
 		</div>
 	)
 }
 
 const PostContent = () => {
-	const [open, setOpen] = useState(false)
-	const showModal = () => {
-		setOpen(true)
+	const [openPostReport, setOpenPostReport] = useState(false)
+	const showPostReport = () => {
+		setOpenPostReport(true)
 	}
 	const [isLiked, setIsLiked] = useState(false)
 	const [likesCount, setLikesCount] = useState(0)
@@ -103,12 +104,24 @@ const PostContent = () => {
 		setIsLiked(response.data.hasLike === null ? false : response.data.hasLike)
 	})
 
+	const [deletePost] = useFetching(async (id) => {
+		PostService.deletePost(id)
+			.then(() => {
+				message.success("Публикация успешно удалена")
+				navigate('/login')
+			}
+			)
+			.catch(e => {
+				message.error(`Ошибка удаления публикации ${e}`)
+			})
+	})
+
 	const getMenuItems = () => {
 		const items: MenuProps['items'] = [
 			{
 				key: '3',
 				label: 'Пожаловаться',
-				onClick: showModal,
+				onClick: () => { isAuth ? showPostReport() : navigate('/login') },
 				icon: <FlagFilled color='red' />,
 				danger: true
 			}
@@ -118,7 +131,8 @@ const PostContent = () => {
 			items.unshift({
 				key: '2',
 				label: 'Удалить',
-				icon: <DeleteOutlined />
+				icon: <DeleteOutlined />,
+				onClick: () => deletePost(post.id)
 			})
 		}
 		if (isAuth && post.owner && (authCredential.username === post.owner.username)) {
@@ -147,7 +161,7 @@ const PostContent = () => {
 
 	return (
 		<>
-			<ReportWindow open={open} setOpen={setOpen} />
+			<ReportPostWindow open={openPostReport} setOpen={setOpenPostReport} />
 			<div className='title-container'>
 				<Typography.Title level={3} className='title'>
 					{post?.name}
