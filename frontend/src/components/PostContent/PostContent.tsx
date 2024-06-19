@@ -120,7 +120,7 @@ const PostContent = () => {
 			{
 				key: '3',
 				label: 'Пожаловаться',
-				onClick: showPostReport,
+				onClick: () => { isAuth ? showPostReport() : navigate('/login') },
 				icon: <FlagFilled color='red' />,
 				danger: true
 			}

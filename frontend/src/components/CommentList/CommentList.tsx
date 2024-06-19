@@ -62,7 +62,7 @@ const CommentList: FC<CommentListProps> = ({ data, setData }) => {
 		const items = [
 			{
 				key: '2',
-				onClick: showCommentReport,
+				onClick: () => { isAuth ? showCommentReport() : navigate('/login') },
 				label: 'Пожаловаться',
 				icon: <FlagFilled color='red' />,
 				danger: true
