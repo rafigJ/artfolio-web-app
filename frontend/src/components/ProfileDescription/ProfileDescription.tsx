@@ -92,9 +92,9 @@ const ProfileDescription: FC<ProfileDescriptionProps> = ({ profile }) => {
 					</Button>
 					<Statistic
 						title='Количество лайков'
-						value={3}
+						value={profile?.likeCount}
 						prefix={<HeartOutlined />} />
-					<Statistic title='Количество публикаций' value={3} />
+					<Statistic title='Количество публикаций' value={profile?.postCount} />
 					<div onClick={showSubscribers} style={{ cursor: 'pointer' }}>
 						<Statistic
 							title='Подписчики:'

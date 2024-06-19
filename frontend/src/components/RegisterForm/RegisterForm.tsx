@@ -60,10 +60,6 @@ const RegisterForm: React.FC = () => {
 	}
 	
 	const onFinishStep2 = (values: SecondStepSlice) => {
-		if (!avatar.length) {
-			message.error('Выберите аватар')
-			return
-		}
 		const trimmedValues: SecondStepSlice = {
 			fullName: values.fullName.trim(),
 			country: values.country ? values.country.trim() : '',

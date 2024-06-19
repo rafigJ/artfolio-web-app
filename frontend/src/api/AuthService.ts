@@ -13,7 +13,9 @@ export default class AuthService {
 		const bodyFormData = new FormData()
 		
 		bodyFormData.append('userInfo', new Blob([JSON.stringify(request)], { type: 'application/json' }))
-		bodyFormData.append('avatarFile', avatar)
+		if (avatar) {
+			bodyFormData.append('avatarFile', avatar)
+		}
 		return await $api.post<AuthResponse>('/auth/register', bodyFormData)
 	}
 	

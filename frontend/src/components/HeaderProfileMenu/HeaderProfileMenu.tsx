@@ -9,6 +9,7 @@ import './HeaderProfileMenu.css'
 
 const HeaderProfileMenu: FC = () => {
 	const [open, setOpen] = useState(false)
+	const [imageKey, setImageKey] = useState(0);
 	const { setIsAuth, authCredential, setAuthCredential } = useContext(AuthContext)
 	const navigate = useNavigate()
 	
@@ -55,6 +56,7 @@ const HeaderProfileMenu: FC = () => {
 	
 	useEffect(() => {
 		if (authCredential?.username) {
+			setImageKey(Math.random());
 			setImageSrc(`${API_URL}/user/${authCredential?.username}/avatar`)
 		}
 	}, [authCredential])
@@ -69,6 +71,7 @@ const HeaderProfileMenu: FC = () => {
 			open={open}
 		>
 			<img
+				key={imageKey}
 				className='header-avatar__image'
 				width={32}
 				height={32}
