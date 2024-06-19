@@ -26,6 +26,7 @@ interface AuthorLinkCardProps {
 }
 
 const AuthorLinkCard: FC<AuthorLinkCardProps> = ({ owner, style }) => {
+	const place = [owner?.city, owner?.country].filter(p => p).join(', ')
 	return (
 		<div style={style}>
 			<Link to={`/profile/${owner?.username}`}>
@@ -44,7 +45,7 @@ const AuthorLinkCard: FC<AuthorLinkCardProps> = ({ owner, style }) => {
 					</Typography.Title>
 				</Link>
 
-				<Typography.Text>Воронеж, Россия</Typography.Text>
+				<Typography.Text>{place}</Typography.Text>
 			</div>
 		</div>
 	)
