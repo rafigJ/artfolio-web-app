@@ -15,16 +15,16 @@ import SearchPage from '../pages/SearchPage/SearchPage'
 
 const AppRouter = () => {
 	const { isAuth, authCredential } = useContext(AuthContext)
-	
+
 	const location = useLocation()
-	
+
 	useEffect(() => {
 		if (typeof window.ym === 'function') {
 			window.ym(97163910, 'hit', location.pathname)
 		}
 	}, [location])
-	
-	
+
+
 	return (
 		<Routes>
 			<Route index path='/' element={<MainPage />} />
@@ -48,9 +48,10 @@ const AppRouter = () => {
 				:
 				<Route path='/profile/edit' element={<Navigate replace to='/login' />} />
 			}
-			{/* {isAuth && authCredential.role === 'ADMIN' && */}
-			<Route path='/admin' element={<AdminPanelPage />} />
-			{/* } */}
+			{isAuth && authCredential.role === 'ADMIN' && <>
+				<Route path='/admin' element={<AdminPanelPage />} />
+			</>
+			}
 			<Route path='*' element={<Navigate replace to='/' />} />
 		</Routes>
 	)
