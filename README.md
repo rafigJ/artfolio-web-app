@@ -30,7 +30,7 @@
 
 [Видеодемонстрация экранов 2 аттестация](https://drive.google.com/file/d/1XPzvDkrKQy9Lxy4fbOVKVUbzqQrX0jv9/view?usp=sharing)
 
-[Видеопрезентация Защита](https://drive.google.com/drive/folders/1588rl638kQ7oWBYgDIIZ9sM31hZNdnHD)
+[Видеопрезентация Защита](https://drive.google.com/file/d/1AmkdE9bSw20Jcara-WfNAPC21058NfpM/view?usp=sharing)
 
 [Видео про backend и деплой](https://drive.google.com/drive/folders/1-Jy6gHRVGVeQtqDWyh5TVf8tAm-mRTiH)
 
