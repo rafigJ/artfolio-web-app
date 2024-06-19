@@ -1,11 +1,13 @@
 import { AntDesignOutlined } from '@ant-design/icons'
 import { Avatar, Button, Flex, message, Typography } from 'antd'
-import { type FC, useContext, useState } from 'react'
+import { useContext, useState, type FC } from 'react'
 
 import { useNavigate } from 'react-router-dom'
 import { API_URL } from '../../api'
 import $api from '../../api/index'
+import UserService from '../../api/UserService'
 import { AuthContext } from '../../context'
+import { useFetching } from '../../hooks/useFetching'
 import type { FullUserResponse } from '../../types/user/FullUserResponse'
 
 interface ProfileHeaderProps {
@@ -39,6 +41,17 @@ const ProfileHeader: FC<ProfileHeaderProps> = ({ profile }) => {
 			message.error('Произошла ошибка при отписке')
 		}
 	}
+
+	const [deleteUser] = useFetching(async (username: string) => {
+		await UserService.deleteUser(username)
+			.then(() => {
+				navigate('/login')
+				message.success("Пользователь успешно удалён")
+			})
+			.catch(e => {
+				message.error("Ошибка удаления пользователя" + e)
+			})
+	})
 
 	return (
 		<Flex
@@ -85,6 +98,17 @@ const ProfileHeader: FC<ProfileHeaderProps> = ({ profile }) => {
 					style={{ margin: '5px 0', minWidth: '200px' }}>
 					Связаться
 				</Button>
+				{isAuth &&
+					authCredential.role === 'ADMIN' &&
+					authCredential.username != profile.username &&
+					<Button
+						style={{ margin: '5px 0', minWidth: '200px' }}
+						danger={true}
+						type='primary'
+						onClick={() => deleteUser(profile.username)}
+					>
+						Удалить пользователя
+					</Button>}
 			</Flex>
 		</Flex>
 	)

@@ -103,6 +103,18 @@ const PostContent = () => {
 		setIsLiked(response.data.hasLike === null ? false : response.data.hasLike)
 	})
 
+	const [deletePost] = useFetching(async (id) => {
+		PostService.deletePost(id)
+			.then(() => {
+				message.success("Публикация успешно удалена")
+				navigate('/login')
+			}
+			)
+			.catch(e => {
+				message.error(`Ошибка удаления публикации ${e}`)
+			})
+	})
+
 	const getMenuItems = () => {
 		const items: MenuProps['items'] = [
 			{
@@ -118,7 +130,8 @@ const PostContent = () => {
 			items.unshift({
 				key: '2',
 				label: 'Удалить',
-				icon: <DeleteOutlined />
+				icon: <DeleteOutlined />,
+				onClick: () => deletePost(post.id)
 			})
 		}
 		if (isAuth && post.owner && (authCredential.username === post.owner.username)) {
