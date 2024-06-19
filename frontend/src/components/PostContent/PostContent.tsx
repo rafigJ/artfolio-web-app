@@ -17,7 +17,7 @@ import { useFetching } from '../../hooks/useFetching'
 import { UserResponse } from '../../types/UserResponse'
 import type { FullPostResponse } from '../../types/post/FullPostResponse'
 import Error404Result from '../Error404Result/Error404Result'
-import ReportWindow from '../ReportWindow/ReportWindow'
+import ReportPostWindow from '../ReportWindow/ReportPostWindow'
 import './PostContent.css'
 
 interface AuthorLinkCardProps {
@@ -51,9 +51,9 @@ const AuthorLinkCard: FC<AuthorLinkCardProps> = ({ owner, style }) => {
 }
 
 const PostContent = () => {
-	const [open, setOpen] = useState(false)
-	const showModal = () => {
-		setOpen(true)
+	const [openPostReport, setOpenPostReport] = useState(false)
+	const showPostReport = () => {
+		setOpenPostReport(true)
 	}
 	const [isLiked, setIsLiked] = useState(false)
 	const [likesCount, setLikesCount] = useState(0)
@@ -108,7 +108,7 @@ const PostContent = () => {
 			{
 				key: '3',
 				label: 'Пожаловаться',
-				onClick: showModal,
+				onClick: showPostReport,
 				icon: <FlagFilled color='red' />,
 				danger: true
 			}
@@ -147,7 +147,7 @@ const PostContent = () => {
 
 	return (
 		<>
-			<ReportWindow open={open} setOpen={setOpen} />
+			<ReportPostWindow open={openPostReport} setOpen={setOpenPostReport} />
 			<div className='title-container'>
 				<Typography.Title level={3} className='title'>
 					{post?.name}

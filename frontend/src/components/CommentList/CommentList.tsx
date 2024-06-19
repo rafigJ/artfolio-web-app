@@ -10,7 +10,7 @@ import CommentService from '../../api/CommentService'
 import { AuthContext } from '../../context'
 import { useFetching } from '../../hooks/useFetching'
 import { CommentResponse } from '../../types/comment/CommentResponse'
-import ReportWindow from '../ReportWindow/ReportWindow'
+import ReportCommentWindow from '../ReportWindow/ReportCommentWindow'
 import './CommentList.css'
 
 export interface CommentItem {
@@ -28,11 +28,13 @@ interface CommentListProps {
 
 const CommentList: FC<CommentListProps> = ({ data, setData }) => {
 	const [activeComment, setActiveComment] = useState<CommentResponse | null>(null)
+	const [activeCommentId, setActiveCommentId] = useState<number>(0)
 	const { authCredential, isAuth } = useContext(AuthContext)
 	const navigate = useNavigate()
 	const param = useParams()
 	const handleCommentHover = (comment: CommentResponse) => {
 		setActiveComment(comment)
+		setActiveCommentId(comment.id)
 	}
 
 	const handleCommentLeave = () => {
@@ -50,17 +52,17 @@ const CommentList: FC<CommentListProps> = ({ data, setData }) => {
 			.catch((e) => message.error('Ошибка удаления комментария ' + e))
 	})
 
-	const [open, setOpen] = useState(false)
+	const [openCommentReport, setOpenCommentReport] = useState(false)
 
-	const showModal = () => {
-		setOpen(true)
+	const showCommentReport = () => {
+		setOpenCommentReport(true)
 	}
 
 	const getMenuItems = (item: CommentResponse) => {
 		const items = [
 			{
 				key: '2',
-				onClick: showModal,
+				onClick: showCommentReport,
 				label: 'Пожаловаться',
 				icon: <FlagFilled color='red' />,
 				danger: true
@@ -81,7 +83,7 @@ const CommentList: FC<CommentListProps> = ({ data, setData }) => {
 	}
 	return (
 		<>
-			<ReportWindow open={open} setOpen={setOpen} />
+			<ReportCommentWindow open={openCommentReport} setOpen={setOpenCommentReport} commentId={activeCommentId} />
 			<List
 				style={{ backgroundColor: 'transparent' }}
 				header={<Typography.Title level={5}> Комментарии </Typography.Title>}

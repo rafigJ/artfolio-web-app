@@ -1,9 +1,9 @@
 import { PlusOutlined } from '@ant-design/icons'
 import type { GetProp, UploadFile, UploadProps } from 'antd'
-import { message, Upload } from 'antd'
+import { Upload, message } from 'antd'
 import React from 'react'
 
-type FileType = Parameters<GetProp<UploadProps, 'beforeUpload'>>[0];
+type FileType = Parameters<GetProp<UploadProps, 'beforeUpload'>>[0]
 
 const beforeUpload = (file: FileType) => {
 	const isPNG = file.type === 'image/png'
@@ -26,25 +26,25 @@ interface RegisterFormAvatarUploadProps {
 }
 
 const RegisterFormAvatarUpload: React.FC<RegisterFormAvatarUploadProps> = ({ avatar, setAvatar }) => {
-	
+
 	const uploadButton = (
 		<button style={{ border: 0, background: 'none' }} type='button'>
 			<PlusOutlined />
 			<div style={{ marginTop: 8 }}>Загрузить</div>
 		</button>
 	)
-	
+
 	const onChange: UploadProps['onChange'] = ({ fileList }) => {
 		setAvatar(fileList)
 	}
-	
+
 	return (
 		<div style={{ margin: '10px 0' }}>
 			<Upload
 				name='avatar'
 				listType='picture-circle'
 				className='avatar-uploader'
-				showUploadList={{ showRemoveIcon: false, showDownloadIcon: false, showPreviewIcon: false }}
+				showUploadList={{ showDownloadIcon: false, showPreviewIcon: false }}
 				beforeUpload={beforeUpload}
 				fileList={avatar}
 				onChange={onChange}
