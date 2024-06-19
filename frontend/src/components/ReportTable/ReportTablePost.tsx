@@ -1,5 +1,6 @@
 import { DownOutlined } from '@ant-design/icons'
 import { Button, Dropdown, MenuProps, Space, Table, TableProps, message } from 'antd'
+import { format } from 'date-fns'
 import { FC, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import ReportService from '../../api/ReportService'
@@ -74,7 +75,11 @@ const ReportTablePost: FC = () => {
 		{
 			title: 'Время оставления жалобы',
 			dataIndex: 'createTime',
-			key: 'createTime'
+			key: 'createTime',
+			render: (createTime) =>
+				<span>
+					{format(new Date(createTime), 'dd.MM.yyyy HH:mm:ss')}
+				</span>
 		},
 		{
 			title: 'Статус',
@@ -117,7 +122,7 @@ const ReportTablePost: FC = () => {
 	}
 
 	const handleReview = async (reportId: number, reportReviewed: boolean) => {
-		ReportService.reviewPostReport(reportId, reportReviewed)
+		ReportService.reviewPostReport(reportId, !reportReviewed)
 			.then(() => {
 				fetchReports()
 				listReviewed ?

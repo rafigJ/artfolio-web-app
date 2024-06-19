@@ -23,12 +23,12 @@ export default class ReportService {
 
 	static async reviewPostReport(reportId: number,
 		reviewed: boolean): Promise<AxiosResponse<ReportResponse>> {
-		return await $api.patch(`/reports/posts/${reportId}`, reviewed)
+		return await $api.patch(`/reports/posts/${reportId}`, { reviewed })
 	}
 
 	static async reviewCommentReport(reportId: number,
 		reviewed: boolean): Promise<AxiosResponse<ReportResponse>> {
-		return await $api.patch(`/reports/comments/${reportId}`, reviewed)
+		return await $api.patch(`/reports/comments/${reportId}`, { reviewed })
 	}
 
 	static async sendCommentReport(commentId: number,
