@@ -13,7 +13,7 @@ import './EditProfileForm.css'
 
 const EditProfileForm = () => {
 	
-	const prevAvatar = useRef<Blob>()
+	const [prevAvatar, setPrevAvatar] = useState<Blob | undefined>()
 	const [avatar, setAvatar] = useState<UploadFile[]>([] as UploadFile[])
 	const [form] = Form.useForm()
 	const navigate = useNavigate()
@@ -38,8 +38,7 @@ const EditProfileForm = () => {
 					thumbUrl: avatarUrl,
 					name: 'avatarSomeNameBig'
 				}
-				console.log(blob)
-				prevAvatar.current = blob
+				setPrevAvatar(blob)
 				setAvatar([uploadFile])
 			}
 		} catch (error) {
@@ -66,7 +65,7 @@ const EditProfileForm = () => {
 		}
 		try {
 			const originFileObj = avatar.pop()?.originFileObj
-			const currentAvatar = originFileObj ? originFileObj : prevAvatar.current
+			const currentAvatar = originFileObj ? originFileObj : prevAvatar
 			const response = await UserService.editUserProfile(editProfileRequest, currentAvatar)
 			setAuthCredential({
 				username: response.data.username,
@@ -206,7 +205,7 @@ const EditProfileForm = () => {
 				</Form.Item>
 				
 				Фото профиля:
-				<RegisterFormAvatarUpload avatar={avatar} setAvatar={setAvatar} />
+				<RegisterFormAvatarUpload avatar={avatar} setAvatar={setAvatar} setBlob={setPrevAvatar} />
 				
 				<Form.Item>
 					<Button
