@@ -1442,21 +1442,14 @@ components:
           type: integer
           example: 100
         owner:
-          type: object
-          properties:
-            fullName:
-              type: string
-              example: Рамси Болтон
-            username:
-              type: string
-              example: boltonArts
+          $ref: '#/components/schemas/UserResponse'
         comment:
           type: string
           example: Теон, у вас невероятно красивое портфолио! Надеюсь, и я когда-нибудь создам подобное)
         createTime:
           type: string
-          example: 2024-03-23 12:00
-          format: yyyy-MM-dd HH:mm
+          example: 2024-03-20T07:21:32.541117
+          format: uuuu-MM-ddTHH:mm:ss.SSSSSS
     CommentsPage:
       type: object
       properties:
@@ -1594,8 +1587,8 @@ components:
           example: false
         createTime:
           type: string
-          example: 2024-03-23 12:00
-          format: yyyy-MM-dd HH:mm
+          example: 2024-03-20T07:21:32.541117
+          format: uuuu-MM-ddTHH:mm:ss.SSSSSS
         targetUser:
           $ref: '#/components/schemas/UserResponse'
         sender:
@@ -1653,8 +1646,8 @@ components:
           example: false
         createTime:
           type: string
-          example: 2024-03-23 12:00
-          format: yyyy-MM-dd HH:mm
+          example: 2024-03-20T07:21:32.541117
+          format: uuuu-MM-ddTHH:mm:ss.SSSSSS
         targetUser:
           $ref: '#/components/schemas/UserResponse'
         sender:
