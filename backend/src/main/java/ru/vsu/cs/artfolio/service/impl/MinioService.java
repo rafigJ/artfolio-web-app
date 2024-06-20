@@ -58,9 +58,8 @@ public class MinioService {
         return uploadToMinio(file.contentType(), imageFile, "avatar");
     }
 
-    public MinioResult uploadFile(MultipartFile file) {
+    public MinioResult uploadFile(MultipartFile file, String name) {
         try (InputStream inputStream = file.getInputStream()) {
-            String name = UUID.randomUUID().toString();
             minioClient.putObject(PutObjectArgs.builder()
                     .bucket(bucketName)
                     .object(name)
@@ -131,7 +130,7 @@ public class MinioService {
                 throw new BadRequestException("File must have a valid image content-type");
             }
 
-            String outputFormat = contentType.substring("image/" .length());
+            String outputFormat = contentType.substring("image/".length());
             Thumbnails.of(originalImage)
                     .size(width, height)
                     .crop(Positions.CENTER)
