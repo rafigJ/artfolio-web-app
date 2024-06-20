@@ -1,6 +1,7 @@
 package ru.vsu.cs.artfolio.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -31,7 +32,9 @@ import ru.vsu.cs.artfolio.service.PostService;
 
 import javax.annotation.Nullable;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @Service
@@ -55,7 +58,8 @@ public class PostServiceImpl implements PostService {
         PostEntity post = PostMapper.toEntity(requestDto, executor, minioService.uploadPreviewFile(file));
 
         PostEntity createdPost = postRepository.save(post);
-        List<MinioResult> mediaFiles = files.stream().map(minioService::uploadFile).toList();
+        List<MinioResult> mediaFiles = uploadFiles(files);
+
         List<MediaFileEntity> medias = mediaRepository.saveAll(MediaMapper.toEntityList(mediaFiles, createdPost));
 
         List<Long> mediaIds = medias.stream().map(MediaFileEntity::getId).toList();
@@ -120,12 +124,30 @@ public class PostServiceImpl implements PostService {
         updatePostDetails(postToUpdate, requestDto, files);
 
         postRepository.save(postToUpdate);
-        List<MinioResult> mediaFiles = files.stream().map(minioService::uploadFile).toList();
+
+        List<MinioResult> mediaFiles = uploadFiles(files);
+
         List<MediaFileEntity> medias = mediaRepository.saveAll(MediaMapper.toEntityList(mediaFiles, postToUpdate));
 
         List<Long> mediaIds = medias.stream().map(MediaFileEntity::getId).toList();
         Boolean hasLike = likeService.hasLike(executor.getUuid(), id);
         return PostMapper.toFullDto(postToUpdate, mediaIds, likeService.getLikeCount(id), hasLike);
+    }
+
+    @NotNull
+    private List<MinioResult> uploadFiles(List<MultipartFile> files) {
+        Map<String, MultipartFile> nameFile = new HashMap<>();
+        Map<String, Integer> namePosition = new HashMap<>();
+        int i = 0;
+        for (MultipartFile multipartFile : files) {
+            String name = UUID.randomUUID().toString();
+            namePosition.put(name, i++);
+            nameFile.put(name, multipartFile);
+        }
+        return nameFile.entrySet().parallelStream()
+                .map(v -> minioService.uploadFile(v.getValue(), v.getKey()))
+                .sorted(Comparator.comparing(a -> namePosition.get(a.name())))
+                .toList();
     }
 
     private void updatePostDetails(PostEntity postToUpdate, PostRequestDto requestDto, List<MultipartFile> files) {
