@@ -130,7 +130,7 @@ public class MinioService {
                 throw new BadRequestException("File must have a valid image content-type");
             }
 
-            String outputFormat = contentType.substring("image/" .length());
+            String outputFormat = contentType.substring("image/".length());
             Thumbnails.of(originalImage)
                     .size(width, height)
                     .crop(Positions.CENTER)

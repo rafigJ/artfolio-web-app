@@ -32,10 +32,10 @@ import ru.vsu.cs.artfolio.service.PostService;
 
 import javax.annotation.Nullable;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 @RequiredArgsConstructor
@@ -136,8 +136,8 @@ public class PostServiceImpl implements PostService {
 
     @NotNull
     private List<MinioResult> uploadFiles(List<MultipartFile> files) {
-        Map<String, MultipartFile> nameFile = new ConcurrentHashMap<>();
-        Map<String, Integer> namePosition = new ConcurrentHashMap<>();
+        Map<String, MultipartFile> nameFile = new HashMap<>();
+        Map<String, Integer> namePosition = new HashMap<>();
         int i = 0;
         for (MultipartFile multipartFile : files) {
             String name = UUID.randomUUID().toString();
