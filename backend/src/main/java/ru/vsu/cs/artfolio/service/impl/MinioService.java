@@ -58,9 +58,8 @@ public class MinioService {
         return uploadToMinio(file.contentType(), imageFile, "avatar");
     }
 
-    public MinioResult uploadFile(MultipartFile file) {
+    public MinioResult uploadFile(MultipartFile file, String name) {
         try (InputStream inputStream = file.getInputStream()) {
-            String name = UUID.randomUUID().toString();
             minioClient.putObject(PutObjectArgs.builder()
                     .bucket(bucketName)
                     .object(name)
